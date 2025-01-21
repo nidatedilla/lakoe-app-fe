@@ -7,6 +7,7 @@ import {
   HiOutlineInbox,
   HiOutlineShoppingCart,
   HiShoppingCart,
+  HiOutlineUserCircle,
 } from 'react-icons/hi2';
 import { LuSettings, LuSettings2 } from 'react-icons/lu';
 import { Link } from 'react-router-dom';
@@ -19,7 +20,7 @@ const Navbar = () => {
   };
 
   return (
-    <Flex flexDirection={'column'} gap={5} py={2}>
+    <Flex flexDirection={'column'} gap={5} py={2} bg={"white"}>
       <Box
         display="flex"
         flexDirection="column"
@@ -40,7 +41,7 @@ const Navbar = () => {
             fontWeight={activeTab === 'dashboard' ? 'bold' : 'normal'}
             color={activeTab === 'dashboard' ? 'blue.500' : 'black'}
           >
-            <Link onClick={() => handleSetActiveTab('dashboard')} to="/">
+            <Link onClick={() => handleSetActiveTab('dashboard')} to="/dashboard">
               Dashboard
             </Link>
           </Text>
@@ -56,7 +57,7 @@ const Navbar = () => {
             fontWeight={activeTab === 'produk' ? 'bold' : 'normal'}
             color={activeTab === 'produk' ? 'blue.500' : 'black'}
           >
-            <Link onClick={() => handleSetActiveTab('produk')} to={'/'}>
+            <Link onClick={() => handleSetActiveTab('produk')} to={'/produk'}>
               Produk
             </Link>
           </Text>
@@ -94,9 +95,28 @@ const Navbar = () => {
           >
             <Link
               onClick={() => handleSetActiveTab('pengaturan')}
-              to={'/'}
+              to={'/pengaturan'}
             >
               Pengaturan
+            </Link>
+          </Text>
+        </Box>
+        <Box display={'flex'} flexDirection={'row'} gap={2}>
+          <Icon
+            fontSize={'2xl'}
+            color={activeTab === 'pengaturan' ? 'blue.500' : 'black'}
+          >
+            {activeTab === 'pengaturan' ? <HiOutlineUserCircle /> : <HiOutlineUserCircle />}
+          </Icon>
+          <Text
+            fontWeight={activeTab === 'pengaturan' ? 'bold' : 'normal'}
+            color={activeTab === 'pengaturan' ? 'blue.500' : 'black'}
+          >
+            <Link
+              onClick={() => handleSetActiveTab('profile')}
+              to={'/profile'}
+            >
+              Profile
             </Link>
           </Text>
         </Box>
