@@ -3,26 +3,12 @@ import {
   createListCollection,
   HStack,
   Input,
-  SelectRoot,
-  SelectValueText,
+
   Tabs,
 } from '@chakra-ui/react';
 import CardPesanan from './card-pesanan';
 import { InputGroup } from './ui/input-group';
-import { LuFileSearch } from 'react-icons/lu';
-import { SelectContent, SelectItem, SelectTrigger } from './ui/select';
-import { pesananDummy } from './pesanan-dummy';
 
-export default function TabsPesanan() {
-  const getPesananCountByStatus = (status: string) =>
-    pesananDummy.filter((pesanan) => pesanan.status === status).length;
-
-  return (
-    <Tabs.Root defaultValue="semua">
-      <Box
-        display="flex"
-        gap={2}
-        overflowX="auto"
         maxWidth="100%"
         css={{
           '&::-webkit-scrollbar': {
@@ -33,7 +19,7 @@ export default function TabsPesanan() {
           msOverflowStyle: 'none',
         }}
       >
-        <Tabs.List whiteSpace="nowrap" border="none">
+
           <Tabs.Trigger
             value="semua"
             _selected={{ color: 'blue.500', borderBottom: '2px solid blue' }}
@@ -47,9 +33,7 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
+
             >
               {pesananDummy.length}
             </Box>
@@ -68,9 +52,7 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
+
             >
               {getPesananCountByStatus('Belum Dibayar')}
             </Box>
@@ -89,9 +71,7 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
+
             >
               {getPesananCountByStatus('Pesanan Baru')}
             </Box>
@@ -110,9 +90,7 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
+
             >
               {getPesananCountByStatus('Siap Dikirim')}
             </Box>
@@ -131,9 +109,7 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
+
             >
               {getPesananCountByStatus('Dalam Pengiriman')}
             </Box>
@@ -152,11 +128,7 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-            >
-              {getPesananCountByStatus('Pesanan Selesai')} SSS
+
             </Box>
             Pesanan Selesai
           </Tabs.Trigger>
@@ -165,7 +137,7 @@ export default function TabsPesanan() {
 
       <HStack gap="2" width="full" pt={2}>
         <InputGroup flex="1" startElement={<LuFileSearch />}>
-          <Input size="sm" placeholder="Cari pesanan" />
+
         </InputGroup>
         <SelectRoot collection={kurir} size="sm" width="200px">
           <SelectTrigger>
@@ -211,6 +183,7 @@ export default function TabsPesanan() {
       <Tabs.Content value="pesanan selesai">
         <CardPesanan statusFilter="Pesanan Selesai" />
       </Tabs.Content>
+
     </Tabs.Root>
   );
 }
