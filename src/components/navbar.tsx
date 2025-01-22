@@ -9,7 +9,7 @@ import {
   HiShoppingCart,
   HiOutlineUserCircle,
 } from 'react-icons/hi2';
-import { LuSettings, LuSettings2 } from 'react-icons/lu';
+import { LuSettings } from 'react-icons/lu';
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
@@ -20,7 +20,7 @@ const Navbar = () => {
   };
 
   return (
-    <Flex flexDirection={'column'} gap={5} py={2} bg={"white"}>
+    <Flex flexDirection={'column'} gap={5} py={2} bg={'white'}>
       <Box
         display="flex"
         flexDirection="column"
@@ -41,7 +41,10 @@ const Navbar = () => {
             fontWeight={activeTab === 'dashboard' ? 'bold' : 'normal'}
             color={activeTab === 'dashboard' ? 'blue.500' : 'black'}
           >
-            <Link onClick={() => handleSetActiveTab('dashboard')} to="/dashboard">
+            <Link
+              onClick={() => handleSetActiveTab('dashboard')}
+              to="/dashboard"
+            >
               Dashboard
             </Link>
           </Text>
@@ -87,16 +90,13 @@ const Navbar = () => {
             fontSize={'2xl'}
             color={activeTab === 'pengaturan' ? 'blue.500' : 'black'}
           >
-            {activeTab === 'pengaturan' ? <LuSettings /> : <LuSettings2 />}
+            {activeTab === 'pengaturan' ? <LuSettings /> : <LuSettings />}
           </Icon>
           <Text
             fontWeight={activeTab === 'pengaturan' ? 'bold' : 'normal'}
             color={activeTab === 'pengaturan' ? 'blue.500' : 'black'}
           >
-            <Link
-              onClick={() => handleSetActiveTab('pengaturan')}
-              to={'/pengaturan'}
-            >
+            <Link onClick={() => handleSetActiveTab('pengaturan')} to={'/'}>
               Pengaturan
             </Link>
           </Text>
@@ -104,18 +104,19 @@ const Navbar = () => {
         <Box display={'flex'} flexDirection={'row'} gap={2}>
           <Icon
             fontSize={'2xl'}
-            color={activeTab === 'pengaturan' ? 'blue.500' : 'black'}
+            color={activeTab === 'profile' ? 'blue.500' : 'black'}
           >
-            {activeTab === 'pengaturan' ? <HiOutlineUserCircle /> : <HiOutlineUserCircle />}
+            {activeTab === 'profile' ? (
+              <HiOutlineUserCircle />
+            ) : (
+              <HiOutlineUserCircle />
+            )}
           </Icon>
           <Text
-            fontWeight={activeTab === 'pengaturan' ? 'bold' : 'normal'}
-            color={activeTab === 'pengaturan' ? 'blue.500' : 'black'}
+            fontWeight={activeTab === 'profile' ? 'bold' : 'normal'}
+            color={activeTab === 'profile' ? 'blue.500' : 'black'}
           >
-            <Link
-              onClick={() => handleSetActiveTab('profile')}
-              to={'/profile'}
-            >
+            <Link onClick={() => handleSetActiveTab('profile')} to={'/profile'}>
               Profile
             </Link>
           </Text>
