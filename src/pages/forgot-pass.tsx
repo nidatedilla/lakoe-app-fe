@@ -1,8 +1,7 @@
 import { Button, Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
-import { FcGoogle } from 'react-icons/fc';
 import { Link } from 'react-router-dom';
 
-export function LoginPage() {
+export function ForgotPassPage() {
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Flex
@@ -24,10 +23,12 @@ export function LoginPage() {
           p={10}
         >
           <Text fontSize="4xl" fontWeight="bold" color="black">
-            Welcome Back to Lakoe!
+            "Forgot Your Password?"
           </Text>
           <Text mt={4} fontSize="lg" color="black">
-            Log in to access your personalized dashboard and stay updated.
+            Don’t worry, it happens! Enter your email below and we’ll send you a
+            link to reset your password and get you back to your personalized
+            dashboard in no time.
           </Text>
           <Box
             mt={6}
@@ -44,10 +45,10 @@ export function LoginPage() {
           <VStack gapY={8} align="stretch" textAlign="center">
             <Box>
               <Text fontSize="3xl" fontWeight="bold">
-                Login
+                Forgot Password?
               </Text>
               <Text mt={2} color="gray.500">
-                Enter your email below to log in to your account.
+                No worries! Enter your email below to reset your password
               </Text>
             </Box>
 
@@ -66,45 +67,14 @@ export function LoginPage() {
                 />
               </Box>
 
-              {/* Password Input */}
-              <Box w="full" textAlign="left">
-                <Flex justify="space-between" align="center" mb={2}>
-                  <Text fontWeight="semibold">Password</Text>
-                  <Link
-                    to="/forgot-password"
-                    className="ml-auto inline-block text-sm underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </Flex>
-                <Input
-                  type="password"
-                  placeholder="Enter your password"
-                  size="lg"
-                  borderColor="blue.500"
-                  required
-                />
-              </Box>
-
               {/* Submit Button */}
               <Button type="submit" size="lg" colorScheme="blue" w="full">
-                Login
+                Submit
               </Button>
-
-              {/* Login with Google */}
               <Button variant="outline" size="lg" w="full">
-                <FcGoogle />
-                Continue with Google
+                <Link to="/login">Back to Login</Link>
               </Button>
             </VStack>
-
-            {/* Sign Up Link */}
-            <Text fontSize="sm">
-              Don&apos;t have an account?{' '}
-              <Link to="/register" className="underline">
-                Sign up
-              </Link>
-            </Text>
           </VStack>
         </Box>
       </Flex>
@@ -112,4 +82,4 @@ export function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default ForgotPassPage;

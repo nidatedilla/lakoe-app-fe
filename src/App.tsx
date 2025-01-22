@@ -3,6 +3,7 @@ import Pesanan from './pages/pesanan';
 import Produk from './pages/produk';
 import Login from './pages/login';
 import Register from './pages/register';
+import ForgotPass from './pages/forgot-pass';
 import { Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
         {/* Route Login (tanpa PrivateLayout) */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPass />} />
 
         {/* Routes dengan PrivateLayout */}
         <Route path="/" element={<PrivateLayout />}>
