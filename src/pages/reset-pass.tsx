@@ -23,12 +23,11 @@ export function ForgotPassPage() {
           p={10}
         >
           <Text fontSize="4xl" fontWeight="bold" color="black">
-            "Forgot Your Password?"
+            "Reset Your Password?"
           </Text>
           <Text mt={4} fontSize="lg" color="black">
-            Don’t worry, it happens! Enter your email below and we’ll send you a
-            link to reset your password and get you back to your personalized
-            dashboard in no time.
+            Reset your password to regain access to your personalized dashboard
+            and stay connected.
           </Text>
           <Box
             mt={6}
@@ -45,22 +44,31 @@ export function ForgotPassPage() {
           <VStack gapY={8} align="stretch" textAlign="center">
             <Box>
               <Text fontSize="3xl" fontWeight="bold">
-                Forgot Password
-              </Text>
-              <Text mt={2} color="gray.500">
-                No worries! Enter your email below to reset your password
+                Reset Password
               </Text>
             </Box>
 
             <VStack as="form" gapY={6}>
-              {/* Email Input */}
               <Box w="full" textAlign="left">
-                <Text mb={2} fontWeight="semibold">
-                  Email
-                </Text>
+                <Flex justify="space-between" align="center" mb={2}>
+                  <Text fontWeight="semibold">New Password</Text>
+                </Flex>
                 <Input
-                  type="email"
-                  placeholder="m@example.com"
+                  type="password"
+                  placeholder="Enter your new password"
+                  size="lg"
+                  borderColor="blue.500"
+                  required
+                />
+              </Box>
+
+              <Box w="full" textAlign="left">
+                <Flex justify="space-between" align="center" mb={2}>
+                  <Text fontWeight="semibold">Konfirmasi Password</Text>
+                </Flex>
+                <Input
+                  type="password"
+                  placeholder="Confirm password"
                   size="lg"
                   borderColor="blue.500"
                   required

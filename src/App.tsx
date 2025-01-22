@@ -4,6 +4,7 @@ import Produk from './pages/produk';
 import Login from './pages/login';
 import Register from './pages/register';
 import ForgotPass from './pages/forgot-pass';
+import ResetPass from './pages/reset-pass';
 import { Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPass />} />
+        <Route path="/reset-password" element={<ResetPass />} />
 
         {/* Routes dengan PrivateLayout */}
         <Route path="/" element={<PrivateLayout />}>

@@ -58,7 +58,7 @@ export function RegisterPage() {
                   Fullname
                 </Text>
                 <Input
-                  type="fullname"
+                  type="text"
                   placeholder="example"
                   size="lg"
                   borderColor="blue.500"
@@ -72,7 +72,7 @@ export function RegisterPage() {
                   Email
                 </Text>
                 <Input
-                  type="username"
+                  type="text"
                   placeholder="@example"
                   size="lg"
                   borderColor="blue.500"
