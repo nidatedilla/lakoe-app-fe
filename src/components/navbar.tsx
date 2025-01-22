@@ -6,6 +6,7 @@ import {
   HiOutlineHome,
   HiOutlineInbox,
   HiOutlineShoppingCart,
+  HiOutlineUserCircle,
   HiShoppingCart,
 } from 'react-icons/hi2';
 import { LuSettings } from 'react-icons/lu';
@@ -94,6 +95,26 @@ const Navbar = () => {
           >
             <Link onClick={() => handleSetActiveTab('pengaturan')} to={'/'}>
               Pengaturan
+            </Link>
+          </Text>
+        </Box>
+        <Box display={'flex'} flexDirection={'row'} gap={2}>
+          <Icon
+            fontSize={'2xl'}
+            color={activeTab === 'profile' ? 'blue.500' : 'black'}
+          >
+            {activeTab === 'profile' ? (
+              <HiOutlineUserCircle />
+            ) : (
+              <HiOutlineUserCircle />
+            )}
+          </Icon>
+          <Text
+            fontWeight={activeTab === 'profile' ? 'bold' : 'normal'}
+            color={activeTab === 'profile' ? 'blue.500' : 'black'}
+          >
+            <Link onClick={() => handleSetActiveTab('profile')} to={'/profile'}>
+              Profile
             </Link>
           </Text>
         </Box>
