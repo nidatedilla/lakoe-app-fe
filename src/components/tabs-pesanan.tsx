@@ -9,21 +9,20 @@ import {
 } from '@chakra-ui/react';
 import CardPesanan from './card-pesanan';
 import { InputGroup } from './ui/input-group';
-import { SelectContent, SelectItem, SelectTrigger } from './ui/select';
 import { LuFileSearch } from 'react-icons/lu';
+import { SelectContent, SelectItem, SelectTrigger } from './ui/select';
 import { pesananDummy } from './pesanan-dummy';
 
 export default function TabsPesanan() {
-  const getPesananCountByStatus = (status: string) => {
-    return pesananDummy.filter((pesanan) => pesanan.status === status).length;
-  };
+  const getPesananCountByStatus = (status: string) =>
+    pesananDummy.filter((pesanan) => pesanan.status === status).length;
 
   return (
-    <Tabs.Root defaultValue={'semua'}>
+    <Tabs.Root defaultValue="semua">
       <Box
-        display={'flex'}
+        display="flex"
         gap={2}
-        overflowX={'auto'}
+        overflowX="auto"
         maxWidth="100%"
         css={{
           '&::-webkit-scrollbar': {
@@ -34,7 +33,7 @@ export default function TabsPesanan() {
           msOverflowStyle: 'none',
         }}
       >
-        <Tabs.List whiteSpace="nowrap" border={'none'}>
+        <Tabs.List whiteSpace="nowrap" border="none">
           <Tabs.Trigger
             value="semua"
             _selected={{ color: 'blue.500', borderBottom: '2px solid blue' }}
@@ -48,10 +47,34 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
             >
               {pesananDummy.length}
             </Box>
             Semua
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value="belum dibayar"
+            _selected={{ color: 'blue.500', borderBottom: '2px solid blue' }}
+            display="flex"
+            alignItems="center"
+          >
+            <Box
+              bg="blue.500"
+              color="white"
+              borderRadius="full"
+              width="20px"
+              height="20px"
+              fontSize="12px"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              {getPesananCountByStatus('Belum Dibayar')}
+            </Box>
+            Belum Dibayar
           </Tabs.Trigger>
           <Tabs.Trigger
             value="pesanan baru"
@@ -66,6 +89,9 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
             >
               {getPesananCountByStatus('Pesanan Baru')}
             </Box>
@@ -84,6 +110,9 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
             >
               {getPesananCountByStatus('Siap Dikirim')}
             </Box>
@@ -102,6 +131,9 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
             >
               {getPesananCountByStatus('Dalam Pengiriman')}
             </Box>
@@ -120,6 +152,9 @@ export default function TabsPesanan() {
               width="20px"
               height="20px"
               fontSize="12px"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
             >
               {getPesananCountByStatus('Pesanan Selesai')}
             </Box>
@@ -130,7 +165,7 @@ export default function TabsPesanan() {
 
       <HStack gap="2" width="full" pt={2}>
         <InputGroup flex="1" startElement={<LuFileSearch />}>
-          <Input size={'sm'} placeholder="Cari pesanan" />
+          <Input size="sm" placeholder="Cari pesanan" />
         </InputGroup>
         <SelectRoot collection={kurir} size="sm" width="200px">
           <SelectTrigger>
@@ -175,9 +210,6 @@ export default function TabsPesanan() {
       </Tabs.Content>
       <Tabs.Content value="pesanan selesai">
         <CardPesanan statusFilter="Pesanan Selesai" />
-      </Tabs.Content>
-      <Tabs.Content value="dibatalkan">
-        <CardPesanan statusFilter="Dibatalkan" />
       </Tabs.Content>
     </Tabs.Root>
   );
