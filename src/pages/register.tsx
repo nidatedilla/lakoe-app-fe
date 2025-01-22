@@ -1,8 +1,7 @@
 import { Button, Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
-import { FcGoogle } from 'react-icons/fc';
 import { Link } from 'react-router-dom';
 
-export function LoginPage() {
+export function RegisterPage() {
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Flex
@@ -24,10 +23,11 @@ export function LoginPage() {
           p={10}
         >
           <Text fontSize="4xl" fontWeight="bold" color="black">
-            Welcome Back to Lakoe!
+            Welcome to Lakoe!
           </Text>
           <Text mt={4} fontSize="lg" color="black">
-            Log in to access your personalized dashboard and stay updated.
+            Create your account to unlock personalized features and stay updated
+            with all things Lakoe. Join the community and get started now!
           </Text>
           <Box
             mt={6}
@@ -44,14 +44,56 @@ export function LoginPage() {
           <VStack gapY={8} align="stretch" textAlign="center">
             <Box>
               <Text fontSize="3xl" fontWeight="bold">
-                Login
+                Register
               </Text>
               <Text mt={2} color="gray.500">
-                Enter your email below to log in to your account.
+                Enter your email below to create your account
               </Text>
             </Box>
 
             <VStack as="form" gapY={6}>
+              {/* Fullname Input */}
+              <Box w="full" textAlign="left">
+                <Text mb={2} fontWeight="semibold">
+                  Fullname
+                </Text>
+                <Input
+                  type="fullname"
+                  placeholder="example"
+                  size="lg"
+                  borderColor="blue.500"
+                  required
+                />
+              </Box>
+
+              {/* username Input */}
+              <Box w="full" textAlign="left">
+                <Text mb={2} fontWeight="semibold">
+                  Email
+                </Text>
+                <Input
+                  type="username"
+                  placeholder="@example"
+                  size="lg"
+                  borderColor="blue.500"
+                  required
+                />
+              </Box>
+
+              {/* phone Input */}
+              <Box w="full" textAlign="left">
+                <Text mb={2} fontWeight="semibold">
+                  Phone
+                </Text>
+                <Input
+                  type="text"
+                  placeholder="0895xxx"
+                  size="lg"
+                  borderColor="blue.500"
+                  required
+                />
+              </Box>
+
               {/* Email Input */}
               <Box w="full" textAlign="left">
                 <Text mb={2} fontWeight="semibold">
@@ -73,9 +115,7 @@ export function LoginPage() {
                   <Link
                     to="/auth/forgot-password"
                     className="ml-auto inline-block text-sm underline"
-                  >
-                    Forgot your password?
-                  </Link>
+                  ></Link>
                 </Flex>
                 <Input
                   type="password"
@@ -88,21 +128,15 @@ export function LoginPage() {
 
               {/* Submit Button */}
               <Button type="submit" size="lg" colorScheme="blue" w="full">
-                Login
-              </Button>
-
-              {/* Login with Google */}
-              <Button variant="outline" size="lg" w="full">
-                <FcGoogle />
-                Continue with Google
+                Create Account
               </Button>
             </VStack>
 
             {/* Sign Up Link */}
             <Text fontSize="sm">
-              Don&apos;t have an account?{' '}
-              <Link to="/register" className="underline">
-                Sign up
+              Have an account?{' '}
+              <Link to="/login" className="underline">
+                Sign in
               </Link>
             </Text>
           </VStack>
@@ -112,4 +146,4 @@ export function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;
