@@ -6,6 +6,7 @@ import {
   HiOutlineHome,
   HiOutlineInbox,
   HiOutlineShoppingCart,
+  HiOutlineUserCircle,
   HiShoppingCart,
   HiOutlineUserCircle,
 } from 'react-icons/hi2';
