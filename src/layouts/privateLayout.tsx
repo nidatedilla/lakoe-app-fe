@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import Navbar from '../components/navbar';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 
 const PrivateLayout = () => {
   return (
@@ -12,7 +12,7 @@ const PrivateLayout = () => {
         overflow="hidden"
         mt={10}
         boxShadow="0 -1px 2px rgba(0, 0, 0, 0.1)"
-        bg={"white"}
+        bg={'white'}
       >
         <Box width="20%" height="100vh" overflow="hidden">
           <Navbar />
@@ -20,7 +20,7 @@ const PrivateLayout = () => {
         <Box
           flex="1"
           overflowX={'auto'}
-          height="100vh"
+          minH="100vh"
           bg={'gray.50'}
           boxShadow="-1px 0 2px rgba(0, 0, 0, 0.1), 1px 0 2px rgba(0, 0, 0, 0.1)"
         >

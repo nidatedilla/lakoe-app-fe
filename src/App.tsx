@@ -1,17 +1,39 @@
+import Fallback from './components/fallback';
+import DetailOrder from './features/order/components/detail-order';
 import PrivateLayout from './layouts/privateLayout';
-import Pesanan from './pages/pesanan';
-import Produk from './pages/produk';
-import { Route, Routes } from 'react-router-dom';
+import Order from './pages/order';
+import Product from './pages/product';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 
 function App() {
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      Component: PrivateLayout,
+      HydrateFallback: Fallback,
+      children: [
+        {
+          path: '/product',
+          Component: Product,
+          HydrateFallback: Fallback,
+        },
+        {
+          path: '/order',
+          Component: Order,
+          HydrateFallback: Fallback,
+        },
+        {
+          path: '/detail-order/:orderId',
+          Component: DetailOrder,
+          HydrateFallback: Fallback,
+        },
+      ],
+    },
+  ]);
+
   return (
     <div>
-      <Routes>
-        <Route path="/" element={<PrivateLayout />}>
-          <Route path="/pesanan" element={<Pesanan />} />
-          <Route path="/produk" element={<Produk />} />
-        </Route>
-      </Routes>
+      <RouterProvider router={router} />
     </div>
   );
 }

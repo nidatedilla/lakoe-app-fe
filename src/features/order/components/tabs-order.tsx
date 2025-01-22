@@ -5,21 +5,39 @@ import {
   Input,
   Tabs,
 } from '@chakra-ui/react';
-import CardPesanan from './card-pesanan';
-import { InputGroup } from './ui/input-group';
+import { InputGroup } from '../../../components/ui/input-group';
 import {
   SelectContent,
   SelectItem,
   SelectRoot,
   SelectTrigger,
   SelectValueText,
-} from './ui/select';
+} from '../../../components/ui/select';
 import { LuFileSearch } from 'react-icons/lu';
-import { pesananDummy } from './pesanan-dummy';
+import { orderDummy } from './order-dummy';
+import CardOrder from './card-order';
+import { useEffect } from 'react';
+import { fetchOrders } from '../services/order-service';
+import { useOrderStore } from '../../../store/order-store';
 
-export default function TabsPesanan() {
-  const getPesananCountByStatus = (status: string) => {
-    return pesananDummy.filter((pesanan) => pesanan.status === status).length;
+export default function TabsOrder() {
+  const { orders, setOrders } = useOrderStore();
+
+  useEffect(() => {
+    const fetchOrderData = async () => {
+      try {
+        const data = await fetchOrders();
+        setOrders(data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+
+    fetchOrderData();
+  }, [setOrders]);
+
+  const getOrderCountByStatus = (status: string) => {
+    return orders.filter((order) => order.status === status).length;
   };
 
   return (
@@ -53,7 +71,7 @@ export default function TabsPesanan() {
               height="20px"
               fontSize="12px"
             >
-              {pesananDummy.length}
+              {orderDummy.length}
             </Box>
             Semua
           </Tabs.Trigger>
@@ -71,7 +89,7 @@ export default function TabsPesanan() {
               height="20px"
               fontSize="12px"
             >
-              {getPesananCountByStatus('Belum Dibayar')}
+              {getOrderCountByStatus('Belum Dibayar')}
             </Box>
             Belum Dibayar
           </Tabs.Trigger>
@@ -89,7 +107,7 @@ export default function TabsPesanan() {
               height="20px"
               fontSize="12px"
             >
-              {getPesananCountByStatus('Pesanan Baru')}
+              {getOrderCountByStatus('Pesanan Baru')}
             </Box>
             Pesanan Baru
           </Tabs.Trigger>
@@ -107,7 +125,7 @@ export default function TabsPesanan() {
               height="20px"
               fontSize="12px"
             >
-              {getPesananCountByStatus('Siap Dikirim')}
+              {getOrderCountByStatus('Siap Dikirim')}
             </Box>
             Siap Dikirim
           </Tabs.Trigger>
@@ -125,7 +143,7 @@ export default function TabsPesanan() {
               height="20px"
               fontSize="12px"
             >
-              {getPesananCountByStatus('Dalam Pengiriman')}
+              {getOrderCountByStatus('Dalam Pengiriman')}
             </Box>
             Dalam Pengiriman
           </Tabs.Trigger>
@@ -143,7 +161,7 @@ export default function TabsPesanan() {
               height="20px"
               fontSize="12px"
             >
-              {getPesananCountByStatus('Pesanan Selesai')}
+              {getOrderCountByStatus('Pesanan Selesai')}
             </Box>
             Pesanan Selesai
           </Tabs.Trigger>
@@ -154,26 +172,26 @@ export default function TabsPesanan() {
         <InputGroup flex="1" startElement={<LuFileSearch />}>
           <Input size={'sm'} placeholder="Cari pesanan" />
         </InputGroup>
-        <SelectRoot collection={kurir} size="sm" width="200px">
+        <SelectRoot collection={courier} size="sm" width="200px">
           <SelectTrigger>
             <SelectValueText placeholder="Kurir" />
           </SelectTrigger>
           <SelectContent>
-            {kurir.items.map((kurir) => (
-              <SelectItem item={kurir} key={kurir.value}>
-                {kurir.label}
+            {courier.items.map((courier) => (
+              <SelectItem item={courier} key={courier.value}>
+                {courier.label}
               </SelectItem>
             ))}
           </SelectContent>
         </SelectRoot>
-        <SelectRoot collection={urutkan} size="sm" width="200px">
+        <SelectRoot collection={sort} size="sm" width="200px">
           <SelectTrigger>
             <SelectValueText placeholder="Urutkan" />
           </SelectTrigger>
           <SelectContent>
-            {urutkan.items.map((urutkan) => (
-              <SelectItem item={urutkan} key={urutkan.value}>
-                {urutkan.label}
+            {sort.items.map((sort) => (
+              <SelectItem item={sort} key={sort.value}>
+                {sort.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -181,38 +199,38 @@ export default function TabsPesanan() {
       </HStack>
 
       <Tabs.Content value="semua">
-        <CardPesanan statusFilter="semua" />
+        <CardOrder statusFilter="semua" orders={orders} />
       </Tabs.Content>
       <Tabs.Content value="belum dibayar">
-        <CardPesanan statusFilter="Belum Dibayar" />
+        <CardOrder statusFilter="Belum Dibayar" orders={orders} />
       </Tabs.Content>
       <Tabs.Content value="pesanan baru">
-        <CardPesanan statusFilter="Pesanan Baru" />
+        <CardOrder statusFilter="Pesanan Baru" orders={orders} />
       </Tabs.Content>
       <Tabs.Content value="siap dikirim">
-        <CardPesanan statusFilter="Siap Dikirim" />
+        <CardOrder statusFilter="Siap Dikirim" orders={orders} />
       </Tabs.Content>
       <Tabs.Content value="dalam pengiriman">
-        <CardPesanan statusFilter="Dalam Pengiriman" />
+        <CardOrder statusFilter="Dalam Pengiriman" orders={orders} />
       </Tabs.Content>
       <Tabs.Content value="pesanan selesai">
-        <CardPesanan statusFilter="Pesanan Selesai" />
+        <CardOrder statusFilter="Pesanan Selesai" orders={orders} />
       </Tabs.Content>
       <Tabs.Content value="dibatalkan">
-        <CardPesanan statusFilter="Dibatalkan" />
+        <CardOrder statusFilter="Dibatalkan" orders={orders} />
       </Tabs.Content>
     </Tabs.Root>
   );
 }
 
-const kurir = createListCollection({
+const courier = createListCollection({
   items: [
     { label: 'JNE Express', value: 'jne' },
     { label: 'J&T Express', value: 'jnt' },
   ],
 });
 
-const urutkan = createListCollection({
+const sort = createListCollection({
   items: [
     { label: 'Harga terendah', value: 'rendah' },
     { label: 'Harga tertinggi', value: 'tinggi' },
