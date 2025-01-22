@@ -12,7 +12,7 @@ const PrivateLayout = () => {
         overflow="hidden"
         mt={10}
         boxShadow="0 -1px 2px rgba(0, 0, 0, 0.1)"
-        bg={"white"}
+        bg={'white'}
       >
         <Box width="20%" height="100vh" overflow="hidden">
           <Navbar />

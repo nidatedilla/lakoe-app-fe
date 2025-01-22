@@ -21,7 +21,7 @@ const Navbar = () => {
   };
 
   return (
-    <Flex flexDirection={'column'} gap={5} py={2} bg={"white"}>
+    <Flex flexDirection={'column'} gap={5} py={2} bg={'white'}>
       <Box
         display="flex"
         flexDirection="column"
@@ -42,7 +42,10 @@ const Navbar = () => {
             fontWeight={activeTab === 'dashboard' ? 'bold' : 'normal'}
             color={activeTab === 'dashboard' ? 'blue.500' : 'black'}
           >
-            <Link onClick={() => handleSetActiveTab('dashboard')} to="/dashboard">
+            <Link
+              onClick={() => handleSetActiveTab('dashboard')}
+              to="/dashboard"
+            >
               Dashboard
             </Link>
           </Text>
