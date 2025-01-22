@@ -128,7 +128,6 @@ import { InputGroup } from './ui/input-group';
               width="20px"
               height="20px"
               fontSize="12px"
-
             </Box>
             Pesanan Selesai
           </Tabs.Trigger>
