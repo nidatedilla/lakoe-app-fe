@@ -156,7 +156,7 @@ export default function TabsPesanan() {
               justifyContent="center"
               alignItems="center"
             >
-              {getPesananCountByStatus('Pesanan Selesai')}
+              {getPesananCountByStatus('Pesanan Selesai')} SSS
             </Box>
             Pesanan Selesai
           </Tabs.Trigger>
