@@ -1,11 +1,10 @@
 import { Box, Text, Button, Flex, Spacer } from '@chakra-ui/react';
-import TabsPesanan from '../components/tabs-produk';
 import { CiCirclePlus } from 'react-icons/ci';
+import TabsProduk from '../components/tabs-produk';
 
 function Produk() {
   return (
     <Box bg={'white'} m={4} p={3} borderRadius={'lg'}>
-      {/* Header dengan teks dan tombol di baris yang sama */}
       <Flex align="center" mb={4}>
         <Text fontWeight={'medium'}>Daftar Produk</Text>
         <Spacer />
@@ -16,8 +15,7 @@ function Produk() {
         </Button>
       </Flex>
 
-      {/* Konten Tabs */}
-      <TabsPesanan />
+      <TabsProduk />
     </Box>
   );
 }
