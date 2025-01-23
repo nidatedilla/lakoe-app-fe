@@ -1,6 +1,6 @@
 import { Button, Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 export function LoginPage() {
   return (

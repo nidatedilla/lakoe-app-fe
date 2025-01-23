@@ -28,15 +28,6 @@ const textColor: Record<Status, string> = {
   Dibatalkan: 'white',
 };
 
-// const buttonText: Record<Status, string> = {
-//   'Belum Dibayar': 'Hubungi Pembeli',
-//   'Aktif': 'Proses Pesanan',
-//   'Non-Aktif': 'Kabari Pembeli',
-//   'Dalam Pengiriman': 'Lihat Rincian Pengiriman',
-//   'Pesanan Selesai': 'Hubungi Pembeli',
-//   Dibatalkan: 'white',
-// };
-
 interface CardProductProps {
   statusFilter: Status | 'semua';
 }
