@@ -113,7 +113,7 @@ export function RegisterPage() {
                 <Flex justify="space-between" align="center" mb={2}>
                   <Text fontWeight="semibold">Password</Text>
                   <Link
-                    to="/auth/forgot-password"
+                    to="/forgot-password"
                     className="ml-auto inline-block text-sm underline"
                   ></Link>
                 </Flex>

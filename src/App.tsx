@@ -1,9 +1,7 @@
 import Fallback from './components/fallback';
 import DetailOrder from './components/detail-order';
 import PrivateLayout from './layouts/privateLayout';
-import Order from './pages/order';
-import { createBrowserRouter, RouterProvider } from 'react-router';
-import Produk from './pages/product';
+
 
 function App() {
   const router = createBrowserRouter([
@@ -33,7 +31,7 @@ function App() {
 
   return (
     <div>
-      <RouterProvider router={router} />
+
     </div>
   );
 }
