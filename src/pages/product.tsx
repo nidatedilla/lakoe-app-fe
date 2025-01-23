@@ -1,6 +1,6 @@
 import { Box, Text, Button, Flex, Spacer } from '@chakra-ui/react';
 import { CiCirclePlus } from 'react-icons/ci';
-import TabsProduk from '../components/tabs-produk';
+import TabsProduk from '../components/tabs-product';
 
 function Produk() {
   return (

@@ -219,13 +219,13 @@ export default function DetailOrder() {
             <HStack>
               <Image
                 boxSize="50px"
-                src={order.produk.gambar}
-                alt={order.produk.nama}
+                src={order.product.gambar}
+                alt={order.product.nama}
               />
               <VStack alignItems="flex-start" gap={0}>
-                <Text fontWeight={'medium'}>{order.produk.nama}</Text>
+                <Text fontWeight={'medium'}>{order.product.nama}</Text>
                 <Text fontSize="12px" color="gray.600">
-                  {order.produk.jumlah} x {order.produk.harga}
+                  {order.product.jumlah} x {order.product.harga}
                 </Text>
               </VStack>
             </HStack>
@@ -234,7 +234,7 @@ export default function DetailOrder() {
                 Total Belanja
               </Text>
               <Text fontWeight={'medium'}>
-                {formatCurrency(order.produk.harga * order.produk.jumlah)}
+                {formatCurrency(order.product.harga * order.product.jumlah)}
               </Text>
             </VStack>
           </HStack>

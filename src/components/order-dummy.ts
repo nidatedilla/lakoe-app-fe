@@ -7,7 +7,7 @@ export const orderDummy: Order[] = [
     kode: 'INV/356364767/FHD/74378',
     pembeli: 'Nida',
     tanggal: '23 Januari 2025-19:43 WIB',
-    produk: {
+    product: {
       nama: 'TAS RANSEL WANITA',
       jumlah: 1,
       harga: 150000,
@@ -35,7 +35,7 @@ export const orderDummy: Order[] = [
     kode: 'INV/356364768/FHD/74379',
     pembeli: 'Tedilla',
     tanggal: '23 Januari 2025-19:43 WIB',
-    produk: {
+    product: {
       nama: 'TAS RANSEL SEKOLAH ANAK WANITA',
       jumlah: 3,
       harga: 300000,
@@ -63,7 +63,7 @@ export const orderDummy: Order[] = [
     kode: 'INV/356364769/FHD/74380',
     pembeli: 'Manuar',
     tanggal: '23 Januari 2025-19:43 WIB',
-    produk: {
+    product: {
       nama: 'TAS SELEMPANG WANITA',
       jumlah: 2,
       harga: 100000,

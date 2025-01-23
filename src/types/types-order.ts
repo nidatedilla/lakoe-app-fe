@@ -5,7 +5,7 @@ export type Order = {
   kode: string;
   pembeli: string;
   tanggal: string;
-  produk: {
+  product: {
     nama: string;
     jumlah: number;
     harga: number;

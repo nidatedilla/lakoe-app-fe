@@ -1,9 +1,9 @@
-export const produkDummy = [
+export const productDummy = [
   {
     id: 1,
     status: 'Aktif',
     kode: 'INV/356364767/FHD/74378',
-    produk: {
+    product: {
       nama: 'TAS RANSEL WANITA',
       jumlah: 1,
       harga: 150000,
@@ -15,7 +15,7 @@ export const produkDummy = [
     id: 2,
     status: 'Non-Aktif',
     kode: 'INV/356364768/FHD/74379',
-    produk: {
+    product: {
       nama: 'TAS RANSEL SEKOLAH ANAK WANITA',
       jumlah: 3,
       harga: 300000,
@@ -27,7 +27,7 @@ export const produkDummy = [
     id: 3,
     status: 'Aktif',
     kode: 'INV/356364769/FHD/74380',
-    produk: {
+    product: {
       nama: 'TAS SELEMPANG WANITA',
       jumlah: 2,
       harga: 100000,
