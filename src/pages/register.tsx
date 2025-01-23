@@ -1,7 +1,9 @@
 import { Button, Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { useRegisterForm } from '../hooks/use-register';
+import { Link } from 'react-router';
 
 export function RegisterPage() {
+  const { onSubmit, register, handleSubmit, errors } = useRegisterForm();
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Flex
@@ -26,8 +28,9 @@ export function RegisterPage() {
             Welcome to Lakoe!
           </Text>
           <Text mt={4} fontSize="lg" color="black">
-            Create your account to unlock personalized features and stay updated
-            with all things Lakoe. Join the community and get started now!
+            Create your account to unlock personalized features and stay
+            updated with all things Lakoe. Join the community and get
+            started now!
           </Text>
           <Box
             mt={6}
@@ -50,87 +53,99 @@ export function RegisterPage() {
                 Enter your email below to create your account
               </Text>
             </Box>
+            
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <VStack gapY={6}>
+                {/* Fullname Input */}
+                <Box w="full" textAlign="left">
+                  <Text mb={2} fontWeight="semibold">
+                    Name
+                  </Text>
+                  <Input
+                    type="text"
+                    placeholder="example"
+                    size="lg"
+                    borderColor="blue.500"
+                    {...register('name')}
+                    required
+                  />
+                  {errors.name && (
+                    <Text color="red.500" fontSize="sm">
+                      {errors.name.message}
+                    </Text>
+                  )}
+                </Box>
 
-            <VStack as="form" gapY={6}>
-              {/* Fullname Input */}
-              <Box w="full" textAlign="left">
-                <Text mb={2} fontWeight="semibold">
-                  Fullname
-                </Text>
-                <Input
-                  type="text"
-                  placeholder="example"
-                  size="lg"
-                  borderColor="blue.500"
-                  required
-                />
-              </Box>
+                {/* Email Input */}
+                <Box w="full" textAlign="left">
+                  <Text mb={2} fontWeight="semibold">
+                    Email
+                  </Text>
+                  <Input
+                    type="text"
+                    placeholder="@example"
+                    size="lg"
+                    borderColor="blue.500"
+                    {...register('email')}
+                    required
+                  />
+                  {errors.email && (
+                    <Text color="red.500" fontSize="sm">
+                      {errors.email.message}
+                    </Text>
+                  )}
+                </Box>
 
-              {/* username Input */}
-              <Box w="full" textAlign="left">
-                <Text mb={2} fontWeight="semibold">
-                  Email
-                </Text>
-                <Input
-                  type="text"
-                  placeholder="@example"
-                  size="lg"
-                  borderColor="blue.500"
-                  required
-                />
-              </Box>
+                {/* Phone Input */}
+                <Box w="full" textAlign="left">
+                  <Text mb={2} fontWeight="semibold">
+                    Phone
+                  </Text>
+                  <Input
+                    type="number"
+                    placeholder="0895xxx"
+                    size="lg"
+                    borderColor="blue.500"
+                    {...register('phone')}
+                    required
+                  />
+                  {errors.phone && (
+                    <Text color="red.500" fontSize="sm">
+                      {errors.phone.message}
+                    </Text>
+                  )}
+                </Box>
 
-              {/* phone Input */}
-              <Box w="full" textAlign="left">
-                <Text mb={2} fontWeight="semibold">
-                  Phone
-                </Text>
-                <Input
-                  type="text"
-                  placeholder="0895xxx"
-                  size="lg"
-                  borderColor="blue.500"
-                  required
-                />
-              </Box>
+                {/* Password Input */}
+                <Box w="full" textAlign="left">
+                  <Flex justify="space-between" align="center" mb={2}>
+                    <Text fontWeight="semibold">Password</Text>
+                    <Link
+                      to="/forgot-password"
+                      className="ml-auto inline-block text-sm underline"
+                    ></Link>
+                  </Flex>
+                  <Input
+                    type="password"
+                    placeholder="Enter your password"
+                    size="lg"
+                    borderColor="blue.500"
+                    {...register('password')}
+                    required
+                  />
+                  {errors.password && (
+                    <Text color="red.500" fontSize="sm">
+                      {errors.password.message}
+                    </Text>
+                  )}
+                </Box>
 
-              {/* Email Input */}
-              <Box w="full" textAlign="left">
-                <Text mb={2} fontWeight="semibold">
-                  Email
-                </Text>
-                <Input
-                  type="email"
-                  placeholder="m@example.com"
-                  size="lg"
-                  borderColor="blue.500"
-                  required
-                />
-              </Box>
-
-              {/* Password Input */}
-              <Box w="full" textAlign="left">
-                <Flex justify="space-between" align="center" mb={2}>
-                  <Text fontWeight="semibold">Password</Text>
-                  <Link
-                    to="/forgot-password"
-                    className="ml-auto inline-block text-sm underline"
-                  ></Link>
-                </Flex>
-                <Input
-                  type="password"
-                  placeholder="Enter your password"
-                  size="lg"
-                  borderColor="blue.500"
-                  required
-                />
-              </Box>
-
-              {/* Submit Button */}
-              <Button type="submit" size="lg" colorScheme="blue" w="full">
-                Create Account
-              </Button>
-            </VStack>
+                {/* Submit Button */}
+                <Button type="submit" size="lg" colorScheme="blue" w="full">
+                  Create Account
+                </Button>
+              </VStack>
+            </form>
 
             {/* Sign Up Link */}
             <Text fontSize="sm">
@@ -144,6 +159,6 @@ export function RegisterPage() {
       </Flex>
     </Flex>
   );
-}
+};
 
 export default RegisterPage;

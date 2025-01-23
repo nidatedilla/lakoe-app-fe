@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { CiCirclePlus } from 'react-icons/ci';
 import TabsProduk from '../components/tabs-product';
 
-function Produk() {
+function Product() {
   return (
     <Box bg={'white'} m={4} p={3} borderRadius={'lg'}>
       <Flex align="center" mb={4}>
@@ -22,4 +22,4 @@ function Produk() {
   );
 }
 
-export default Produk;
+export default Product;

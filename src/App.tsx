@@ -1,17 +1,20 @@
 import Fallback from './components/fallback';
 import DetailOrder from './components/detail-order';
+
 import Order from './pages/order';
-import { createBrowserRouter, RouterProvider } from 'react-router';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import Product from './pages/product';
 import CreateProduct from './pages/create-product';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
-import ForgotpassPage from './pages/forgot-pass';
-import ResetpassPage from './pages/reset-pass';
-import PrivateLayout from './layouts/privateLayout';
 
 function App() {
   const router = createBrowserRouter([
+    {
+      path: '/landing-page',
+      Component: LandingPage,
+      HydrateFallback: Fallback,
+    },
     {
       path: '/login',
       Component: LoginPage,
@@ -38,6 +41,15 @@ function App() {
       HydrateFallback: Fallback,
       children: [
         {
+          path: '/',
+          Component: () => <Navigate to="/dashboard" />,
+        },
+        {
+          path: '/dashboard',
+          Component: Dashboard,
+          HydrateFallback: Fallback,
+        },
+        {
           path: '/product',
           Component: Product,
           HydrateFallback: Fallback,
@@ -63,7 +75,8 @@ function App() {
 
   return (
     <div>
-      <RouterProvider router={router} />
+      <RouterProvider router={router}  />
+      <Toaster />
     </div>
   );
 }
