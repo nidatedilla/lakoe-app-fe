@@ -1,13 +1,13 @@
 import { Box, Text } from '@chakra-ui/react';
-import TabsPesanan from '../components/tabs-pesanan';
+import TabsOrder from '../components/tabs-order';
 
-function Pesanan() {
+function Order() {
   return (
     <Box bg={'white'} m={4} p={3} borderRadius={'lg'}>
       <Text fontWeight={'medium'}>Daftar Pesanan</Text>
-      <TabsPesanan />
+      <TabsOrder />
     </Box>
   );
 }
 
-export default Pesanan;
+export default Order;
