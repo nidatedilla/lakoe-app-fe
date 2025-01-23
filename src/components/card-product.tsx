@@ -1,6 +1,5 @@
 import { Box, HStack, Image, Text, VStack, Button } from '@chakra-ui/react';
-// import { Button } from './ui/button';
-import { produkDummy } from './produk-dummy';
+import { productDummy } from './product-dummy';
 
 type Status =
   | 'Belum Dibayar'
@@ -37,21 +36,21 @@ const textColor: Record<Status, string> = {
 //   Dibatalkan: 'white',
 // };
 
-interface CardProdukProps {
+interface CardProductProps {
   statusFilter: Status | 'semua';
 }
 
-export default function CardProduk({ statusFilter }: CardProdukProps) {
-  const filteredProduk =
+export default function CardProduct({ statusFilter }: CardProductProps) {
+  const filteredProduct =
     statusFilter === 'semua'
-      ? produkDummy
-      : produkDummy.filter((produk) => produk.status === statusFilter);
+      ? productDummy
+      : productDummy.filter((product) => product.status === statusFilter);
 
   return (
     <>
-      {filteredProduk.map((produk) => (
+      {filteredProduct.map((product) => (
         <Box
-          key={produk.id}
+          key={product.id}
           borderWidth={'1px'}
           borderColor={'gray.200'}
           borderRadius={'md'}
@@ -62,14 +61,15 @@ export default function CardProduk({ statusFilter }: CardProdukProps) {
               width={'auto'}
               px={2}
               borderRadius={'md'}
-              bg={statusColors[produk.status as Status] || 'gray.400'}
+              bg={statusColors[product.status as Status] || 'gray.400'}
             >
               <Text
                 textAlign={'center'}
                 fontSize={'14px'}
-                color={textColor[produk.status as Status] || 'black'}
+
+                color={textColor[product.status as Status] || 'black'}
               >
-                {produk.status}
+                {product.status}
               </Text>
             </Box>
             {/* <Button
@@ -89,7 +89,7 @@ export default function CardProduk({ statusFilter }: CardProdukProps) {
               {/* Gambar Produk */}
               <Box width={'45px'} height={'45px'} overflow={'hidden'}>
                 <Image
-                  src={produk.produk.imageUrl}
+                  src={product.product.imageUrl}
                   objectFit={'cover'}
                   width={'100%'}
                   height={'100%'}
@@ -98,15 +98,14 @@ export default function CardProduk({ statusFilter }: CardProdukProps) {
 
               {/* Informasi Produk */}
               <VStack alignItems={'flex-start'} gapY={1}>
-                <Text fontWeight={'medium'}>{produk.produk.nama}</Text>
-
+                <Text fontWeight={'medium'}>{product.product.nama}</Text>
                 {/* Menyelaraskan jumlah barang dan kode secara horizontal */}
                 <HStack gapY={2}>
                   <Text fontSize={'14px'} color={'gray.500'}>
-                    {produk.kode}
+                    {product.kode}
                   </Text>
                   <Text fontSize={'14px'} color={'gray.500'}>
-                    • Stok: {produk.produk.jumlah}
+                    • Stok: {product.product.jumlah}
                   </Text>
                 </HStack>
               </VStack>
@@ -114,7 +113,7 @@ export default function CardProduk({ statusFilter }: CardProdukProps) {
               {/* Harga Produk */}
               <VStack alignItems={'flex-end'} gapY={1} ml={'auto'}>
                 <Text fontWeight={'medium'} fontSize={'14px'}>
-                  Rp{produk.produk.harga.toLocaleString()}
+                  Rp{product.product.harga.toLocaleString()}
                 </Text>
               </VStack>
             </HStack>

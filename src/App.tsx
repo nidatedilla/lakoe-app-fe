@@ -8,6 +8,7 @@ import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
 import Dashboard from './pages/dashboard';
 import LandingPage from './components/landing-page';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const router = createBrowserRouter([
@@ -61,7 +62,8 @@ function App() {
 
   return (
     <div>
-      <RouterProvider router={router} />
+      <RouterProvider router={router}  />
+      <Toaster />
     </div>
   );
 }

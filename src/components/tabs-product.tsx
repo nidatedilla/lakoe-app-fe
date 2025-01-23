@@ -7,15 +7,15 @@ import {
   SelectValueText,
   Tabs,
 } from '@chakra-ui/react';
-import CardProduk from './card-product';
+import CardProduct from './card-product';
 import { InputGroup } from './ui/input-group';
 import { SelectContent, SelectItem, SelectTrigger } from './ui/select';
 import { LuFileSearch } from 'react-icons/lu';
-import { produkDummy } from './produk-dummy';
+import { productDummy } from './product-dummy';
 
-export default function TabsProduk() {
-  const getProdukCountByStatus = (status: string) => {
-    return produkDummy.filter((produk) => produk.status === status).length;
+export default function TabsProduct() {
+  const getProductCountByStatus = (status: string) => {
+    return productDummy.filter((product) => product.status === status).length;
   };
 
   return (
@@ -49,7 +49,7 @@ export default function TabsProduk() {
               height="20px"
               fontSize="12px"
             >
-              {produkDummy.length}
+              {productDummy.length}
             </Box>
             Semua
           </Tabs.Trigger>
@@ -67,7 +67,7 @@ export default function TabsProduk() {
               height="20px"
               fontSize="12px"
             >
-              {getProdukCountByStatus('Aktif')}
+              {getProductCountByStatus('Aktif')}
             </Box>
             Aktif
           </Tabs.Trigger>
@@ -85,7 +85,7 @@ export default function TabsProduk() {
               height="20px"
               fontSize="12px"
             >
-              {getProdukCountByStatus('Non-Aktif')}
+              {getProductCountByStatus('Non-Aktif')}
             </Box>
             Non-Aktif
           </Tabs.Trigger>
@@ -123,25 +123,25 @@ export default function TabsProduk() {
       </HStack>
 
       <Tabs.Content value="semua">
-        <CardProduk statusFilter="semua" />
+        <CardProduct statusFilter="semua" />
       </Tabs.Content>
       <Tabs.Content value="belum dibayar">
-        <CardProduk statusFilter="Belum Dibayar" />
+        <CardProduct statusFilter="Belum Dibayar" />
       </Tabs.Content>
       <Tabs.Content value="Aktif">
-        <CardProduk statusFilter="Aktif" />
+        <CardProduct statusFilter="Aktif" />
       </Tabs.Content>
       <Tabs.Content value="Non-Aktif">
-        <CardProduk statusFilter="Non-Aktif" />
+        <CardProduct statusFilter="Non-Aktif" />
       </Tabs.Content>
       <Tabs.Content value="dalam pengiriman">
-        <CardProduk statusFilter="Dalam Pengiriman" />
+        <CardProduct statusFilter="Dalam Pengiriman" />
       </Tabs.Content>
       <Tabs.Content value="pesanan selesai">
-        <CardProduk statusFilter="Pesanan Selesai" />
+        <CardProduct statusFilter="Pesanan Selesai" />
       </Tabs.Content>
       <Tabs.Content value="dibatalkan">
-        <CardProduk statusFilter="Dibatalkan" />
+        <CardProduct statusFilter="Dibatalkan" />
       </Tabs.Content>
     </Tabs.Root>
   );
