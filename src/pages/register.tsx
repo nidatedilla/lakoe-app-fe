@@ -1,7 +1,7 @@
 import { Button, Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
-export function RegisterPage() {
+export const RegisterPage: React.FC = () => {
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Flex
@@ -58,7 +58,7 @@ export function RegisterPage() {
                   Fullname
                 </Text>
                 <Input
-                  type="fullname"
+                  type="name"
                   placeholder="example"
                   size="lg"
                   borderColor="blue.500"
@@ -66,13 +66,13 @@ export function RegisterPage() {
                 />
               </Box>
 
-              {/* username Input */}
+              {/* email Input */}
               <Box w="full" textAlign="left">
                 <Text mb={2} fontWeight="semibold">
                   Email
                 </Text>
                 <Input
-                  type="username"
+                  type="email"
                   placeholder="@example"
                   size="lg"
                   borderColor="blue.500"
@@ -88,20 +88,6 @@ export function RegisterPage() {
                 <Input
                   type="text"
                   placeholder="0895xxx"
-                  size="lg"
-                  borderColor="blue.500"
-                  required
-                />
-              </Box>
-
-              {/* Email Input */}
-              <Box w="full" textAlign="left">
-                <Text mb={2} fontWeight="semibold">
-                  Email
-                </Text>
-                <Input
-                  type="email"
-                  placeholder="m@example.com"
                   size="lg"
                   borderColor="blue.500"
                   required
@@ -144,6 +130,6 @@ export function RegisterPage() {
       </Flex>
     </Flex>
   );
-}
+};
 
 export default RegisterPage;

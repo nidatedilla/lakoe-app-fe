@@ -13,7 +13,6 @@ export function LoginPage() {
         overflow="hidden"
         flexDirection={{ base: 'column', lg: 'row' }}
       >
-        {/* Left Column - Cover Image */}
         <Box
           display={{ base: 'none', lg: 'flex' }}
           flex="1"
@@ -39,7 +38,6 @@ export function LoginPage() {
           />
         </Box>
 
-        {/* Right Column - Login Form */}
         <Box flex="1" bg="white" p={8} py={16}>
           <VStack gapY={8} align="stretch" textAlign="center">
             <Box>
@@ -52,7 +50,6 @@ export function LoginPage() {
             </Box>
 
             <VStack as="form" gapY={6}>
-              {/* Email Input */}
               <Box w="full" textAlign="left">
                 <Text mb={2} fontWeight="semibold">
                   Email
@@ -66,7 +63,6 @@ export function LoginPage() {
                 />
               </Box>
 
-              {/* Password Input */}
               <Box w="full" textAlign="left">
                 <Flex justify="space-between" align="center" mb={2}>
                   <Text fontWeight="semibold">Password</Text>
@@ -86,19 +82,16 @@ export function LoginPage() {
                 />
               </Box>
 
-              {/* Submit Button */}
               <Button type="submit" size="lg" colorScheme="blue" w="full">
                 Login
               </Button>
 
-              {/* Login with Google */}
               <Button variant="outline" size="lg" w="full">
                 <FcGoogle />
                 Continue with Google
               </Button>
             </VStack>
 
-            {/* Sign Up Link */}
             <Text fontSize="sm">
               Don&apos;t have an account?{' '}
               <Link to="/register" className="underline">

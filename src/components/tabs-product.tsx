@@ -7,7 +7,7 @@ import {
   SelectValueText,
   Tabs,
 } from '@chakra-ui/react';
-import CardProduk from './card-produk';
+import CardProduk from './card-product';
 import { InputGroup } from './ui/input-group';
 import { SelectContent, SelectItem, SelectTrigger } from './ui/select';
 import { LuFileSearch } from 'react-icons/lu';

@@ -92,22 +92,22 @@ export default function CardOrder({ statusFilter, orders }: CardOrderProps) {
                 </Button>
               </HStack>
               <Text fontSize={'14px'} color={'gray.500'} pl={3} pb={2}>
-                {order.kode}
+                {order.code}
               </Text>
               <Box borderTopWidth={'1px'} borderColor={'gray.200'}>
                 <HStack alignItems={'center'} p={3}>
                   <Box width={'45px'} height={'45px'} overflow={'hidden'}>
                     <Image
-                      src={order.produk.gambar}
+                      src={order.product.image}
                       objectFit={'cover'}
                       width={'100%'}
                       height={'100%'}
                     />
                   </Box>
                   <VStack alignItems={'flex-start'} gap={0}>
-                    <Text fontWeight={'medium'}>{order.produk.nama}</Text>
+                    <Text fontWeight={'medium'}>{order.product.name}</Text>
                     <Text fontSize={'12px'} color={'gray.500'}>
-                      {order.produk.jumlah} Barang
+                      {order.product.quantity} Barang
                     </Text>
                   </VStack>
                   <VStack alignItems={'flex-end'} gap={0} ml={'auto'}>
@@ -115,7 +115,7 @@ export default function CardOrder({ statusFilter, orders }: CardOrderProps) {
                       Total Belanja
                     </Text>
                     <Text fontWeight={'medium'} fontSize={'14px'}>
-                      Rp{order.produk.harga.toLocaleString()}
+                      Rp{order.product.price.toLocaleString()}
                     </Text>
                   </VStack>
                 </HStack>

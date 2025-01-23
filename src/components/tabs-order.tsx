@@ -17,7 +17,7 @@ import { LuFileSearch } from 'react-icons/lu';
 import { orderDummy } from './order-dummy';
 import CardOrder from './card-order';
 import { useEffect } from 'react';
-import { fetchOrders } from '../services/order-service';
+import { fetchOrders } from '../services/order-services';
 import { useOrderStore } from '../store/order-store';
 
 export default function TabsOrder() {
