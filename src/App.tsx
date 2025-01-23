@@ -2,8 +2,8 @@ import Fallback from './components/fallback';
 import DetailOrder from './components/detail-order';
 import PrivateLayout from './layouts/privateLayout';
 import Order from './pages/order';
-import Product from './pages/product';
 import { createBrowserRouter, RouterProvider } from 'react-router';
+import Produk from './pages/product';
 
 function App() {
   const router = createBrowserRouter([
@@ -14,7 +14,7 @@ function App() {
       children: [
         {
           path: '/product',
-          Component: Product,
+          Component: Produk,
           HydrateFallback: Fallback,
         },
         {
