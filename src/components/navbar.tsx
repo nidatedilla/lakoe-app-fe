@@ -6,12 +6,11 @@ import {
   HiOutlineHome,
   HiOutlineInbox,
   HiOutlineShoppingCart,
-  HiOutlineUserCircle,
   HiShoppingCart,
   HiOutlineUserCircle,
 } from 'react-icons/hi2';
 import { LuSettings } from 'react-icons/lu';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const Navbar = () => {
   const [activeTab, setActiveTab] = useState<string>('');
@@ -53,15 +52,15 @@ const Navbar = () => {
         <Box display={'flex'} flexDirection={'row'} gap={2}>
           <Icon
             fontSize={'2xl'}
-            color={activeTab === 'produk' ? 'blue.500' : 'black'}
+            color={activeTab === 'product' ? 'blue.500' : 'black'}
           >
-            {activeTab === 'produk' ? <HiInbox /> : <HiOutlineInbox />}
+            {activeTab === 'product' ? <HiInbox /> : <HiOutlineInbox />}
           </Icon>
           <Text
-            fontWeight={activeTab === 'produk' ? 'bold' : 'normal'}
-            color={activeTab === 'produk' ? 'blue.500' : 'black'}
+            fontWeight={activeTab === 'product' ? 'bold' : 'normal'}
+            color={activeTab === 'product' ? 'blue.500' : 'black'}
           >
-            <Link onClick={() => handleSetActiveTab('produk')} to={'/produk'}>
+            <Link onClick={() => handleSetActiveTab('product')} to={'/product'}>
               Produk
             </Link>
           </Text>
@@ -69,19 +68,19 @@ const Navbar = () => {
         <Box display={'flex'} flexDirection={'row'} gap={2}>
           <Icon
             fontSize={'2xl'}
-            color={activeTab === 'pesanan' ? 'blue.500' : 'black'}
+            color={activeTab === 'order' ? 'blue.500' : 'black'}
           >
-            {activeTab === 'pesanan' ? (
+            {activeTab === 'order' ? (
               <HiShoppingCart />
             ) : (
               <HiOutlineShoppingCart />
             )}
           </Icon>
           <Text
-            fontWeight={activeTab === 'pesanan' ? 'bold' : 'normal'}
-            color={activeTab === 'pesanan' ? 'blue.500' : 'black'}
+            fontWeight={activeTab === 'order' ? 'bold' : 'normal'}
+            color={activeTab === 'order' ? 'blue.500' : 'black'}
           >
-            <Link onClick={() => handleSetActiveTab('pesanan')} to={'/pesanan'}>
+            <Link onClick={() => handleSetActiveTab('order')} to={'/order'}>
               Pesanan
             </Link>
           </Text>
@@ -89,15 +88,15 @@ const Navbar = () => {
         <Box display={'flex'} flexDirection={'row'} gap={2}>
           <Icon
             fontSize={'2xl'}
-            color={activeTab === 'pengaturan' ? 'blue.500' : 'black'}
+            color={activeTab === 'setting' ? 'blue.500' : 'black'}
           >
-            {activeTab === 'pengaturan' ? <LuSettings /> : <LuSettings />}
+            {activeTab === 'setting' ? <LuSettings /> : <LuSettings />}
           </Icon>
           <Text
-            fontWeight={activeTab === 'pengaturan' ? 'bold' : 'normal'}
-            color={activeTab === 'pengaturan' ? 'blue.500' : 'black'}
+            fontWeight={activeTab === 'setting' ? 'bold' : 'normal'}
+            color={activeTab === 'setting' ? 'blue.500' : 'black'}
           >
-            <Link onClick={() => handleSetActiveTab('pengaturan')} to={'/'}>
+            <Link onClick={() => handleSetActiveTab('setting')} to={'/'}>
               Pengaturan
             </Link>
           </Text>
