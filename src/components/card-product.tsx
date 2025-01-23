@@ -1,5 +1,4 @@
 import { Box, HStack, Image, Text, VStack, Button } from '@chakra-ui/react';
-// import { Button } from './ui/button';
 import { productDummy } from './product-dummy';
 
 type Status =
@@ -67,6 +66,7 @@ export default function CardProduct({ statusFilter }: CardProductProps) {
               <Text
                 textAlign={'center'}
                 fontSize={'14px'}
+
                 color={textColor[product.status as Status] || 'black'}
               >
                 {product.status}
@@ -99,7 +99,6 @@ export default function CardProduct({ statusFilter }: CardProductProps) {
               {/* Informasi Produk */}
               <VStack alignItems={'flex-start'} gapY={1}>
                 <Text fontWeight={'medium'}>{product.product.nama}</Text>
-
                 {/* Menyelaraskan jumlah barang dan kode secara horizontal */}
                 <HStack gapY={2}>
                   <Text fontSize={'14px'} color={'gray.500'}>

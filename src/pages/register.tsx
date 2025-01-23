@@ -53,7 +53,7 @@ export function RegisterPage() {
                 Enter your email below to create your account
               </Text>
             </Box>
-
+            
             <form onSubmit={handleSubmit(onSubmit)}>
               <VStack gapY={6}>
                 {/* Fullname Input */}
@@ -159,6 +159,6 @@ export function RegisterPage() {
       </Flex>
     </Flex>
   );
-}
+};
 
 export default RegisterPage;

@@ -1,28 +1,27 @@
-// Define the type for the order details
 export type Order = {
   id: number;
   status: string;
-  kode: string;
-  pembeli: string;
-  tanggal: string;
+  code: string;
+  buyer: string;
+  date: string;
   product: {
-    nama: string;
-    jumlah: number;
-    harga: number;
-    gambar: string;
+    name: string;
+    quantity: number;
+    price: number;
+    image: string;
   };
-  pengiriman: {
-    kurir: string;
-    resi: string;
-    alamat: string;
+  shipping: {
+    courier: string;
+    trackingNumber: string;
+    address: string;
   };
-  rincian: {
-    totalBarang: number;
-    totalHarga: number;
-    ongkosKirim: number;
-    berat: number;
-    diskon: number;
-    biayaLayanan: number;
-    totalPenjualan: number;
+  details: {
+    totalItems: number;
+    totalPrice: number;
+    shippingCost: number;
+    weight: number;
+    discount: number;
+    serviceFee: number;
+    totalAmount: number;
   };
 };

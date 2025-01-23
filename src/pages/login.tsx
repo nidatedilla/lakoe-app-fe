@@ -16,7 +16,6 @@ export function LoginPage() {
         overflow="hidden"
         flexDirection={{ base: 'column', lg: 'row' }}
       >
-        {/* Left Column - Cover Image */}
         <Box
           display={{ base: 'none', lg: 'flex' }}
           flex="1"
@@ -42,7 +41,6 @@ export function LoginPage() {
           />
         </Box>
 
-        {/* Right Column - Login Form */}
         <Box flex="1" bg="white" p={8} py={16}>
           <VStack gapY={8} align="stretch" textAlign="center">
             <Box>
@@ -115,7 +113,6 @@ export function LoginPage() {
               </VStack>
             </form>
 
-            {/* Sign Up Link */}
             <Text fontSize="sm">
               Don&apos;t have an account?{' '}
               <Link to="/register" className="underline">
