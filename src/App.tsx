@@ -1,5 +1,5 @@
 import Fallback from './components/fallback';
-import DetailOrder from './features/order/components/detail-order';
+import DetailOrder from './components/detail-order';
 import PrivateLayout from './layouts/privateLayout';
 import Order from './pages/order';
 import Product from './pages/product';

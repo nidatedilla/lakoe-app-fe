@@ -1,8 +1,8 @@
 import { Box, HStack, Image, Text, VStack } from '@chakra-ui/react';
-import { Button } from '../../../components/ui/button';
+import { Button } from './ui/button';
 import { orderDummy } from './order-dummy';
 import { Link } from 'react-router';
-import { Status } from 'features/order/types/types-status';
+import { Status } from 'types/types-status';
 
 interface CardOrderProps {
   statusFilter: Status | 'semua';

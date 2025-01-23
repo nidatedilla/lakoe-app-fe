@@ -6,7 +6,7 @@ import {
   TimelineItem,
   TimelineRoot,
   TimelineTitle,
-} from '../../../components/ui/timeline';
+} from './ui/timeline';
 import { LuCheck, LuPackage, LuShip } from 'react-icons/lu';
 
 export default function HistoryOrder() {

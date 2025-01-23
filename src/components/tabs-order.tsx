@@ -5,20 +5,20 @@ import {
   Input,
   Tabs,
 } from '@chakra-ui/react';
-import { InputGroup } from '../../../components/ui/input-group';
+import { InputGroup } from './ui/input-group';
 import {
   SelectContent,
   SelectItem,
   SelectRoot,
   SelectTrigger,
   SelectValueText,
-} from '../../../components/ui/select';
+} from './ui/select';
 import { LuFileSearch } from 'react-icons/lu';
 import { orderDummy } from './order-dummy';
 import CardOrder from './card-order';
 import { useEffect } from 'react';
 import { fetchOrders } from '../services/order-service';
-import { useOrderStore } from '../../../store/order-store';
+import { useOrderStore } from '../store/order-store';
 
 export default function TabsOrder() {
   const { orders, setOrders } = useOrderStore();

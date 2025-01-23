@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Order } from 'features/order/types/types-order';
+import { Order } from 'types/types-order';
 
 type OrderState = {
   orders: Order[];

@@ -1,5 +1,5 @@
 import { Box, Text } from '@chakra-ui/react';
-import TabsOrder from '../features/order/components/tabs-order';
+import TabsOrder from '../components/tabs-order';
 
 function Order() {
   return (

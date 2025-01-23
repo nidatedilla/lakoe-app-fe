@@ -20,12 +20,12 @@ import {
   BreadcrumbCurrentLink,
   BreadcrumbLink,
   BreadcrumbRoot,
-} from '../../../components/ui/breadcrumb';
+} from './ui/breadcrumb';
 import HistoryOrder from './history-order';
 import { HiChat } from 'react-icons/hi';
 import { useEffect } from 'react';
 import { fetchOrderById } from '../services/order-service';
-import { useOrderStore } from '../../../store/order-store';
+import { useOrderStore } from '../store/order-store';
 import { useParams } from 'react-router';
 import { LuCopy } from 'react-icons/lu';
 
