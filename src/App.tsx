@@ -1,11 +1,12 @@
 import Fallback from './components/fallback';
 import DetailOrder from './components/detail-order';
-import PrivateLayout from './layouts/private-layout';
+
 import Order from './pages/order';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import Product from './pages/product';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
+import PrivateLayout from './layouts/privateLayout';
 
 function App() {
   const router = createBrowserRouter([
