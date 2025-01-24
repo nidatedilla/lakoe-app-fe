@@ -4,6 +4,7 @@ import PrivateLayout from './layouts/private-layout';
 import Order from './pages/order';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import Product from './pages/product';
+import ProductPage from './pages/create-product';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
 import Dashboard from './pages/dashboard';
@@ -47,6 +48,11 @@ function App() {
           HydrateFallback: Fallback,
         },
         {
+          path: '/create-product',
+          Component: ProductPage,
+          HydrateFallback: Fallback,
+        },
+        {
           path: '/order',
           Component: Order,
           HydrateFallback: Fallback,
@@ -62,7 +68,7 @@ function App() {
 
   return (
     <div>
-      <RouterProvider router={router}  />
+      <RouterProvider router={router} />
       <Toaster />
     </div>
   );
