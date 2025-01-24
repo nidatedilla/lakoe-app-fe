@@ -1,4 +1,4 @@
-import { Box, Flex, Icon, Text } from '@chakra-ui/react';
+import { Box, Flex, Icon, Text, Button } from '@chakra-ui/react';
 import { useState } from 'react';
 import {
   HiHome,
@@ -19,8 +19,18 @@ const Navbar = () => {
     setActiveTab(tab);
   };
 
+  const handleLogout = () => {
+    console.log('User logged out');
+  };
+
   return (
-    <Flex flexDirection={'column'} gap={5} py={2} bg={'white'}>
+    <Flex
+      flexDirection={'column'}
+      justifyContent="space-between"
+      minH="100vh"
+      py={2}
+      bg={'white'}
+    >
       <Box
         display="flex"
         flexDirection="column"
@@ -121,6 +131,17 @@ const Navbar = () => {
             </Link>
           </Text>
         </Box>
+      </Box>
+
+      <Box px={10} py={5} mb={5}>
+        <Button
+          onClick={handleLogout}
+          colorScheme="red"
+          variant="solid"
+          w="full"
+        >
+          Logout
+        </Button>
       </Box>
     </Flex>
   );

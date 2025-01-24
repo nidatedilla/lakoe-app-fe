@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 
 export function RegisterPage() {
   const { onSubmit, register, handleSubmit, errors } = useRegisterForm();
+
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Flex
@@ -28,9 +29,8 @@ export function RegisterPage() {
             Welcome to Lakoe!
           </Text>
           <Text mt={4} fontSize="lg" color="black">
-            Create your account to unlock personalized features and stay
-            updated with all things Lakoe. Join the community and get
-            started now!
+            Create your account to unlock personalized features and stay updated
+            with all things Lakoe. Join the community and get started now!
           </Text>
           <Box
             mt={6}
@@ -53,7 +53,7 @@ export function RegisterPage() {
                 Enter your email below to create your account
               </Text>
             </Box>
-            
+
             <form onSubmit={handleSubmit(onSubmit)}>
               <VStack gapY={6}>
                 {/* Fullname Input */}
@@ -159,6 +159,6 @@ export function RegisterPage() {
       </Flex>
     </Flex>
   );
-};
+}
 
 export default RegisterPage;
