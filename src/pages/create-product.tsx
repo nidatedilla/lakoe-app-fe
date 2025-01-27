@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SelectChangeEvent } from '@mui/material';
 import {
   Box,
   Button,
@@ -12,7 +13,12 @@ import {
   FormControl,
 } from '@mui/material';
 
-const categories = [
+interface Category {
+  label: string;
+  children?: Category[];
+}
+
+const categories: Category[] = [
   {
     label: 'Fashion Pria',
     children: [
@@ -58,18 +64,18 @@ function App() {
     Array(5).fill(null)
   ); // Array to hold image previews
 
-  const handleLevel1Change = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLevel1Change = (event: SelectChangeEvent<string>) => {
     setLevel1(event.target.value as string);
     setLevel2(''); // Reset level 2 and 3 when level 1 changes
     setLevel3('');
   };
 
-  const handleLevel2Change = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLevel2Change = (event: SelectChangeEvent<string>) => {
     setLevel2(event.target.value as string);
     setLevel3(''); // Reset level 3 when level 2 changes
   };
 
-  const handleLevel3Change = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLevel3Change = (event: SelectChangeEvent<string>) => {
     setLevel3(event.target.value as string);
   };
 
@@ -181,11 +187,13 @@ function App() {
                     <MenuItem value="" disabled>
                       Pilih Subkategori Terakhir
                     </MenuItem>
-                    {level3Options.map((finalCategory, index) => (
-                      <MenuItem key={index} value={finalCategory.label}>
-                        {finalCategory.label}
-                      </MenuItem>
-                    ))}
+                    {level3Options.map(
+                      (finalCategory: { label: string }, index: number) => (
+                        <MenuItem key={index} value={finalCategory.label}>
+                          {finalCategory.label}
+                        </MenuItem>
+                      )
+                    )}
                   </Select>
                 </FormControl>
               )}

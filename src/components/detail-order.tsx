@@ -128,7 +128,7 @@ export default function DetailOrder() {
   };
 
   return (
-    <Box minH={'100vh'} mb={10}>
+    <Box>
       <BreadcrumbRoot p={4}>
         <BreadcrumbLink href="#" color={'blue.500'}>
           Daftar Pesanan
