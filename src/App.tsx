@@ -8,8 +8,11 @@ import ProductPage from './pages/create-product';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
 import Dashboard from './pages/dashboard';
-import LandingPage from './components/landing-page';
+import SettingStore from './pages/setting-store';
+import LandingPage from './pages/landing-page';
 import { Toaster } from 'react-hot-toast';
+import SettingShipping from './pages/setting-shipping';
+import SettingPaymentMethod from './pages/setting-payment-method';
 
 function App() {
   const router = createBrowserRouter([
@@ -60,6 +63,21 @@ function App() {
         {
           path: '/detail-order/:orderId',
           Component: DetailOrder,
+          HydrateFallback: Fallback,
+        },
+        {
+          path: '/setting-store',
+          Component: SettingStore,
+          HydrateFallback: Fallback,
+        },
+        {
+          path: '/setting-shipping',
+          Component: SettingShipping,
+          HydrateFallback: Fallback,
+        },
+        {
+          path: '/payment-method',
+          Component: SettingPaymentMethod,
           HydrateFallback: Fallback,
         },
       ],

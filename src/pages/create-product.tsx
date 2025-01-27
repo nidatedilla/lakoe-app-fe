@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SelectChangeEvent } from '@mui/material';
 import {
   Box,
   Button,
@@ -21,7 +22,12 @@ import {
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 
-const categories = [
+interface Category {
+  label: string;
+  children?: Category[];
+}
+
+const categories: Category[] = [
   {
     label: 'Fashion Pria',
     children: [
@@ -69,18 +75,18 @@ function App() {
     Array(5).fill(null)
   );
 
-  const handleLevel1Change = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLevel1Change = (event: SelectChangeEvent<string>) => {
     setLevel1(event.target.value as string);
     setLevel2('');
     setLevel3('');
   };
 
-  const handleLevel2Change = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLevel2Change = (event: SelectChangeEvent<string>) => {
     setLevel2(event.target.value as string);
     setLevel3('');
   };
 
-  const handleLevel3Change = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLevel3Change = (event: SelectChangeEvent<string>) => {
     setLevel3(event.target.value as string);
   };
 

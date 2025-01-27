@@ -8,13 +8,21 @@ export default function LandingPage() {
       gradientFrom="whiteAlpha.200"
       gradientTo="blue.200"
       minH="100vh"
-      px={10}
     >
       <Box>
-        <HStack w="full" justify="space-between" align="center" mb={10}>
-          <Text color="blue.400" fontSize={'40px'} fontWeight={'bolder'}>
-            Lakoe
-          </Text>
+        <HStack
+          w="full"
+          justify="space-between"
+          align="center"
+          mb={10}
+          px={5}
+          borderBottomWidth={'1px'}
+          borderColor={'gray.300'}
+          bgGradient="to-r"
+          gradientFrom="blue.100"
+          gradientTo="whiteAlpha.700"
+        >
+          <Image src="src/assets/lakoe-logo.png" width={'150px'} />
           <HStack gap={4}>
             <Button
               bg={'transparent'}
