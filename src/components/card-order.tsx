@@ -1,12 +1,15 @@
-import { Box, HStack, Image, Text, VStack } from '@chakra-ui/react';
+import { Box, HStack, Icon, Image, Text, VStack } from '@chakra-ui/react';
 import { Button } from './ui/button';
 import { orderDummy } from './order-dummy';
 import { Link } from 'react-router';
 import { Status } from 'types/types-status';
+import { TbShoppingCartSearch } from 'react-icons/tb';
+import { MdRemoveShoppingCart } from 'react-icons/md';
 
 interface CardOrderProps {
   statusFilter: Status | 'semua';
   orders: typeof orderDummy;
+  noSearchResults: boolean;
 }
 
 const statusMapping: Record<
@@ -45,14 +48,41 @@ const statusMapping: Record<
   },
 };
 
-export default function CardOrder({ statusFilter, orders }: CardOrderProps) {
+export default function CardOrder({
+  statusFilter,
+  orders,
+  noSearchResults,
+}: CardOrderProps) {
   const filteredOrder =
     statusFilter === 'semua'
       ? orders
       : orders.filter((order) => order.status === statusFilter);
 
+  if (noSearchResults) {
+    return (
+      <HStack justifyContent={'center'} py={10} gap={4}>
+        <Icon color={'gray.500'}>
+          <TbShoppingCartSearch size={'50px'} />
+        </Icon>
+        <VStack alignItems={'start'} gap={0}>
+          <Text>Oops, pesanan yang kamu cari tidak ditemukan</Text>
+          <Text fontSize={'14px'} color={'gray.500'}>
+            Coba bisa cari dengan kata kunci lain
+          </Text>
+        </VStack>
+      </HStack>
+    );
+  }
+
   if (filteredOrder.length === 0) {
-    return <Text>Tidak ada pesanan.</Text>;
+    return (
+      <VStack alignItems={'center'} py={10}>
+        <Icon color={'gray.500'}>
+          <MdRemoveShoppingCart size={'50px'} />
+        </Icon>
+        <Text color={'gray.500'}>Tidak ada pesanan tersedia</Text>
+      </VStack>
+    );
   }
 
   return (

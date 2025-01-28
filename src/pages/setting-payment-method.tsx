@@ -43,6 +43,7 @@ export default function SettingPaymentMethod() {
                 <Checkbox
                   checked={method.isEnabled}
                   onChange={() => handleToggleMethod(index)}
+                  colorPalette={'blue'}
                 />
                 <Text>{method.name}</Text>
               </HStack>

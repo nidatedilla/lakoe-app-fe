@@ -68,6 +68,7 @@ export default function SettingShipping() {
                 <Checkbox
                   checked={method.isSelected}
                   onChange={() => handleMethodChange(index)}
+                  colorPalette={'blue'}
                 />
                 <Text>{method.name}</Text>
               </HStack>

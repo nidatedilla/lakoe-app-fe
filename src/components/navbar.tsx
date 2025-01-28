@@ -18,6 +18,7 @@ import {
   HiShoppingCart,
   HiOutlineUserCircle,
 } from 'react-icons/hi2';
+import { RiLogoutCircleRLine } from 'react-icons/ri';
 import { GoDotFill } from 'react-icons/go';
 import { LuSettings } from 'react-icons/lu';
 import { Link } from 'react-router';
@@ -51,7 +52,7 @@ const Navbar = () => {
   const logout = useLogout();
 
   return (
-    <Flex flexDirection={'column'} minH="100vh" py={2} bg={'white'}>
+    <Flex flexDirection={'column'} minH="100vh" maxH="100vh" py={2}>
       <Box
         display="flex"
         flexDirection="column"
@@ -243,9 +244,18 @@ const Navbar = () => {
       </Box>
 
       {User ? (
-        <Box px={10} py={5} mb={5}>
-          <Button onClick={logout} colorScheme="red" variant="solid" w="full">
+        <Box display={'flex'} justifyContent={'center'} mt={'auto'} mb={20}>
+          <Button
+            onClick={logout}
+            width={'90px'}
+            bg={'transparent'}
+            color={'black'}
+            fontSize={'16px'}
+          >
             Logout
+            <Icon fontSize={'2xl'} color={'black'}>
+              <RiLogoutCircleRLine />
+            </Icon>
           </Button>
         </Box>
       ) : null}

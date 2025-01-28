@@ -15,7 +15,7 @@ export const orderDummy: Order[] = [
         'https://dynamic.zacdn.com/QgEV1TUOsw_EeB1_-sNLHhaDpv0=/filters:quality(70):format(webp)/https://static-id.zacdn.com/p/gykaco-4560-3988114-1.jpg',
     },
     shipping: {
-      courier: 'J&T-Regular',
+      courier: 'J&T',
       trackingNumber: '-',
       address: 'Tangerang',
     },
@@ -43,7 +43,7 @@ export const orderDummy: Order[] = [
         'https://dynamic.zacdn.com/CCB1kSzVzPUvvaMlNgG4o4X3ehM=/filters:quality(70):format(webp)/https://static-id.zacdn.com/p/hamlin-2576-4056183-1.jpg',
     },
     shipping: {
-      courier: 'J&T-Express',
+      courier: 'J&T',
       trackingNumber: '-',
       address: 'Jakarta',
     },
@@ -71,7 +71,7 @@ export const orderDummy: Order[] = [
         'https://silvertote.com/cdn/shop/files/IMG_9026_1024x1024@2x.jpg?v=1684915118',
     },
     shipping: {
-      courier: 'JNE-Regular',
+      courier: 'J&T',
       trackingNumber: '-',
       address: 'Tangerang',
     },
