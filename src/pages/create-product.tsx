@@ -60,6 +60,8 @@ const categories: Category[] = [
     ],
   },
   {
+    Switch,
+    InputAdornment,
     label: 'Elektronik',
     children: [{ label: 'Handphone' }, { label: 'Laptop' }],
   },
@@ -127,13 +129,9 @@ function App() {
     setShowVariantUI(true);
   };
 
-  const handleVariantChange = (
-    index: number,
-    field: keyof (typeof variants)[0],
-    value: string | boolean
-  ) => {
-    const updatedVariants = [...variants] as typeof variants;
-    updatedVariants[index][field] = value as never;
+  const handleVariantChange = (index, field, value) => {
+    const updatedVariants = [...variants];
+    updatedVariants[index][field] = value;
     setVariants(updatedVariants);
   };
 
