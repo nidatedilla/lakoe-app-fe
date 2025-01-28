@@ -20,17 +20,18 @@ import {
 } from './ui/breadcrumb';
 import HistoryOrder from './history-order';
 import { FaWhatsappSquare } from 'react-icons/fa';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchOrderById } from '../services/order-services';
 import { useOrderStore } from '../store/order-store';
 import { Link, useParams } from 'react-router';
 import { LuCalendarRange, LuCopy, LuWallet } from 'react-icons/lu';
 import DialogTrackDelivery from './dialog-track-delivery';
-import { IoIosArrowDown } from 'react-icons/io';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 export default function DetailOrder() {
   const { orders, loading, setOrders, setLoading } = useOrderStore();
   const { orderId } = useParams<{ orderId: string }>();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -130,7 +131,7 @@ export default function DetailOrder() {
   return (
     <Box>
       <BreadcrumbRoot p={4}>
-        <BreadcrumbLink href="#" color={'blue.500'}>
+        <BreadcrumbLink href="/order" color={'blue.500'}>
           Daftar Pesanan
         </BreadcrumbLink>
         <BreadcrumbCurrentLink>{order.code}</BreadcrumbCurrentLink>
@@ -158,12 +159,16 @@ export default function DetailOrder() {
               </Text>
             </Box>
             <Text fontSize={'14px'}>{statusInfo.message}</Text>
-            <Collapsible.Root>
+            <Collapsible.Root
+              onOpenChange={(details) => setIsExpanded(details.open)}
+            >
               <Collapsible.Trigger fontSize={'14px'} color={'blue.500'} pb={2}>
                 <HStack>
-                  <Text>Lihat Riwayat Pesanan</Text>
+                  <Text>
+                    {isExpanded ? 'Sembunyikan' : 'Lihat Riwayat Pesanan'}
+                  </Text>
                   <Icon>
-                    <IoIosArrowDown />
+                    {isExpanded ? <IoIosArrowUp /> : <IoIosArrowDown />}
                   </Icon>
                 </HStack>
               </Collapsible.Trigger>

@@ -1,6 +1,6 @@
 import Fallback from './components/fallback';
 import DetailOrder from './components/detail-order';
-import PrivateLayout from './layouts/private-layout';
+import PrivateRoute from './routes/private-route';
 import Order from './pages/order';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import Product from './pages/product';
@@ -33,7 +33,7 @@ function App() {
     },
     {
       path: '/',
-      Component: PrivateLayout,
+      Component: PrivateRoute,
       HydrateFallback: Fallback,
       children: [
         {

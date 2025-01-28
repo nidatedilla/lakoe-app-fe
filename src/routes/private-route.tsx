@@ -1,17 +1,15 @@
 import PrivateLayout from '../layouts/private-layout';
 import { Navigate } from 'react-router';
+import { useGetMe } from '../hooks/use-find-me';
 
-type UserType = {
-  username: string;
-  email: string;
-};
+const PrivateRoute: React.FC = () => {
+  const { User, isLoading } = useGetMe();
 
-interface PrivateRouteProps {
-  user: UserType | null;
-}
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ user }) => {
-  return user ? <PrivateLayout /> : <Navigate to="/login" />;
+  return User ? <PrivateLayout /> : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;

@@ -4,6 +4,8 @@ import {
   HStack,
   Input,
   Tabs,
+  VStack,
+  Text,
 } from '@chakra-ui/react';
 import { InputGroup } from './ui/input-group';
 import {
@@ -13,15 +15,17 @@ import {
   SelectTrigger,
   SelectValueText,
 } from './ui/select';
-import { LuFileSearch } from 'react-icons/lu';
-import { orderDummy } from './order-dummy';
+import { TbShoppingBagSearch } from 'react-icons/tb';
 import CardOrder from './card-order';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchOrders } from '../services/order-services';
 import { useOrderStore } from '../store/order-store';
+import { Checkbox } from './ui/checkbox';
 
 export default function TabsOrder() {
   const { orders, setOrders } = useOrderStore();
+  const [selectedCouriers, setSelectedCouriers] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -39,6 +43,26 @@ export default function TabsOrder() {
   const getOrderCountByStatus = (status: string) => {
     return orders.filter((order) => order.status === status).length;
   };
+
+  const handleCourierChange = (value: string) => {
+    setSelectedCouriers((prev) =>
+      prev.includes(value)
+        ? prev.filter((courier) => courier !== value)
+        : [...prev, value]
+    );
+  };
+
+  const filteredOrders = orders.filter(
+    (order) =>
+      (selectedCouriers.length > 0
+        ? selectedCouriers.includes(order.shipping.courier)
+        : true) &&
+      (searchQuery
+        ? order.product.name.toLowerCase().includes(searchQuery.toLowerCase())
+        : true)
+  );
+
+  const noSearchResults = !!searchQuery;
 
   return (
     <Tabs.Root defaultValue={'semua'}>
@@ -71,7 +95,7 @@ export default function TabsOrder() {
               height="20px"
               fontSize="12px"
             >
-              {orderDummy.length}
+              {orders.length}
             </Box>
             Semua
           </Tabs.Trigger>
@@ -169,19 +193,37 @@ export default function TabsOrder() {
       </Box>
 
       <HStack gap="2" width="full" pt={2}>
-        <InputGroup flex="1" startElement={<LuFileSearch />}>
-          <Input size={'sm'} placeholder="Cari pesanan" />
+        <InputGroup flex="1" startElement={<TbShoppingBagSearch />}>
+          <Input
+            size={'sm'}
+            placeholder="Cari pesanan"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </InputGroup>
         <SelectRoot collection={courier} size="sm" width="200px">
           <SelectTrigger>
-            <SelectValueText placeholder="Kurir" />
+            <SelectValueText
+              placeholder={
+                selectedCouriers.length > 0
+                  ? `${selectedCouriers.length} Kurir Terpilih`
+                  : 'Kurir'
+              }
+            />
           </SelectTrigger>
           <SelectContent>
-            {courier.items.map((courier) => (
-              <SelectItem item={courier} key={courier.value}>
-                {courier.label}
-              </SelectItem>
-            ))}
+            <VStack align="start">
+              {courier.items.map((courier) => (
+                <HStack key={courier.value}>
+                  <Checkbox
+                    checked={selectedCouriers.includes(courier.label)}
+                    onChange={() => handleCourierChange(courier.label)}
+                    colorPalette={'blue'}
+                  />
+                  <Text>{courier.label}</Text>
+                </HStack>
+              ))}
+            </VStack>
           </SelectContent>
         </SelectRoot>
         <SelectRoot collection={sort} size="sm" width="200px">
@@ -199,25 +241,53 @@ export default function TabsOrder() {
       </HStack>
 
       <Tabs.Content value="semua">
-        <CardOrder statusFilter="semua" orders={orders} />
+        <CardOrder
+          statusFilter="semua"
+          orders={filteredOrders}
+          noSearchResults={noSearchResults}
+        />
       </Tabs.Content>
       <Tabs.Content value="belum dibayar">
-        <CardOrder statusFilter="Belum Dibayar" orders={orders} />
+        <CardOrder
+          statusFilter="Belum Dibayar"
+          orders={filteredOrders}
+          noSearchResults={noSearchResults}
+        />
       </Tabs.Content>
       <Tabs.Content value="pesanan baru">
-        <CardOrder statusFilter="Pesanan Baru" orders={orders} />
+        <CardOrder
+          statusFilter="Pesanan Baru"
+          orders={filteredOrders}
+          noSearchResults={noSearchResults}
+        />
       </Tabs.Content>
       <Tabs.Content value="siap dikirim">
-        <CardOrder statusFilter="Siap Dikirim" orders={orders} />
+        <CardOrder
+          statusFilter="Siap Dikirim"
+          orders={filteredOrders}
+          noSearchResults={noSearchResults}
+        />
       </Tabs.Content>
       <Tabs.Content value="dalam pengiriman">
-        <CardOrder statusFilter="Dalam Pengiriman" orders={orders} />
+        <CardOrder
+          statusFilter="Dalam Pengiriman"
+          orders={filteredOrders}
+          noSearchResults={noSearchResults}
+        />
       </Tabs.Content>
       <Tabs.Content value="pesanan selesai">
-        <CardOrder statusFilter="Pesanan Selesai" orders={orders} />
+        <CardOrder
+          statusFilter="Pesanan Selesai"
+          orders={filteredOrders}
+          noSearchResults={noSearchResults}
+        />
       </Tabs.Content>
       <Tabs.Content value="dibatalkan">
-        <CardOrder statusFilter="Dibatalkan" orders={orders} />
+        <CardOrder
+          statusFilter="Dibatalkan"
+          orders={filteredOrders}
+          noSearchResults={noSearchResults}
+        />
       </Tabs.Content>
     </Tabs.Root>
   );
@@ -225,14 +295,16 @@ export default function TabsOrder() {
 
 const courier = createListCollection({
   items: [
-    { label: 'JNE Express', value: 'jne' },
-    { label: 'J&T Express', value: 'jnt' },
+    { label: 'JNE', value: 'jne' },
+    { label: 'J&T', value: 'jnt' },
   ],
 });
 
 const sort = createListCollection({
   items: [
-    { label: 'Harga terendah', value: 'rendah' },
-    { label: 'Harga tertinggi', value: 'tinggi' },
+    { label: 'Paling Lama', value: 'paling lama' },
+    { label: 'Paling Baru', value: 'paling baru' },
+    { label: 'Respons Tercepat', value: 'respons tercepat' },
+    { label: 'Respons Terlama', value: 'respons terlama' },
   ],
 });
