@@ -62,7 +62,7 @@ export default function TabsOrder() {
         : true)
   );
 
-  const noSearchResults = !!searchQuery;
+  const noSearchResults = !!searchQuery && filteredOrders.length === 0;
 
   return (
     <Tabs.Root defaultValue={'semua'}>
