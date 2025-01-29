@@ -1,6 +1,5 @@
 import Fallback from './components/fallback';
 import DetailOrder from './components/detail-order';
-import PrivateRoute from './routes/private-route';
 import Order from './pages/order';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import Product from './pages/product';
@@ -13,6 +12,8 @@ import LandingPage from './pages/landing-page';
 import { Toaster } from 'react-hot-toast';
 import SettingShipping from './pages/setting-shipping';
 import SettingPaymentMethod from './pages/setting-payment-method';
+import ProfilePage from './pages/profile';
+import PrivateLayout from './layouts/private-layout';
 
 function App() {
   const router = createBrowserRouter([
@@ -33,7 +34,7 @@ function App() {
     },
     {
       path: '/',
-      Component: PrivateRoute,
+      Component: PrivateLayout,
       HydrateFallback: Fallback,
       children: [
         {
@@ -78,6 +79,11 @@ function App() {
         {
           path: '/payment-method',
           Component: SettingPaymentMethod,
+          HydrateFallback: Fallback,
+        },
+        {
+          path: '/profile',
+          Component: ProfilePage,
           HydrateFallback: Fallback,
         },
       ],
