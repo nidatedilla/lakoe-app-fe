@@ -3,10 +3,20 @@ export interface User {
   email: string;
   role: string;
   name: string;
-  phone: number;
+  phone: string;
   profile?: {
     id: String;
     image: String;
     userId: String;
   };
+  stores?: stores;
+}
+
+export interface stores {
+  id?: string;
+  name?: string;
+  description?: string;
+  banner?: string;
+  logo?: string;
+  slogan?: string;
 }
