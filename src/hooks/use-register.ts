@@ -25,11 +25,7 @@ export const useRegisterForm = () => {
     async (data: RegisterForm) => {
       setIsLoading(true);
       try {
-        const formattedData = {
-          ...data,
-          phone: parseInt(data.phone, 10),
-        };
-        await mutateAsync(formattedData as unknown as RegisterForm);
+        await mutateAsync(data);
         toast.success('Registration successful!');
         navigate('/login');
       } catch (error: any) {

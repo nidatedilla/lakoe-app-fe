@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { useFindMe } from '../services/auth-service';
 import { updateStore, updateStoreShema } from '../utils/update-store';
 
-export const useUpdateStore = () => {
+ export const useUpdateStore = () => {
   const { data: User } = useFindMe();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = React.useState(false);
