@@ -1,10 +1,12 @@
-import { Button, Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
+import { Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
 import { useLoginForm } from '../hooks/use-login';
+import { Button } from '../components/ui/button';
 import { Link } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 
 export function LoginPage() {
-  const { onSubmit, register, handleSubmit, errors } = useLoginForm();
+  const { onSubmit, register, handleSubmit, errors, isLoading } =
+    useLoginForm();
 
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
@@ -101,7 +103,14 @@ export function LoginPage() {
                 </Box>
 
                 {/* Submit Button */}
-                <Button type="submit" size="lg" colorScheme="blue" w="full">
+                <Button
+                  loading={isLoading}
+                  disabled={isLoading}
+                  type="submit"
+                  size="lg"
+                  colorScheme="blue"
+                  w="full"
+                >
                   Login
                 </Button>
 

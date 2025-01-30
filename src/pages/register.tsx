@@ -1,9 +1,10 @@
-import { Button, Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
+import { Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
 import { useRegisterForm } from '../hooks/use-register';
 import { Link } from 'react-router';
-
+import { Button } from '../components/ui/button';
 export function RegisterPage() {
-  const { onSubmit, register, handleSubmit, errors } = useRegisterForm();
+  const { onSubmit, register, handleSubmit, errors, isLoading } =
+    useRegisterForm();
 
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
@@ -115,7 +116,6 @@ export function RegisterPage() {
                     </Text>
                   )}
                 </Box>
-
                 {/* Password Input */}
                 <Box w="full" textAlign="left">
                   <Flex justify="space-between" align="center" mb={2}>
@@ -139,9 +139,15 @@ export function RegisterPage() {
                     </Text>
                   )}
                 </Box>
-
                 {/* Submit Button */}
-                <Button type="submit" size="lg" colorScheme="blue" w="full">
+                <Button
+                  loading={isLoading}
+                  disabled={isLoading}
+                  type="submit"
+                  size="lg"
+                  colorScheme="blue"
+                  w="full"
+                >
                   Create Account
                 </Button>
               </VStack>
