@@ -179,7 +179,6 @@ const ProductPage = () => {
         <select
           value={selectedCategory}
           onChange={handleCategoryChange}
-          placeholder="Pilih kategori"
           style={{ marginBottom: '16px', padding: '8px', width: '100%' }}
         >
           <option value="">Pilih kategori</option>
@@ -191,7 +190,6 @@ const ProductPage = () => {
         <select
           value={sortOption}
           onChange={handleSortChange}
-          placeholder="Urutkan berdasarkan"
           style={{ marginBottom: '16px', padding: '8px', width: '100%' }}
         >
           <option value="">Urutkan berdasarkan</option>

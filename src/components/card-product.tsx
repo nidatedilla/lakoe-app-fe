@@ -8,6 +8,9 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { Checkbox } from '../components/ui/checkbox';
+
+import React, { useState } from 'react';
+import { IoIosLink } from 'react-icons/io';
 import {
   DialogActionTrigger,
   DialogBody,
@@ -17,11 +20,9 @@ import {
   DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import React, { useState } from 'react';
-import { IoIosLink } from 'react-icons/io';
-import { Switch } from '@/components/ui/switch';
-import { Field } from '@/components/ui/field';
+} from './ui/dialog';
+import { Switch } from './ui/switch';
+import { Field } from './ui/field';
 
 interface Product {
   id: number;
@@ -79,8 +80,12 @@ export default function CardProduct({ products }: CardProductProps) {
   return (
     <>
       <Checkbox
-        isChecked={selectedProducts.length === products.length}
-        onChange={handleSelectAll}
+        checked={selectedProducts.length === products.length}
+        onChange={(event) =>
+          handleSelectAll(
+            event as unknown as React.ChangeEvent<HTMLInputElement>
+          )
+        }
         mb={4}
       >
         Pilih Semua
@@ -171,6 +176,7 @@ export default function CardProduct({ products }: CardProductProps) {
                 </DialogFooter>
               </DialogContent>
             </DialogRoot>
+
             <DialogRoot>
               <DialogTrigger asChild>
                 <Button size="xs" colorScheme="blue" variant="outline">
