@@ -3,18 +3,12 @@ import { Link } from 'react-router';
 
 export default function LandingPage() {
   return (
-    <Box
-      bgGradient="to-r"
-      gradientFrom="whiteAlpha.200"
-      gradientTo="blue.200"
-      minH="100vh"
-    >
+    <Box bg={'white'} minH="100vh">
       <Box>
         <HStack
           w="full"
           justify="space-between"
           align="center"
-          mb={10}
           px={5}
           borderBottomWidth={'1px'}
           borderColor={'gray.300'}
@@ -45,6 +39,10 @@ export default function LandingPage() {
             </Button>
           </HStack>
         </HStack>
+
+        <Box minW={'full'}>
+          <Image w={'full'} src="src/assets/lakoe-banner.png" />
+        </Box>
 
         <HStack gap={5} align="center" justify="space-between" m={16}>
           <Box
