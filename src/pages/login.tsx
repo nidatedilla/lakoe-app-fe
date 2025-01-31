@@ -1,7 +1,7 @@
 import { Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
 import { useLoginForm } from '../hooks/use-login';
 import { Button } from '../components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { FcGoogle } from 'react-icons/fc';
 
 export function LoginPage() {
