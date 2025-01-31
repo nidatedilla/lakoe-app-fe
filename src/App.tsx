@@ -13,7 +13,11 @@ import { Toaster } from 'react-hot-toast';
 import SettingShipping from './pages/setting-shipping';
 import SettingPaymentMethod from './pages/setting-payment-method';
 import ProfilePage from './pages/profile';
-import PrivateLayout from './layouts/private-layout';
+import ShopPage from './pages/buyer-page/shop-page';
+import ProductDetail from './pages/buyer-page/product-detail';
+import Layout from './pages/buyer-page/layout';
+import PrivateRoute from './routes/private-route';
+import CartPage from './pages/buyer-page/cart-page';
 
 function App() {
   const router = createBrowserRouter([
@@ -34,7 +38,7 @@ function App() {
     },
     {
       path: '/',
-      Component: PrivateLayout,
+      Component: PrivateRoute,
       HydrateFallback: Fallback,
       children: [
         {
@@ -84,6 +88,32 @@ function App() {
         {
           path: '/profile',
           Component: ProfilePage,
+          HydrateFallback: Fallback,
+        },
+      ],
+    },
+    {
+      path: '/lakoe-app',
+      Component: Layout,
+      HydrateFallback: Fallback,
+      children: [
+        {
+          path: '/lakoe-app',
+          Component: () => <Navigate to="/lakoe-app/shop-page" />,
+        },
+        {
+          path: '/lakoe-app/shop-page',
+          Component: ShopPage,
+          HydrateFallback: Fallback,
+        },
+        {
+          path: '/lakoe-app/product-detail/:id',
+          Component: ProductDetail,
+          HydrateFallback: Fallback,
+        },
+        {
+          path: '/lakoe-app/cart-page',
+          Component: CartPage,
           HydrateFallback: Fallback,
         },
       ],
