@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SelectChangeEvent } from '@mui/material';
 import {
   Box,
   Button,
@@ -21,7 +22,12 @@ import {
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 
-const categories = [
+interface Category {
+  label: string;
+  children?: Category[];
+}
+
+const categories: Category[] = [
   {
     label: 'Fashion Pria',
     children: [
@@ -54,8 +60,6 @@ const categories = [
     ],
   },
   {
-    Switch,
-    InputAdornment,
     label: 'Elektronik',
     children: [{ label: 'Handphone' }, { label: 'Laptop' }],
   },
@@ -69,18 +73,18 @@ function App() {
     Array(5).fill(null)
   );
 
-  const handleLevel1Change = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLevel1Change = (event: SelectChangeEvent<string>) => {
     setLevel1(event.target.value as string);
     setLevel2('');
     setLevel3('');
   };
 
-  const handleLevel2Change = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLevel2Change = (event: SelectChangeEvent<string>) => {
     setLevel2(event.target.value as string);
     setLevel3('');
   };
 
-  const handleLevel3Change = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLevel3Change = (event: SelectChangeEvent<string>) => {
     setLevel3(event.target.value as string);
   };
 
@@ -108,64 +112,11 @@ function App() {
     [];
 
   const [showVariantButtons, setShowVariantButtons] = useState(false); // Toggle untuk tombol varian
-  const [showVariantWarnaUI, setShowVariantWarnaUI] = useState(false); // Toggle untuk UI varian
-  const [color_variants] = useState([
-    // Daftar varian warna produk
+  const [showVariantUI, setShowVariantUI] = useState(false); // Toggle untuk UI varian
+  const [variants, setVariants] = useState([
+    // Daftar varian produk
     { color: 'Sage', active: true, price: '', stock: '', sku: '', weight: '' },
     { color: 'Hitam', active: true, price: '', stock: '', sku: '', weight: '' },
-  ]);
-
-  const [showVariantUkuranUI, setShowVariantUkuranUI] = useState(false); // Toggle untuk UI varian
-  const [size_variants] = useState([
-    // Daftar varian ukuran produk
-    {
-      color: 'Sage-S',
-      active: true,
-      price: '',
-      stock: '',
-      sku: '',
-      weight: '',
-    },
-    {
-      color: 'Sage-M',
-      active: true,
-      price: '',
-      stock: '',
-      sku: '',
-      weight: '',
-    },
-    {
-      color: 'Sage-L',
-      active: true,
-      price: '',
-      stock: '',
-      sku: '',
-      weight: '',
-    },
-    {
-      color: 'Hitam-S',
-      active: true,
-      price: '',
-      stock: '',
-      sku: '',
-      weight: '',
-    },
-    {
-      color: 'Hitam-M',
-      active: true,
-      price: '',
-      stock: '',
-      sku: '',
-      weight: '',
-    },
-    {
-      color: 'Hitam-L',
-      active: true,
-      price: '',
-      stock: '',
-      sku: '',
-      weight: '',
-    },
   ]);
 
   const handleTambahVarian = () => {
@@ -173,11 +124,17 @@ function App() {
   };
 
   const handleButtonWarnaClick = () => {
-    setShowVariantWarnaUI(true);
+    setShowVariantUI(true);
   };
 
-  const handleButtonUkuranClick = () => {
-    setShowVariantUkuranUI(true);
+  const handleVariantChange = (
+    index: number,
+    field: keyof (typeof variants)[0],
+    value: string | boolean
+  ) => {
+    const updatedVariants = [...variants];
+    updatedVariants[index][field] = value as never;
+    setVariants(updatedVariants);
   };
 
   const [open, setOpen] = useState(false); // State to control dialog visibility
@@ -401,11 +358,7 @@ function App() {
                   >
                     Warna
                   </Button>
-                  <Button
-                    variant="outlined"
-                    sx={{ borderRadius: '16px' }}
-                    onClick={handleButtonUkuranClick}
-                  >
+                  <Button variant="outlined" sx={{ borderRadius: '16px' }}>
                     Ukuran
                   </Button>
                   <Button variant="outlined" sx={{ borderRadius: '16px' }}>
@@ -421,8 +374,8 @@ function App() {
                 </Box>
               )}
 
-              {/* UI Varian Warna Produk */}
-              {showVariantWarnaUI && (
+              {/* UI Varian Produk */}
+              {showVariantUI && (
                 <Box sx={{ mt: 2 }}>
                   <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
                     <InputLabel>Warna*</InputLabel>
@@ -444,9 +397,9 @@ function App() {
                   </FormControl>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
                     <Switch
-                      checked={color_variants.active}
+                      checked={variants[0].active}
                       onChange={(e) =>
-                        handleVariantChange(index, 'active', e.target.checked)
+                        handleVariantChange(0, 'active', e.target.checked)
                       }
                     />
                     <Typography>Gunakan foto varian</Typography>
@@ -548,10 +501,10 @@ function App() {
                               <TextField
                                 label="Harga"
                                 fullWidth
-                                value={color_variants.price}
+                                value={variants[0].price}
                                 onChange={(e) =>
                                   handleVariantChange(
-                                    index,
+                                    0,
                                     'price',
                                     e.target.value
                                   )
@@ -570,10 +523,10 @@ function App() {
                                 label="Stok Produk"
                                 fullWidth
                                 type="number"
-                                value={color_variants.stock}
+                                value={variants[0].stock}
                                 onChange={(e) =>
                                   handleVariantChange(
-                                    index,
+                                    0,
                                     'stock',
                                     e.target.value
                                   )
@@ -584,13 +537,9 @@ function App() {
                               <TextField
                                 label="SKU"
                                 fullWidth
-                                value={color_variants.sku}
+                                value={variants[0].sku}
                                 onChange={(e) =>
-                                  handleVariantChange(
-                                    index,
-                                    'sku',
-                                    e.target.value
-                                  )
+                                  handleVariantChange(0, 'sku', e.target.value)
                                 }
                               />
                             </Grid>
@@ -599,10 +548,10 @@ function App() {
                                 label="Berat Produk (gram)"
                                 fullWidth
                                 type="number"
-                                value={color_variants.weight}
+                                value={variants[0].weight}
                                 onChange={(e) =>
                                   handleVariantChange(
-                                    index,
+                                    0,
                                     'weight',
                                     e.target.value
                                   )
@@ -632,7 +581,7 @@ function App() {
                     </Typography>
                   </Box>
 
-                  {color_variants.map((variant, index) => (
+                  {variants.map((variant, index) => (
                     <Box
                       key={index}
                       sx={{
@@ -648,342 +597,7 @@ function App() {
                       >
                         <Typography>Aktif</Typography>
                         <Switch
-                          checked={color_variants.active}
-                          onChange={(e) =>
-                            handleVariantChange(
-                              index,
-                              'active',
-                              e.target.checked
-                            )
-                          }
-                        />
-                      </Box>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="Harga"
-                            fullWidth
-                            value={variant.price}
-                            onChange={(e) =>
-                              handleVariantChange(
-                                index,
-                                'price',
-                                e.target.value
-                              )
-                            }
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  Rp
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="Stok Produk"
-                            fullWidth
-                            type="number"
-                            value={variant.stock}
-                            onChange={(e) =>
-                              handleVariantChange(
-                                index,
-                                'stock',
-                                e.target.value
-                              )
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="SKU"
-                            fullWidth
-                            value={variant.sku}
-                            onChange={(e) =>
-                              handleVariantChange(index, 'sku', e.target.value)
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="Berat Produk (gram)"
-                            fullWidth
-                            type="number"
-                            value={variant.weight}
-                            onChange={(e) =>
-                              handleVariantChange(
-                                index,
-                                'weight',
-                                e.target.value
-                              )
-                            }
-                          />
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-
-              {/* UI Varian Ukuran Produk */}
-              {showVariantUkuranUI && (
-                <Box sx={{ mt: 2 }}>
-                  <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
-                    <InputLabel>Warna*</InputLabel>
-                    <Select
-                      value={level1}
-                      onChange={handleLevel1Change}
-                      displayEmpty
-                      required
-                    >
-                      <MenuItem value="xxx" disabled>
-                        Pilih Ukuran
-                      </MenuItem>
-                      {categories.map((category, index) => (
-                        <MenuItem key={index} value={category.label}>
-                          {category.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-                    <Switch
-                      checked={size_variants.active}
-                      onChange={(e) =>
-                        handleVariantChange(index, 'active', e.target.checked)
-                      }
-                    />
-                    <Typography>Gunakan foto varian</Typography>
-                  </Box>
-
-                  <Grid container spacing={1} sx={{ mt: -1.5, mb: 2 }}>
-                    {imagePreviews.slice(0, 2).map((preview, index) => (
-                      <Grid item xs={2.4} key={index}>
-                        <Box
-                          sx={{
-                            width: '100%',
-                            height: '100px',
-                            border: '1px dashed #ddd',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: '8px',
-                            position: 'relative',
-                          }}
-                        >
-                          {preview ? (
-                            <img
-                              src={preview}
-                              alt={`Preview ${index + 1}`}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                borderRadius: '8px',
-                              }}
-                            />
-                          ) : (
-                            <Typography variant="body2">
-                              Foto {index + 1}
-                            </Typography>
-                          )}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageChange(e, index)}
-                            style={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              width: '100%',
-                              height: '100%',
-                              opacity: 0,
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                    ))}
-                  </Grid>
-
-                  <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
-                    <InputLabel>Ukuran*</InputLabel>
-                    <Select
-                      value={level1}
-                      onChange={handleLevel1Change}
-                      displayEmpty
-                      required
-                    >
-                      <MenuItem value="xxx" disabled>
-                        Pilih Ukuran
-                      </MenuItem>
-                      {categories.map((category, index) => (
-                        <MenuItem key={index} value={category.label}>
-                          {category.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 0 }}>
-                      Daftar Varian
-                    </Typography>
-
-                    {/* Tombol Tambah Varian */}
-
-                    <Button
-                      variant="contained"
-                      sx={{ borderRadius: '16px' }}
-                      color="primary"
-                      startIcon={<EditNoteIcon />}
-                      onClick={handleClickOpen}
-                    >
-                      Atur Sekaligus
-                    </Button>
-
-                    {/* Dialog */}
-                    <Dialog
-                      open={open}
-                      onClose={handleClose}
-                      maxWidth="xs"
-                      fullWidth
-                    >
-                      <DialogTitle>Pilih varian yang ingin diatur</DialogTitle>
-                      <DialogContent>
-                        <Box mb={2}>
-                          {/* Varian Chips */}
-                          <Box
-                            display="flex"
-                            flexWrap="wrap"
-                            gap={1}
-                            mb={2}
-                            maxWidth="100%"
-                            justifyContent="flex-start"
-                          >
-                            <Chip label="Pilih Semua Varian" clickable />
-                            <Chip label="Sage-S" clickable />
-                            <Chip label="Sage-M" clickable />
-                            <Chip label="Sage-L" clickable />
-                            <Chip label="Hitam-S" clickable />
-                            <Chip label="Hitam-M" clickable />
-                            <Chip label="Hitam-L" clickable />
-                          </Box>
-
-                          {/* Form Fields */}
-                          <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                label="Harga"
-                                fullWidth
-                                value={size_variants.price}
-                                onChange={(e) =>
-                                  handleVariantChange(
-                                    index,
-                                    'price',
-                                    e.target.value
-                                  )
-                                }
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      Rp
-                                    </InputAdornment>
-                                  ),
-                                }}
-                              />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                label="Stok Produk"
-                                fullWidth
-                                type="number"
-                                value={size_variants.stock}
-                                onChange={(e) =>
-                                  handleVariantChange(
-                                    index,
-                                    'stock',
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                label="SKU"
-                                fullWidth
-                                value={size_variants.sku}
-                                onChange={(e) =>
-                                  handleVariantChange(
-                                    index,
-                                    'sku',
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                label="Berat Produk (gram)"
-                                fullWidth
-                                type="number"
-                                value={size_variants.weight}
-                                onChange={(e) =>
-                                  handleVariantChange(
-                                    index,
-                                    'weight',
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </Grid>
-                          </Grid>
-                        </Box>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleClose} color="secondary">
-                          Batalkan
-                        </Button>
-                        <Button
-                          onClick={handleClose}
-                          color="primary"
-                          variant="contained"
-                        >
-                          Terapkan
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-                  </Box>
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body1">
-                      Kamu dapat mengatur harga stok dan SKU sekaligus
-                    </Typography>
-                  </Box>
-
-                  {size_variants.map((variant, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        p: 2,
-                        border: '1px solid #ddd',
-                        borderRadius: 2,
-                        mb: 2,
-                      }}
-                    >
-                      <Typography variant="h6">{variant.color}</Typography>
-                      <Box
-                        sx={{ display: 'flex', alignItems: 'center', mb: 2 }}
-                      >
-                        <Typography>Aktif</Typography>
-                        <Switch
-                          checked={size_variants.active}
+                          checked={variant.active}
                           onChange={(e) =>
                             handleVariantChange(
                               index,
