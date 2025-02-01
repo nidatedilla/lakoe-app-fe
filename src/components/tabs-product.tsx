@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, HStack, Icon, Input, Tabs, Text, VStack } from '@chakra-ui/react';
 import CardProduct from '../components/card-product';
 import { TbShoppingCartSearch } from 'react-icons/tb';
+import { useGetProduct } from '../hooks/use-get-product';
 
 // Data produk contoh
 const initialProducts = [
@@ -20,7 +21,7 @@ const initialProducts = [
   },
   {
     id: 2,
-    status: 'Non-Aktif',
+    status: '-',
     kode: 'INV/356364768/FHD/74379',
     product: {
       nama: 'TAS RANSEL SEKOLAH ANAK WANITA',
@@ -52,6 +53,12 @@ const ProductPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortOption, setSortOption] = useState('');
 
+  const {
+    product,
+    isLoading,
+    isError,
+    error,
+  } = useGetProduct()
   useEffect(() => {
     // Jika data produk diambil dari API, lakukan panggilan API di sini
     // Misalnya: fetchProducts().then(data => setProducts(data));
@@ -125,7 +132,7 @@ const ProductPage = () => {
               height="20px"
               fontSize="12px"
             >
-              {initialProducts.length}
+              {product?.length}
             </Box>
             Semua
           </Tabs.Trigger>

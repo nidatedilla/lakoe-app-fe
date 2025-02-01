@@ -5,6 +5,8 @@ import { useGetMe } from '../hooks/use-find-me';
 export default function SettingStore() {
 
   const {  User } = useGetMe()
+
+  console.log("user:", User)
   return (
     <Box bg={'white'} m={4} borderRadius={'lg'}>
       <Box bg={'white'} p={5} borderRadius={'lg'}>

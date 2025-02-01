@@ -1,3 +1,5 @@
+import { product } from "./type-product";
+
 export interface User {
   id: string;
   email: string;
@@ -19,4 +21,8 @@ export interface stores {
   banner?: string;
   logo?: string;
   slogan?: string;
+  products? : product[]
+  _count:{
+    products: number
+  }
 }
