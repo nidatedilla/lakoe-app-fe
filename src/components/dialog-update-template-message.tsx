@@ -1,4 +1,5 @@
-import { HStack, Input, Textarea, VStack } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { HStack, Icon, Input, Textarea, VStack } from '@chakra-ui/react';
 import { Button } from './ui/button';
 import {
   DialogActionTrigger,
@@ -12,67 +13,75 @@ import {
   DialogRoot,
 } from './ui/dialog';
 import { Field } from './ui/field';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { FaRegEdit } from 'react-icons/fa';
+import { updateMessageTemplate } from '../services/message-service';
 import { useMessageStore } from '../store/message-store';
-import { createMessageTemplate } from '../services/message-service';
-import axios from 'axios';
 
-export default function DialogCreateTemplateMessage() {
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
+export default function DialogUpdateTemplateMessage({
+  templateId,
+  initialTitle,
+  initialMessage,
+}: {
+  templateId: string;
+  initialTitle: string;
+  initialMessage: string;
+}) {
   const { templates, setTemplates } = useMessageStore();
+  const [title, setTitle] = useState(initialTitle);
+  const [message, setMessage] = useState(initialMessage);
 
   const handleInsertTag = (tag: string) => {
     setMessage((prevMessage) => prevMessage + ` [${tag}]`);
   };
 
-  const handleSaveTemplate = async () => {
-    if (!title || !message) {
-      toast.error('Judul dan isi pesan harus diisi!');
-      return;
-    }
-
+  const handleSave = async () => {
     try {
-      const newTemplate = await createMessageTemplate(title, message);
-      setTemplates([...templates, newTemplate.template]);
-      toast.success('Template pesan berhasil disimpan!');
+      const updatedTemplate = await updateMessageTemplate(
+        templateId,
+        title,
+        message
+      );
+
+      setTemplates(
+        templates.map((template) =>
+          template.id === templateId
+            ? { ...template, name: title, content: message }
+            : template
+        )
+      );
+
+      console.log('Message template updated:', updatedTemplate);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message || 'Gagal menyimpan template pesan'
-        );
-      } else {
-        toast.error('Terjadi kesalahan yang tidak diketahui');
-      }
+      console.error('Failed to update message template:', error);
     }
   };
+
+  useEffect(() => {
+    setTitle(initialTitle);
+    setMessage(initialMessage);
+  }, [initialTitle, initialMessage]);
 
   return (
     <DialogRoot>
       <DialogTrigger asChild>
         <Button
-          bg={'blue.500'}
-          size={'sm'}
-          borderRadius={'full'}
-          height={'30px'}
-          color={'white'}
+          bg="transparent"
+          borderColor="gray.300"
+          rounded="full"
+          size="xs"
+          h="36px"
         >
-          Buat Template
+          <Icon color="black" as={FaRegEdit} />
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Buat Template Pesan Baru</DialogTitle>
+          <DialogTitle>Ubah Template Pesan</DialogTitle>
         </DialogHeader>
         <DialogBody>
           <VStack gap={4}>
             <Field label="Judul Pesan" required>
-              <Input
-                placeholder="Cth. Pesan Konfirmasi Pengiriman"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} />
             </Field>
             <Field label="Detail Isi Pesan" required>
               <HStack>
@@ -103,7 +112,6 @@ export default function DialogCreateTemplateMessage() {
               </HStack>
               <Textarea
                 h={'100px'}
-                placeholder="Tuliskan isi pesan disini"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
@@ -116,11 +124,7 @@ export default function DialogCreateTemplateMessage() {
               Batalkan
             </Button>
           </DialogActionTrigger>
-          <Button
-            bg={'blue.500'}
-            borderRadius={'full'}
-            onClick={handleSaveTemplate}
-          >
+          <Button bg={'blue.500'} borderRadius={'full'} onClick={handleSave}>
             Simpan
           </Button>
         </DialogFooter>
