@@ -1,10 +1,34 @@
-import { Badge, Box, Card, HStack, Icon, Image, Text } from '@chakra-ui/react';
-import { Button } from '../../components/ui/button';
-import { BsCartPlus } from 'react-icons/bs';
+import {
+  Badge,
+  Box,
+  Container,
+  Flex,
+  HStack,
+  Icon,
+  Image,
+  Text,
+  VStack,
+  Heading,
+  SimpleGrid,
+  IconButton,
+  createListCollection,
+  Button,
+} from '@chakra-ui/react';
+import { BsCartPlus, BsHeart, BsShare } from 'react-icons/bs';
 import { TbTruckDelivery } from 'react-icons/tb';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { productDummy } from '../../components/product-dummy';
+import { useColorModeValue } from '../../components/ui/color-mode';
+import {
+  SelectContent,
+  SelectItem,
+  SelectRoot,
+  SelectTrigger,
+  SelectValueText,
+} from '../../components/ui/select';
+import toast from 'react-hot-toast';
+import { StepperInput } from '../../components/ui/stepper-input';
 
 interface Product {
   id: number;
@@ -18,11 +42,36 @@ interface Product {
   };
 }
 
+const cities = createListCollection({
+  items: [
+    { label: 'Jakarta', value: 'jakarta' },
+    { label: 'Bandung', value: 'bandung' },
+    { label: 'Surabaya', value: 'surabaya' },
+  ],
+});
+
+const shippingMethods = createListCollection({
+  items: [
+    { label: 'Regular (2-3 days)', value: 'regular' },
+    { label: 'Express (1 day)', value: 'express' },
+  ],
+});
+
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<string>('varian1');
-  const [quantity, setQuantity] = useState<number>(1);
+  const [selectedCity, setSelectedCity] = useState('jakarta');
+  const [selectedShipping, setSelectedShipping] = useState('regular');
+
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const textColor = useColorModeValue('gray.800', 'white');
+  const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  const accentColor = useColorModeValue('blue.500', 'blue.300');
+  const sectionBg = useColorModeValue('gray.50', 'gray.700');
+  const buttonHoverBg = useColorModeValue('blue.50', 'blue.700');
+  const selectBg = useColorModeValue('white', 'gray.700');
 
   useEffect(() => {
     const foundProduct = productDummy.find(
@@ -37,170 +86,241 @@ export default function ProductDetail() {
     setSelectedVariant(variant);
   };
 
-  const handleQuantityChange = (change: number) => {
-    setQuantity((prevQuantity) => Math.max(1, prevQuantity + change));
+  const handleAddToCart = () => {
+    toast.success('Produk telah ditambahkan ke keranjang', {
+      duration: 3000,
+    });
   };
 
   if (!product) {
-    return <Text>Loading...</Text>;
+    return (
+      <Container maxW="container.xl" h="100vh" centerContent>
+        <VStack gap={4} mt={20}>
+          <Text fontSize="xl" color={textColor}>
+            Loading product details...
+          </Text>
+        </VStack>
+      </Container>
+    );
   }
 
   return (
-    <Box>
-      <Card.Root m={'10'} p={5} flexDirection="row" overflow="hidden">
-        <Image
-          objectFit="cover"
-          w="80%"
-          h="500px"
-          src={product.product.imageUrl}
-        />
-        <Box w={'full'} overflow={'hidden'}>
-          <Card.Body pt={0}>
-            <Card.Title mb="2" fontSize={'24px'}>
+    <Box py={10} px={20} bg={'gray.50'}>
+      <SimpleGrid bg={'white'} columns={{ base: 1, lg: 2 }} p={5} gap={10}>
+        <Box>
+          <Box
+            position="relative"
+            borderRadius="xl"
+            overflow="hidden"
+            bg={bgColor}
+          >
+            <Image
+              objectFit="cover"
+              w="100%"
+              h="600px"
+              src={product.product.imageUrl}
+              alt={product.product.nama}
+            />
+            <HStack position="absolute" top={4} right={4} gap={2}>
+              <IconButton
+                as={BsHeart}
+                aria-label="Add to wishlist"
+                bg={'transparent'}
+                color={textColor}
+                size="xs"
+                _hover={{ transform: 'scale(1.1)' }}
+              />
+              <IconButton
+                aria-label="Share product"
+                as={BsShare}
+                bg={'transparent'}
+                color={textColor}
+                size="xs"
+                _hover={{ transform: 'scale(1.1)' }}
+              />
+            </HStack>
+          </Box>
+        </Box>
+
+        <VStack align="stretch" gap={6}>
+          <VStack align="stretch" gap={4}>
+            <Heading size="xl" color={textColor}>
               {product.product.nama}
-            </Card.Title>
-            <Badge colorPalette={'blue'} p={3} fontSize={'20px'}>
+            </Heading>
+            <Badge
+              colorScheme="blue"
+              fontSize="2xl"
+              p={2}
+              borderRadius="lg"
+              width="fit-content"
+            >
               Rp{product.product.harga.toLocaleString()}
             </Badge>
-            <Box
-              display="grid"
-              gridAutoColumns="max-content"
-              gridTemplateRows="auto auto"
-              columnGap={4}
-              rowGap={2}
-              alignItems="center"
-              fontSize="16px"
-              position="relative"
-              color={'gray.500'}
-              mt={5}
-            >
-              <Text gridRow="1" gridColumn="1">
-                Pengiriman
-              </Text>
-              <Icon
-                gridRow="1"
-                gridColumn="2"
-                color={'black'}
-                size={'md'}
-                as={TbTruckDelivery}
-              />
-              <HStack gridRow="1" gridColumn="3">
-                <Text>Pengiriman Ke</Text>
-              </HStack>
-              <Box gridRow="1" gridColumn="4" as="select" color={'black'}>
-                <option value="jakarta">Jakarta</option>
-                <option value="bandung">Bandung</option>
-                <option value="surabaya">Surabaya</option>
-              </Box>
+          </VStack>
 
-              <Text gridRow="2" gridColumn="3">
-                Ongkos Kirim
-              </Text>
-              <Box gridRow="2" gridColumn="4" as="select" color={'black'}>
-                <option value="regular">Regular</option>
-                <option value="express">Express</option>
-              </Box>
-            </Box>
+          <Box bg={sectionBg} p={6} borderRadius="xl">
+            <VStack align="stretch" gap={4}>
+              <Flex align="center" gap={4}>
+                <Icon as={TbTruckDelivery} boxSize={6} color={accentColor} />
+                <Text fontSize="lg" fontWeight="medium" color={textColor}>
+                  Pengiriman
+                </Text>
+              </Flex>
 
-            <Box
-              display="grid"
-              gridAutoColumns="max-content"
-              gridTemplateRows="auto auto"
-              columnGap={14}
-              alignItems="center"
-              fontSize="16px"
-              position="relative"
-              color={'gray.500'}
-              mt={5}
-            >
-              <Text gridRow="1" gridColumn="1">
-                Variasi
-              </Text>
-              <HStack gridRow="1" gridColumn="2">
-                <Button
-                  variant={
-                    selectedVariant === 'varian1' ? 'outline' : 'outline'
-                  }
-                  borderColor={
-                    selectedVariant === 'varian1' ? 'blue.500' : 'gray.200'
-                  }
-                  onClick={() => handleVariantClick('varian1')}
-                >
-                  Varian 1
-                </Button>
-                <Button
-                  variant={
-                    selectedVariant === 'varian2' ? 'outline' : 'outline'
-                  }
-                  borderColor={
-                    selectedVariant === 'varian2' ? 'blue.500' : 'gray.200'
-                  }
-                  onClick={() => handleVariantClick('varian2')}
-                >
-                  Varian 2
-                </Button>
-                <Button
-                  variant={
-                    selectedVariant === 'varian3' ? 'outline' : 'outline'
-                  }
-                  borderColor={
-                    selectedVariant === 'varian3' ? 'blue.500' : 'gray.200'
-                  }
-                  onClick={() => handleVariantClick('varian3')}
-                >
-                  Varian 3
-                </Button>
-              </HStack>
-            </Box>
+              <SimpleGrid columns={2} gap={4}>
+                <Box>
+                  <Text color={secondaryTextColor} mb={2}>
+                    Pengiriman Ke
+                  </Text>
+                  <SelectRoot
+                    value={[selectedCity]}
+                    onChange={(e) =>
+                      setSelectedCity((e.target as HTMLSelectElement).value)
+                    }
+                    bg={selectBg}
+                    borderColor={borderColor}
+                    color={textColor}
+                    _hover={{ borderColor: accentColor }}
+                    _focus={{ borderColor: accentColor, boxShadow: 'outline' }}
+                    collection={cities}
+                    size="sm"
+                    width="full"
+                  >
+                    <SelectTrigger>
+                      <SelectValueText placeholder="Select movie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cities.items.map((city) => (
+                        <SelectItem item={city} key={city.value}>
+                          {city.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </SelectRoot>
+                </Box>
 
-            <Box
-              display="grid"
-              gridAutoColumns="max-content"
-              gridTemplateRows="auto auto"
-              columnGap={8}
-              alignItems="center"
-              fontSize="16px"
-              position="relative"
-              color={'gray.500'}
-              mt={5}
-            >
-              <Text gridRow="1" gridColumn="1">
-                Kuantitas
-              </Text>
-              <HStack gridRow="1" gridColumn="2">
-                <Button
-                  size={'xs'}
-                  variant={'outline'}
-                  onClick={() => handleQuantityChange(-1)}
+                <Box>
+                  <Text color={secondaryTextColor} mb={2}>
+                    Ongkos Kirim
+                  </Text>
+                  <SelectRoot
+                    value={[selectedShipping]}
+                    onChange={(e) =>
+                      setSelectedShipping((e.target as HTMLSelectElement).value)
+                    }
+                    bg={selectBg}
+                    borderColor={borderColor}
+                    color={textColor}
+                    _hover={{ borderColor: accentColor }}
+                    _focus={{ borderColor: accentColor, boxShadow: 'outline' }}
+                    collection={shippingMethods}
+                    size="sm"
+                    width="full"
+                  >
+                    <SelectTrigger>
+                      <SelectValueText placeholder="Select movie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {shippingMethods.items.map((method) => (
+                        <SelectItem item={method} key={method.value}>
+                          {method.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </SelectRoot>
+                </Box>
+              </SimpleGrid>
+            </VStack>
+          </Box>
+
+          <Box>
+            <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
+              Varian
+            </Text>
+            <HStack gap={4}>
+              {['varian1', 'varian2', 'varian3'].map((variant) => (
+                <Box
+                  key={variant}
+                  px={6}
+                  py={3}
+                  borderWidth={2}
+                  borderRadius="lg"
+                  borderColor={
+                    selectedVariant === variant ? accentColor : borderColor
+                  }
+                  cursor="pointer"
+                  onClick={() => handleVariantClick(variant)}
+                  _hover={{ borderColor: accentColor }}
+                  transition="all 0.2s"
+                  bg={selectedVariant === variant ? buttonHoverBg : bgColor}
                 >
-                  -
-                </Button>
-                <Text>{quantity}</Text>
-                <Button
-                  size={'xs'}
-                  variant={'outline'}
-                  onClick={() => handleQuantityChange(1)}
-                >
-                  +
-                </Button>
-              </HStack>
-            </Box>
-          </Card.Body>
-          <Card.Footer>
+                  <Text
+                    color={
+                      selectedVariant === variant
+                        ? accentColor
+                        : secondaryTextColor
+                    }
+                    fontWeight={
+                      selectedVariant === variant ? 'medium' : 'normal'
+                    }
+                  >
+                    {variant.charAt(0).toUpperCase() + variant.slice(1)}
+                  </Text>
+                </Box>
+              ))}
+            </HStack>
+          </Box>
+
+          <Box>
+            <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
+              Kuantitas
+            </Text>
+            <StepperInput
+              bg={bgColor}
+              color={textColor}
+              defaultValue="1"
+              min={1}
+            />
+          </Box>
+
+          <HStack gap={4}>
             <Button
-              bg={'blue.50'}
-              variant={'outline'}
-              borderColor={'blue.500'}
-              color={'blue.500'}
+              flex={1}
+              px={8}
+              py={6}
+              borderWidth={2}
+              borderColor={accentColor}
+              borderRadius="lg"
+              bg={bgColor}
+              color={accentColor}
+              fontWeight="medium"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              gap={2}
+              transition="all 0.2s"
+              _hover={{ bg: buttonHoverBg }}
+              onClick={handleAddToCart}
             >
-              <Icon as={BsCartPlus} /> Masukkan Keranjang
+              <Icon as={BsCartPlus} />
+              Masukkan Keranjang
             </Button>
-            <Button bg={'blue.500'} color={'white'}>
+            <Button
+              flex={1}
+              px={8}
+              py={6}
+              bg={accentColor}
+              color="white"
+              borderRadius="lg"
+              fontWeight="medium"
+              transition="all 0.2s"
+              _hover={{ bg: 'blue.600' }}
+            >
               Beli
             </Button>
-          </Card.Footer>
-        </Box>
-      </Card.Root>
+          </HStack>
+        </VStack>
+      </SimpleGrid>
     </Box>
   );
 }
