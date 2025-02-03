@@ -2,6 +2,7 @@ import { Box, Image } from '@chakra-ui/react';
 import Navbar from '../components/navbar';
 import { Outlet } from 'react-router';
 import { Avatar } from '../components/ui/avatar';
+import { AiPage } from '../pages/ai';
 
 const PrivateLayout = () => {
   return (
@@ -49,7 +50,9 @@ const PrivateLayout = () => {
           width="30%"
           height="100vh"
           boxShadow="0 -1px 2px rgba(0, 0, 0, 0.1)"
-        ></Box>
+        >
+          <AiPage />
+        </Box>
       </Box>
     </Box>
   );

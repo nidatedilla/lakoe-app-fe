@@ -23,6 +23,7 @@ import {
 } from './ui/dialog';
 import { Switch } from './ui/switch';
 import { Field } from './ui/field';
+import { useGetProduct } from '../hooks/use-get-product';
 
 interface Product {
   id: number;
@@ -42,68 +43,76 @@ interface CardProductProps {
 }
 
 export default function CardProduct({ products }: CardProductProps) {
-  const statusColors: Record<string, string> = {
-    'Belum Dibayar': 'yellow.400',
-    Aktif: 'green.600',
-    'Non-Aktif': 'gray.300',
-    'Dalam Pengiriman': 'orange.400',
-    'Pesanan Selesai': 'blue.500',
-    Dibatalkan: 'red.500',
-  };
 
-  const textColor: Record<string, string> = {
-    'Belum Dibayar': 'black',
-    Aktif: 'white',
-    'Non-Aktif': 'white',
-    'Dalam Pengiriman': 'white',
-    'Pesanan Selesai': 'black',
-    Dibatalkan: 'white',
-  };
+  const  {
+    product,
+    isLoading,
+    isError,
+    error,
+  }
+  = useGetProduct()
+  // const statusColors: Record<string, string> = {
+  //   'Belum Dibayar': 'yellow.400',
+  //   Aktif: 'green.600',
+  //   'Non-Aktif': 'gray.300',
+  //   'Dalam Pengiriman': 'orange.400',
+  //   'Pesanan Selesai': 'blue.500',
+  //   Dibatalkan: 'red.500',
+  // };
 
-  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
-  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setSelectedProducts(products.map((product) => product.id));
-    } else {
-      setSelectedProducts([]);
-    }
-  };
+  // const textColor: Record<string, string> = {
+  //   'Belum Dibayar': 'black',
+  //   Aktif: 'white',
+  //   'Non-Aktif': 'white',
+  //   'Dalam Pengiriman': 'white',
+  //   'Pesanan Selesai': 'black',
+  //   Dibatalkan: 'white',
+  // };
 
-  const handleProductSelect = (productId: number) => {
-    if (selectedProducts.includes(productId)) {
-      setSelectedProducts(selectedProducts.filter((id) => id !== productId));
-    } else {
-      setSelectedProducts([...selectedProducts, productId]);
-    }
-  };
+  // const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
+  // const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.checked) {
+  //     setSelectedProducts(products.map((product) => product.id));
+  //   } else {
+  //     setSelectedProducts([]);
+  //   }
+  // };
+
+  // const handleProductSelect = (productId: number) => {
+  //   if (selectedProducts.includes(productId)) {
+  //     setSelectedProducts(selectedProducts.filter((id) => id !== productId));
+  //   } else {
+  //     setSelectedProducts([...selectedProducts, productId]);
+  //   }
+  // };
 
   return (
     <>
       <Checkbox
-        checked={selectedProducts.length === products.length}
-        onChange={(event) =>
-          handleSelectAll(
-            event as unknown as React.ChangeEvent<HTMLInputElement>
-          )
-        }
-        mb={4}
+        // checked={selectedProducts.length === products.length}
+        // onChange={(event) =>
+        //   handleSelectAll(
+        //     event as unknown as React.ChangeEvent<HTMLInputElement>
+        //   )
+        // }
+        // mb={4}
       >
         Pilih Semua
       </Checkbox>
-      {products.map((product) => (
+      {product?.map((products) => (
         <Box
-          key={product.id}
+          key={products.id}
           borderWidth={'1px'}
           borderColor={'gray.200'}
           borderRadius={'md'}
           mb={4}
         >
           <Checkbox
-            checked={selectedProducts.includes(product.id)}
-            onChange={() => handleProductSelect(product.id)}
+            // checked={selectedProducts.includes(product.id)}
+            // onChange={() => handleProductSelect(product.id)}
             mb={2}
           ></Checkbox>
-          <HStack justifyContent={'space-between'} px={3} pt={2}>
+          {/* <HStack justifyContent={'space-between'} px={3} pt={2}>
             <Box
               width={'auto'}
               px={2}
@@ -118,13 +127,13 @@ export default function CardProduct({ products }: CardProductProps) {
                 {product.status}
               </Text>
             </Box>
-          </HStack>
+          </HStack> */}
           <Box borderTopWidth={'1px'} borderColor={'gray.200'}>
             <HStack alignItems={'center'} p={3}>
               {/* Gambar Produk */}
               <Box width={'45px'} height={'45px'} overflow={'hidden'}>
                 <Image
-                  src={product.product.imageUrl}
+                  src={products.attachments}
                   objectFit={'cover'}
                   width={'100%'}
                   height={'100%'}
@@ -133,14 +142,14 @@ export default function CardProduct({ products }: CardProductProps) {
 
               {/* Informasi Produk */}
               <VStack alignItems={'flex-start'} gapY={1}>
-                <Text fontWeight={'medium'}>{product.product.nama}</Text>
+                <Text fontWeight={'medium'}>{products.name}</Text>
                 {/* Menyelaraskan jumlah barang dan kode secara horizontal */}
                 <HStack gapY={2}>
                   <Text fontSize={'14px'} color={'gray.500'}>
-                    {product.kode}
+                    {products.sku}
                   </Text>
                   <Text fontSize={'14px'} color={'gray.500'}>
-                    • Stok: {product.product.jumlah}
+                    • Stok: {products.stock}
                   </Text>
                 </HStack>
               </VStack>
@@ -148,7 +157,7 @@ export default function CardProduct({ products }: CardProductProps) {
               {/* Harga Produk */}
               <VStack alignItems={'flex-end'} gapY={1} ml={'auto'}>
                 <Text fontWeight={'medium'} fontSize={'14px'}>
-                  Rp{product.product.harga.toLocaleString()}
+                  Rp{products.price.toLocaleString()}
                 </Text>
                 <Switch colorPalette={'cyan'}></Switch>
               </VStack>
