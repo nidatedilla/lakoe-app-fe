@@ -18,6 +18,7 @@ import ProductDetail from './pages/buyer-page/product-detail';
 import Layout from './pages/buyer-page/layout';
 import PrivateRoute from './routes/private-route';
 import CartPage from './pages/buyer-page/cart-page';
+import CheckoutPage from './pages/buyer-page/checkout-page';
 
 function App() {
   const router = createBrowserRouter([
@@ -117,6 +118,11 @@ function App() {
           HydrateFallback: Fallback,
         },
       ],
+    },
+    {
+      path: '/lakoe-app/checkout-page',
+      Component: CheckoutPage,
+      HydrateFallback: Fallback,
     },
   ]);
 

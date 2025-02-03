@@ -26,6 +26,9 @@ export default function Layout() {
         bgGradient="to-r"
         gradientFrom="blue.100"
         gradientTo="whiteAlpha.700"
+        position={'sticky'}
+        top={0}
+        zIndex={1000}
       >
         <Image src="../src/assets/lakoe-logo.png" width={'130px'} />
         <Group attached flex="1" m={28}>
@@ -47,7 +50,7 @@ export default function Layout() {
         </Link>
       </HStack>
 
-      <Box bg={'white'} overflowY="auto">
+      <Box bg={'white'} overflowY="auto" minH="calc(100vh - 70px)">
         <Outlet />
       </Box>
     </Box>
