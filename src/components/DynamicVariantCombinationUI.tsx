@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -30,7 +30,13 @@ interface VariantOption {
   values: string[];
 }
 
-const DynamicVariantCombinationUI: React.FC = () => {
+interface DynamicVariantCombinationUIProps {
+  onVariantChange: (variants: Variant[]) => void;
+}
+
+const DynamicVariantCombinationUI: React.FC<
+  DynamicVariantCombinationUIProps
+> = ({ onVariantChange }) => {
   // Mengontrol tampilan panel varian
   const [showVariantPanel, setShowVariantPanel] = useState<boolean>(false);
   // Daftar variant option (tipe varian aktif) beserta nilainya
@@ -48,6 +54,11 @@ const DynamicVariantCombinationUI: React.FC = () => {
     stock: '',
     weight: '',
   });
+
+  // Panggil callback setiap kali data varian berubah
+  useEffect(() => {
+    onVariantChange(variants);
+  }, [variants, onVariantChange]);
 
   // === HANDLER PANEL VARIAN ===
 
