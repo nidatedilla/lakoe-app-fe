@@ -1,109 +1,147 @@
-import React, { useState, useCallback } from 'react';
+// MultiColumnCategory.tsx
+import React, { useState, useCallback, useEffect } from 'react';
+import Cookies from 'js-cookie';
 import {
   Paper,
   Typography,
   Grid,
   List,
+  ListItemButton,
   ListItemText,
   TextField,
   Box,
-  ListItem,
 } from '@mui/material';
 
-// Define types for the category structure
-type Category = {
-  [key: string]: Category | string[];
+// Definisikan tipe untuk kategori yang sudah berbentuk tree
+export type CategoryItem = {
+  id: string;
+  name: string;
+  parentId: string | null;
+  children?: CategoryItem[]; // Optional, sehingga jika undefined, kita bisa memberikan default []
 };
 
-// Data kategori
-const categories: Category = {
-  'Fashion Pria': {
-    'Atasan Pria': {
-      'Kaos Pria': [],
-      'Kaos Polo Pria': [],
-      'Kemeja Pria': [],
-    },
-    'Celana Pria': {
-      'Celana Jeans': [],
-      'Celana Chino': [],
-    },
-    'Batik Pria': {
-      'Batik Modern': [],
-      'Batik Tradisional': [],
-    },
-    'Blazer & Jas Pria': {
-      Blazer: [],
-      'Jas Formal': [],
-    },
-  },
-  'Fashion Wanita': {
-    'Atasan Wanita': {
-      Blouse: [],
-      'Kaos Wanita': [],
-    },
-    'Celana Wanita': {
-      'Celana Jeans Wanita': [],
-      'Celana Legging': [],
-    },
-  },
-  'Fashion Muslim': {
-    Gamis: {
-      'Gamis Santai': [],
-      'Gamis Formal': [],
-    },
-    Hijab: {
-      'Hijab Segi Empat': [],
-      'Hijab Instan': [],
-    },
-  },
-};
+// Interface untuk props komponen
+interface MultiColumnCategoryProps {
+  onSelectCategory: (selectedId: string) => void;
+}
 
-const MultiColumnCategory: React.FC = () => {
-  // State untuk menyimpan pilihan kategori
-  const [selectedMainCategory, setSelectedMainCategory] = useState<
-    string | null
-  >(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(
-    null
-  );
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+const MultiColumnCategory: React.FC<MultiColumnCategoryProps> = ({
+  onSelectCategory,
+}) => {
+  // State untuk menyimpan kategori dari API
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // State untuk kategori terpilih
+  const [selectedMainCategory, setSelectedMainCategory] =
+    useState<CategoryItem | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] =
+    useState<CategoryItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<CategoryItem | null>(null);
   const [showCategoryPanel, setShowCategoryPanel] = useState<boolean>(false);
 
-  // Fungsi untuk mengupdate inputan kategori
+  // Fetch data kategori saat komponen dimount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        // Ambil token dari cookies
+        const token = Cookies.get('token');
+
+        // Lakukan fetch dengan menyertakan token di header Authorization
+        const response = await fetch('http://localhost:7000/api/category', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Gagal mengambil data kategori');
+        }
+
+        const data: CategoryItem[] = await response.json();
+        setCategories(data);
+      } catch (err: unknown) {
+        // Gunakan pengecekan tipe untuk mengakses properti message
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError(String(err));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Fungsi untuk mendapatkan path kategori yang terpilih sebagai string
   const getSelectedCategoryPath = useCallback(() => {
     if (selectedMainCategory && selectedSubCategory && selectedItem) {
-      return `${selectedMainCategory} > ${selectedSubCategory} > ${selectedItem}`;
+      return `${selectedMainCategory.name} > ${selectedSubCategory.name} > ${selectedItem.name}`;
     } else if (selectedMainCategory && selectedSubCategory) {
-      return `${selectedMainCategory} > ${selectedSubCategory}`;
+      return `${selectedMainCategory.name} > ${selectedSubCategory.name}`;
     } else if (selectedMainCategory) {
-      return `${selectedMainCategory}`;
+      return `${selectedMainCategory.name}`;
     }
     return '';
   }, [selectedMainCategory, selectedSubCategory, selectedItem]);
 
-  // Handle kategori utama selection
-  const handleMainCategoryClick = useCallback((mainCategory: string) => {
-    setSelectedMainCategory(mainCategory);
-    setSelectedSubCategory(null); // Reset subkategori saat memilih kategori utama baru
-    setSelectedItem(null); // Reset item saat memilih kategori utama baru
+  // Panggil callback ketika kategori final telah dipilih
+  useEffect(() => {
+    // Prioritaskan item jika ada, lalu subkategori jika tidak memiliki anak, atau main category jika tidak memiliki anak.
+    if (selectedItem) {
+      onSelectCategory(selectedItem.id);
+    } else if (
+      selectedSubCategory &&
+      (!selectedSubCategory.children ||
+        selectedSubCategory.children.length === 0)
+    ) {
+      onSelectCategory(selectedSubCategory.id);
+    } else if (
+      selectedMainCategory &&
+      (!selectedMainCategory.children ||
+        selectedMainCategory.children.length === 0)
+    ) {
+      onSelectCategory(selectedMainCategory.id);
+    }
+  }, [
+    selectedMainCategory,
+    selectedSubCategory,
+    selectedItem,
+    onSelectCategory,
+  ]);
+
+  // Handler saat kategori utama dipilih
+  const handleMainCategoryClick = useCallback((category: CategoryItem) => {
+    setSelectedMainCategory(category);
+    setSelectedSubCategory(null); // Reset subkategori
+    setSelectedItem(null); // Reset item
   }, []);
 
-  // Handle subkategori selection
-  const handleSubCategoryClick = useCallback((subCategory: string) => {
-    setSelectedSubCategory(subCategory);
-    setSelectedItem(null); // Reset item saat memilih subkategori baru
+  // Handler saat subkategori dipilih
+  const handleSubCategoryClick = useCallback((subcategory: CategoryItem) => {
+    setSelectedSubCategory(subcategory);
+    setSelectedItem(null);
   }, []);
+
+  if (loading) {
+    return <Typography>Memuat kategori...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">Error: {error}</Typography>;
+  }
 
   return (
-    <Paper
-      elevation={3}
-      style={{ padding: '16px', margin: '16px', maxWidth: '100%' }}
-    >
+    <Paper elevation={3} sx={{ padding: 2, margin: 2, maxWidth: '100%' }}>
       <Typography variant="h6" gutterBottom>
         Kategori Produk
       </Typography>
 
-      {/* Kolom Inputan Kategori */}
+      {/* Input field untuk menampilkan kategori terpilih */}
       <Box sx={{ mb: 2 }}>
         <TextField
           fullWidth
@@ -112,18 +150,18 @@ const MultiColumnCategory: React.FC = () => {
           onClick={() => setShowCategoryPanel((prev) => !prev)}
           InputProps={{
             readOnly: true,
-            style: { cursor: 'pointer' }, // Indicate that the field is clickable
+            sx: { cursor: 'pointer' },
           }}
           aria-label="Pilih Kategori"
         />
       </Box>
 
-      {/* Tampilkan panel kategori hanya jika showCategoryPanel true */}
+      {/* Panel kategori */}
       {showCategoryPanel && (
         <Grid container spacing={2}>
           {/* Kolom 1: Kategori Utama */}
           <Grid item xs={4}>
-            <Paper elevation={1} style={{ padding: '8px' }}>
+            <Paper elevation={1} sx={{ padding: 1 }}>
               <Typography
                 variant="subtitle1"
                 sx={{ fontWeight: 'bold', mb: 1 }}
@@ -131,80 +169,73 @@ const MultiColumnCategory: React.FC = () => {
                 Kategori Utama
               </Typography>
               <List role="menu">
-                {Object.keys(categories).map((mainCategory) => (
-                  <ListItem
-                    button
-                    key={mainCategory}
-                    selected={selectedMainCategory === mainCategory}
-                    onClick={() => handleMainCategoryClick(mainCategory)}
+                {categories.map((mainCat) => (
+                  <ListItemButton
+                    key={mainCat.id}
+                    selected={selectedMainCategory?.id === mainCat.id}
+                    onClick={() => handleMainCategoryClick(mainCat)}
                     role="menuitem"
                   >
-                    <ListItemText primary={mainCategory} />
-                  </ListItem>
+                    <ListItemText primary={mainCat.name} />
+                  </ListItemButton>
                 ))}
               </List>
             </Paper>
           </Grid>
 
-          {/* Kolom 2: Subkategori (jika ada kategori utama yang dipilih) */}
-          {selectedMainCategory && (
-            <Grid item xs={4}>
-              <Paper elevation={1} style={{ padding: '8px' }}>
-                <Typography
-                  variant="subtitle1"
-                  sx={{ fontWeight: 'bold', mb: 1 }}
-                >
-                  Subkategori
-                </Typography>
-                <List role="menu">
-                  {Object.keys(
-                    categories[selectedMainCategory] as Category
-                  ).map((subCategory) => (
-                    <ListItem
-                      button
-                      key={subCategory}
-                      selected={selectedSubCategory === subCategory}
-                      onClick={() => handleSubCategoryClick(subCategory)}
-                      role="menuitem"
-                    >
-                      <ListItemText primary={subCategory} />
-                    </ListItem>
-                  ))}
-                </List>
-              </Paper>
-            </Grid>
-          )}
+          {/* Kolom 2: Subkategori */}
+          {selectedMainCategory &&
+            (selectedMainCategory.children ?? []).length > 0 && (
+              <Grid item xs={4}>
+                <Paper elevation={1} sx={{ padding: 1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: 'bold', mb: 1 }}
+                  >
+                    Subkategori
+                  </Typography>
+                  <List role="menu">
+                    {(selectedMainCategory.children ?? []).map((subCat) => (
+                      <ListItemButton
+                        key={subCat.id}
+                        selected={selectedSubCategory?.id === subCat.id}
+                        onClick={() => handleSubCategoryClick(subCat)}
+                        role="menuitem"
+                      >
+                        <ListItemText primary={subCat.name} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Paper>
+              </Grid>
+            )}
 
-          {/* Kolom 3: Item Subkategori (jika ada subkategori yang dipilih) */}
-          {selectedSubCategory && selectedMainCategory && (
-            <Grid item xs={4}>
-              <Paper elevation={1} style={{ padding: '8px' }}>
-                <Typography
-                  variant="subtitle1"
-                  sx={{ fontWeight: 'bold', mb: 1 }}
-                >
-                  Item
-                </Typography>
-                <List role="menu">
-                  {Object.keys(
-                    (categories[selectedMainCategory] as Category)[
-                      selectedSubCategory
-                    ] as Category
-                  ).map((item) => (
-                    <ListItem
-                      button
-                      key={item}
-                      selected={selectedItem === item}
-                      onClick={() => setSelectedItem(item)}
-                      role="menuitem"
-                    >
-                      <ListItemText primary={item} />
-                    </ListItem>
-                  ))}
-                </List>
-              </Paper>
-            </Grid>
-          )}
+          {/* Kolom 3: Item */}
+          {selectedSubCategory &&
+            (selectedSubCategory.children ?? []).length > 0 && (
+              <Grid item xs={4}>
+                <Paper elevation={1} sx={{ padding: 1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: 'bold', mb: 1 }}
+                  >
+                    Item
+                  </Typography>
+                  <List role="menu">
+                    {(selectedSubCategory.children ?? []).map((item) => (
+                      <ListItemButton
+                        key={item.id}
+                        selected={selectedItem?.id === item.id}
+                        onClick={() => setSelectedItem(item)}
+                        role="menuitem"
+                      >
+                        <ListItemText primary={item.name} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Paper>
+              </Grid>
+            )}
         </Grid>
       )}
     </Paper>
