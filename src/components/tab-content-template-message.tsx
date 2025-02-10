@@ -1,30 +1,13 @@
-import { useEffect, useState } from 'react';
 import { Box, HStack, Text } from '@chakra-ui/react';
 import DialogCreateTemplateMessage from './dialog-create-template-message';
-import { useMessageStore } from '../store/message-store';
-import { getMessageTemplates } from '../services/message-service';
 import DialogUpdateTemplateMessage from './dialog-update-template-message';
 import DialogDeleteTemplateMessage from './dialog-delete-template-message';
+import { useMessageTemplates } from '../hooks/use-message';
+import { MessageTemplate } from '../types/type-message';
+import { SkeletonText } from './ui/skeleton';
 
 export default function TabTemplateMessage() {
-  const { templates, setTemplates } = useMessageStore();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      setLoading(true);
-      try {
-        const data = await getMessageTemplates();
-        setTemplates(data);
-      } catch (error) {
-        console.error('Failed to fetch templates:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTemplates();
-  }, [setTemplates]);
+  const { data: templates = [], isLoading } = useMessageTemplates();
 
   return (
     <Box bg={'white'} borderRadius={'lg'} p={4}>
@@ -35,12 +18,12 @@ export default function TabTemplateMessage() {
         <DialogCreateTemplateMessage />
       </HStack>
 
-      {loading ? (
-        <Text>Loading...</Text>
+      {isLoading ? (
+        <SkeletonText noOfLines={3} gap="4" />
       ) : templates.length === 0 ? (
         <Text>Tidak ada template pesan.</Text>
       ) : (
-        templates.map((template) => (
+        templates.map((template: MessageTemplate) => (
           <Box
             key={template.id}
             my={4}
