@@ -8,6 +8,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { InputGroup } from './ui/input-group';
+import Cookies from 'js-cookie';
 import {
   SelectContent,
   SelectItem,
@@ -17,31 +18,34 @@ import {
 } from './ui/select';
 import { TbShoppingBagSearch } from 'react-icons/tb';
 import CardOrder from './card-order';
-import { useEffect, useState } from 'react';
-import { fetchOrders } from '../services/order-services';
-import { useOrderStore } from '../store/order-store';
+import { useState } from 'react';
 import { Checkbox } from './ui/checkbox';
+import { useStoreOrders } from '../hooks/use-order';
+import { orderTypes } from '../types/types-order';
 
 export default function TabsOrder() {
-  const { orders, setOrders } = useOrderStore();
+  const token = Cookies.get('token');
+  const { data: orders, isLoading, error } = useStoreOrders(token || '');
   const [selectedCouriers, setSelectedCouriers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  useEffect(() => {
-    const fetchOrderData = async () => {
-      try {
-        const data = await fetchOrders();
-        setOrders(data);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      }
-    };
+  console.log('Orders:', orders);
+  console.log('Type of orders:', typeof orders);
+  console.log('Is Array:', Array.isArray(orders));
 
-    fetchOrderData();
-  }, [setOrders]);
+  // useEffect(() => {
+  //   if (orders && orders.length > 0) {
+  //     setActiveTab("all");
+  //   }
+  // }, [orders]);
+
+  if (isLoading) return <Text>Loading...</Text>;
+  if (error) return <Text>Error loading orders.</Text>;
 
   const getOrderCountByStatus = (status: string) => {
-    return orders.filter((order) => order.status === status).length;
+    if (!Array.isArray(orders?.data)) return 0;
+    return orders.data.filter((order: orderTypes) => order.status === status)
+      .length;
   };
 
   const handleCourierChange = (value: string) => {
@@ -52,15 +56,19 @@ export default function TabsOrder() {
     );
   };
 
-  const filteredOrders = orders.filter(
-    (order) =>
-      (selectedCouriers.length > 0
-        ? selectedCouriers.includes(order.shipping.courier)
-        : true) &&
-      (searchQuery
-        ? order.product.name.toLowerCase().includes(searchQuery.toLowerCase())
-        : true)
-  );
+  const filteredOrders = Array.isArray(orders.data)
+    ? orders.data.filter(
+        (order: orderTypes) =>
+          (selectedCouriers.length > 0
+            ? selectedCouriers.includes(order.courier?.courier_company)
+            : true) &&
+          (searchQuery
+            ? order.order_items?.[0]?.product?.name
+                ?.toLowerCase()
+                .includes(searchQuery.toLowerCase())
+            : true)
+      )
+    : [];
 
   const noSearchResults = !!searchQuery && filteredOrders.length === 0;
 
@@ -95,7 +103,7 @@ export default function TabsOrder() {
               height="20px"
               fontSize="12px"
             >
-              {orders.length}
+              {orders.data.length}
             </Box>
             Semua
           </Tabs.Trigger>
@@ -188,6 +196,24 @@ export default function TabsOrder() {
               {getOrderCountByStatus('Pesanan Selesai')}
             </Box>
             Pesanan Selesai
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value="dibatalkan"
+            _selected={{ color: 'blue.500', borderBottom: '2px solid blue' }}
+            display="flex"
+            alignItems="center"
+          >
+            <Box
+              bg="blue.500"
+              color="white"
+              borderRadius="full"
+              width="20px"
+              height="20px"
+              fontSize="12px"
+            >
+              {getOrderCountByStatus('Dibatalkan')}
+            </Box>
+            Dibatalkan
           </Tabs.Trigger>
         </Tabs.List>
       </Box>
