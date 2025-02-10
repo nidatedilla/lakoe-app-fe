@@ -14,10 +14,41 @@ import { Field } from '../../components/ui/field';
 import { Radio, RadioGroup } from '../../components/ui/radio';
 import { useState } from 'react';
 import { orderDummy } from '../../components/order-dummy';
+// import { useCreateOrder } from '../../hooks/use-order';
 
 const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
   const order = orderDummy[0];
+  // const { mutate: createOrder } = useCreateOrder();
+
+  const handleSubmit = () => {
+    const orderData = {
+      userId: order.userId,
+      storeId: order.storeId,
+      total_price: order.details.totalAmount,
+      shipper_contact_name: order.shipping.shipper_name,
+      shipper_contact_phone: order.shipping.shipper_phone,
+      origin_contact_name: order.shipping.origin_name,
+      origin_contact_phone: order.shipping.origin_phone,
+      origin_address: order.shipping.origin_address,
+      origin_postal_code: order.shipping.origin_postal_code,
+      destination_contact_name: order.shipping.destination_name,
+      destination_contact_phone: order.shipping.destination_phone,
+      destination_address: order.shipping.destination_address,
+      destination_postal_code: order.shipping.destination_postal_code,
+      courier_company: order.shipping.courier_company,
+      courier_type: order.shipping.courier_type,
+      items: [
+        {
+          name: order.product.name,
+          quantity: order.product.quantity,
+          price: order.product.price,
+        },
+      ],
+    };
+
+    createOrder(orderData);
+  };
 
   return (
     <Box maxW="full" mx="auto" color={'black'}>
@@ -52,7 +83,9 @@ const CheckoutPage = () => {
           <Box p={5} borderWidth="1px" borderRadius="lg" mb={4}>
             <Text fontWeight="bold">Penerima</Text>
             <Flex justifyContent="space-between" mt={2}>
-              <Text>{order.buyer} - +62 445 4483</Text>
+              <Text>
+                {order.buyer.name} - {order.buyer.phone}
+              </Text>
               <Button size="sm" variant={'outline'} color={'blue.500'}>
                 Ubah
               </Button>
@@ -145,6 +178,7 @@ const CheckoutPage = () => {
             borderColor={'blue'}
             size="lg"
             width="full"
+            onClick={handleSubmit}
           >
             Buat Pesanan
           </Button>
