@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button, Text, Icon } from '@chakra-ui/react';
 import {
   DialogActionTrigger,
@@ -11,9 +10,10 @@ import {
   DialogTrigger,
   DialogRoot,
 } from './ui/dialog';
-import { useMessageStore } from '../store/message-store';
 import { LuTrash } from 'react-icons/lu';
-import { deleteMessageTemplate } from '../services/message-service';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDeleteMessageTemplate } from '../hooks/use-message';
+import Swal from 'sweetalert2';
 
 export default function DialogDeleteTemplateMessage({
   templateId,
@@ -22,28 +22,30 @@ export default function DialogDeleteTemplateMessage({
   templateId: string;
   initialTitle: string;
 }) {
-  const { templates, setTemplates } = useMessageStore();
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const { mutate: deleteTemplate, isPending } = useDeleteMessageTemplate();
 
   const handleDelete = async () => {
-    setLoading(true);
     try {
-      const result = await deleteMessageTemplate(templateId);
+      await deleteTemplate(templateId);
 
-      if (result.message === 'Message template deleted successfully') {
-        setTemplates(
-          templates.filter((template) => template.id !== templateId)
-        );
-      }
+      queryClient.invalidateQueries({ queryKey: ['message-templates'] });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Template pesan berhasil dihapus',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
+      console.log('Message template deleted successfully');
     } catch (error) {
       console.error('Error deleting template:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <DialogRoot>
+    <DialogRoot role="alertdialog">
       <DialogTrigger asChild>
         <Button
           bg="transparent"
@@ -60,7 +62,13 @@ export default function DialogDeleteTemplateMessage({
           <DialogTitle>Hapus Template Pesan</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          <Text>Apakah kamu yakin untuk menghapus {initialTitle}?</Text>
+          <Text>
+            Apakah kamu yakin untuk menghapus{' '}
+            <Text as="span" fontWeight="medium">
+              {initialTitle}
+            </Text>
+            ?
+          </Text>
           <Text>
             Sebab, kamu tidak akan dapat mengembalikan template pesan yang sudah
             dihapus.
@@ -76,7 +84,7 @@ export default function DialogDeleteTemplateMessage({
             bg={'blue.500'}
             borderRadius={'full'}
             onClick={handleDelete}
-            loading={loading}
+            loading={isPending}
             loadingText="Deleting..."
           >
             Ya, Hapus

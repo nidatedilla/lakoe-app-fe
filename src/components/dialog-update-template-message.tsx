@@ -14,8 +14,9 @@ import {
 } from './ui/dialog';
 import { Field } from './ui/field';
 import { FaRegEdit } from 'react-icons/fa';
-import { updateMessageTemplate } from '../services/message-service';
-import { useMessageStore } from '../store/message-store';
+import { useUpdateMessageTemplate } from '../hooks/use-message';
+import { useQueryClient } from '@tanstack/react-query';
+import Swal from 'sweetalert2';
 
 export default function DialogUpdateTemplateMessage({
   templateId,
@@ -26,33 +27,48 @@ export default function DialogUpdateTemplateMessage({
   initialTitle: string;
   initialMessage: string;
 }) {
-  const { templates, setTemplates } = useMessageStore();
   const [title, setTitle] = useState(initialTitle);
   const [message, setMessage] = useState(initialMessage);
+
+  const { mutate: updateTemplate, isPending } = useUpdateMessageTemplate();
+  const queryClient = useQueryClient();
 
   const handleInsertTag = (tag: string) => {
     setMessage((prevMessage) => prevMessage + ` [${tag}]`);
   };
 
   const handleSave = async () => {
-    try {
-      const updatedTemplate = await updateMessageTemplate(
-        templateId,
-        title,
-        message
-      );
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: 'Apakah Anda yakin?',
+      text: 'Anda akan menyimpan perubahan pada template pesan.',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Simpan!',
+      cancelButtonText: 'Tidak',
+      reverseButtons: true,
+    });
 
-      setTemplates(
-        templates.map((template) =>
-          template.id === templateId
-            ? { ...template, name: title, content: message }
-            : template
-        )
-      );
+    if (result.isConfirmed) {
+      try {
+        await updateTemplate({ id: templateId, title, content: message });
 
-      console.log('Message template updated:', updatedTemplate);
-    } catch (error) {
-      console.error('Failed to update message template:', error);
+        queryClient.invalidateQueries({
+          queryKey: ['message-templates'],
+        });
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Template pesan berhasil diperbarui',
+          showConfirmButton: false,
+          timer: 1500,
+          position: 'top',
+          toast: true,
+        });
+
+        console.log('Message template updated:', { title, message });
+      } catch (error) {
+        console.error('Failed to update message template:', error);
+      }
     }
   };
 
@@ -124,7 +140,13 @@ export default function DialogUpdateTemplateMessage({
               Batalkan
             </Button>
           </DialogActionTrigger>
-          <Button bg={'blue.500'} borderRadius={'full'} onClick={handleSave}>
+          <Button
+            bg={'blue.500'}
+            borderRadius={'full'}
+            loading={isPending}
+            onClick={handleSave}
+            disabled={isPending}
+          >
             Simpan
           </Button>
         </DialogFooter>

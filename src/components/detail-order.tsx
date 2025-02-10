@@ -20,53 +20,29 @@ import {
 } from './ui/breadcrumb';
 import HistoryOrder from './history-order';
 import { FaWhatsappSquare } from 'react-icons/fa';
-import { useEffect, useState } from 'react';
-import { fetchOrderById } from '../services/order-services';
-import { useOrderStore } from '../store/order-store';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { LuCalendarRange, LuCopy, LuWallet } from 'react-icons/lu';
 import DialogTrackDelivery from './dialog-track-delivery';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
+import { useOrder } from '../hooks/use-order';
+import Cookies from 'js-cookie';
 
 export default function DetailOrder() {
-  const { orders, loading, setOrders, setLoading } = useOrderStore();
+  const token = Cookies.get('token');
   const { orderId } = useParams<{ orderId: string }>();
   const [isExpanded, setIsExpanded] = useState(false);
+  const {
+    data: order,
+    isLoading,
+    error,
+  } = useOrder(orderId || '', token || '');
 
-  useEffect(() => {
-    const fetchOrderData = async () => {
-      if (!orderId) {
-        console.error('Order ID is missing');
-        return;
-      }
-
-      const numericOrderId = Number(orderId);
-
-      setLoading(true);
-      try {
-        const data = await fetchOrderById(numericOrderId);
-        if (data) {
-          setOrders([data]);
-        } else {
-          console.error('Order not found');
-        }
-      } catch (error) {
-        console.error('Error fetching order:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrderData();
-  }, [orderId, setOrders, setLoading]);
-
-  if (loading) {
+  if (isLoading) {
     return <Text>Loading...</Text>;
   }
 
-  const order = orders?.[0];
-
-  if (!order) {
+  if (error || !order) {
     return <Text>Pesanan tidak ditemukan.</Text>;
   }
 
@@ -124,8 +100,8 @@ export default function DetailOrder() {
     message: 'Status tidak diketahui.',
   };
 
-  const formatCurrency = (amount: number) => {
-    return `Rp${amount.toLocaleString('id-ID')}`;
+  const formatCurrency = (amount: number | null | undefined) => {
+    return `Rp${(amount ?? 0).toLocaleString('id-ID')}`;
   };
 
   return (
@@ -134,7 +110,7 @@ export default function DetailOrder() {
         <BreadcrumbLink href="/order" color={'blue.500'}>
           Daftar Pesanan
         </BreadcrumbLink>
-        <BreadcrumbCurrentLink>{order.code}</BreadcrumbCurrentLink>
+        <BreadcrumbCurrentLink>{order.order_number}</BreadcrumbCurrentLink>
       </BreadcrumbRoot>
       <Box bg={'white'} mx={4} p={3} borderRadius={'lg'}>
         <HStack alignItems={'flex-start'}>
@@ -192,7 +168,7 @@ export default function DetailOrder() {
               </Box>
               <Text fontWeight="medium">Tanggal:</Text>
             </HStack>
-            <Text>{order.date}</Text>
+            <Text>{order.created_at}</Text>
           </HStack>
           <HStack w="full" justifyContent="space-between">
             <HStack>
@@ -225,7 +201,7 @@ export default function DetailOrder() {
                 <Icon color={'green.500'} size={'lg'}>
                   <FaWhatsappSquare />
                 </Icon>
-                <Text>{order.buyer}</Text>
+                <Text>{order.destination_contact_name}</Text>
               </HStack>
             </Link>
           </HStack>
@@ -249,30 +225,42 @@ export default function DetailOrder() {
 
           <VStack alignItems="flex-start" gap={4} w="full">
             <Text fontWeight="medium">Detail Produk:</Text>
-            <HStack w="full" justifyContent="space-between" alignItems="center">
-              <HStack alignItems="center">
-                <Image
-                  boxSize="50px"
-                  src={order.product.image}
-                  alt={order.product.name}
-                />
-                <VStack alignItems="flex-start" gap={0}>
-                  <Text fontWeight={'medium'}>{order.product.name}</Text>
+            {order.order_items.length > 0 && (
+              <HStack
+                w="full"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <HStack alignItems="center">
+                  <Image
+                    boxSize="50px"
+                    src={order.order_items[0].product.attachments}
+                    alt={order.order_items[0].product.name}
+                  />
+                  <VStack alignItems="flex-start" gap={0}>
+                    <Text fontWeight={'medium'}>
+                      {order.order_items[0].product.name}
+                    </Text>
+                    <Text fontSize="12px" color="gray.600">
+                      {order.order_items[0].qty} x{' '}
+                      {order.order_items[0]?.product?.price ?? 0}
+                    </Text>
+                  </VStack>
+                </HStack>
+
+                <VStack alignItems="flex-end" gap={0}>
                   <Text fontSize="12px" color="gray.600">
-                    {order.product.quantity} x {order.product.price}
+                    Total Belanja
+                  </Text>
+                  <Text fontWeight={'medium'}>
+                    {formatCurrency(
+                      (order.order_items[0]?.product?.price ?? 0) *
+                        order.order_items[0].qty
+                    )}
                   </Text>
                 </VStack>
               </HStack>
-
-              <VStack alignItems="flex-end" gap={0}>
-                <Text fontSize="12px" color="gray.600">
-                  Total Belanja
-                </Text>
-                <Text fontWeight={'medium'}>
-                  {formatCurrency(order.product.price * order.product.quantity)}
-                </Text>
-              </VStack>
-            </HStack>
+            )}
           </VStack>
         </HStack>
       </Box>
@@ -301,13 +289,13 @@ export default function DetailOrder() {
 
             <Grid templateColumns="1fr 2fr" w="full" gap={2}>
               <Text fontWeight="medium">Kurir:</Text>
-              <Text fontWeight={'medium'}>{order.shipping.courier}</Text>
+              <Text fontWeight={'medium'}>{order.courier.courier_company}</Text>
 
               <Text fontWeight="medium">No. Resi:</Text>
-              <Text>{order.shipping.trackingNumber || '-'}</Text>
+              <Text>{order.tracking_number || '-'}</Text>
 
               <Text fontWeight="medium">Alamat:</Text>
-              <Text>{order.shipping.address}</Text>
+              <Text>{order.destination_address}</Text>
             </Grid>
           </VStack>
         </HStack>
@@ -330,25 +318,38 @@ export default function DetailOrder() {
           <VStack alignItems="flex-start" w="full">
             <Text fontWeight="medium">Rincian Pembayaran:</Text>
             <HStack w="full" justifyContent="space-between">
-              <Text>Total Harga ({order.details.totalItems} barang)</Text>
-              <Text>{formatCurrency(order.details.totalPrice)}</Text>
+              <Text>
+                Total Harga (
+                {order.order_items.reduce(
+                  (total: number, item: { qty: number }) => total + item.qty,
+                  0
+                )}{' '}
+                barang)
+              </Text>
+              <Text>{formatCurrency(order.total_price)}</Text>
             </HStack>
             <HStack w="full" justifyContent="space-between">
-              <Text>Total Ongkos Kirim ({order.details.weight} kg)</Text>
-              <Text>{formatCurrency(order.details.shippingCost)}</Text>
+              <Text>Total Ongkos Kirim ({order.order_items[0].weight} kg)</Text>
+              <Text>
+                {formatCurrency(order.order_items[0]?.courier?.price ?? 0)}
+              </Text>
             </HStack>
             <HStack w="full" justifyContent="space-between">
               <Text>Diskon</Text>
-              <Text>{formatCurrency(order.details.discount)}</Text>
+              <Text>{formatCurrency(order.discount)}</Text>
             </HStack>
-            <HStack w="full" justifyContent="space-between">
+            {/* <HStack w="full" justifyContent="space-between">
               <Text>Biaya Layanan</Text>
               <Text>{formatCurrency(order.details.serviceFee)}</Text>
-            </HStack>
+            </HStack> */}
             <HStack w="full" justifyContent="space-between">
               <Text fontWeight="medium">Total Penjualan</Text>
               <Text fontWeight="medium" fontSize={'16px'}>
-                {formatCurrency(order.details.totalAmount)}
+                {formatCurrency(
+                  order.total_price +
+                    (order.order_items[0]?.courier?.price ?? 0) -
+                    order.discount
+                )}
               </Text>
             </HStack>
           </VStack>

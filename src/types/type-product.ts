@@ -11,4 +11,5 @@ export interface product {
   categoryId: string;
   stock: number;
   price: number;
+  weight: number;
 }

@@ -14,38 +14,50 @@ import {
 import { Field } from './ui/field';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useMessageStore } from '../store/message-store';
-import { createMessageTemplate } from '../services/message-service';
+import { useCreateMessageTemplate } from '../hooks/use-message';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default function DialogCreateTemplateMessage() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
-  const { templates, setTemplates } = useMessageStore();
+
+  const { mutate: createTemplate, isPending } = useCreateMessageTemplate();
 
   const handleInsertTag = (tag: string) => {
     setMessage((prevMessage) => prevMessage + ` [${tag}]`);
   };
 
-  const handleSaveTemplate = async () => {
+  const handleSaveTemplate = () => {
     if (!title || !message) {
       toast.error('Judul dan isi pesan harus diisi!');
       return;
     }
 
-    try {
-      const newTemplate = await createMessageTemplate(title, message);
-      setTemplates([...templates, newTemplate.template]);
-      toast.success('Template pesan berhasil disimpan!');
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message || 'Gagal menyimpan template pesan'
-        );
-      } else {
-        toast.error('Terjadi kesalahan yang tidak diketahui');
+    createTemplate(
+      { title, content: message },
+      {
+        onSuccess: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Template pesan berhasil disimpan!',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setTitle('');
+          setMessage('');
+        },
+        onError: (error) => {
+          if (axios.isAxiosError(error)) {
+            toast.error(
+              error.response?.data?.message || 'Gagal menyimpan template pesan'
+            );
+          } else {
+            toast.error('Terjadi kesalahan yang tidak diketahui');
+          }
+        },
       }
-    }
+    );
   };
 
   return (
@@ -120,6 +132,7 @@ export default function DialogCreateTemplateMessage() {
             bg={'blue.500'}
             borderRadius={'full'}
             onClick={handleSaveTemplate}
+            loading={isPending}
           >
             Simpan
           </Button>

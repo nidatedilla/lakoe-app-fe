@@ -100,10 +100,10 @@ function App() {
       children: [
         {
           path: '/lakoe-app',
-          Component: () => <Navigate to="/lakoe-app/shop-page" />,
+          Component: () => <Navigate to="/lakoe-app/:domain" />,
         },
         {
-          path: '/lakoe-app/shop-page',
+          path: '/lakoe-app/:domain',
           Component: ShopPage,
           HydrateFallback: Fallback,
         },
