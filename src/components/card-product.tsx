@@ -141,7 +141,7 @@ export default function CombinedProductList() {
       )
     ) {
       selectedIds.forEach((id) => {
-        deleteMutation.mutate(id);
+        deleteMutation.mutate(Number(id)); // Convert string to number
       });
       setSelectedIds([]);
     }
@@ -155,7 +155,11 @@ export default function CombinedProductList() {
       )
     ) {
       selectedIds.forEach((id) => {
-        updateMutation.mutate({ id, updatedData: { is_active: false } });
+        // Convert the id from string to number using Number() or parseInt
+        updateMutation.mutate({
+          id: Number(id),
+          updatedData: { is_active: false },
+        });
       });
       setSelectedIds([]);
     }
@@ -205,7 +209,7 @@ export default function CombinedProductList() {
 
       {/* Jika semua item terfilter terpilih, tampilkan tombol Delete All dan Inactive All */}
       {filteredProducts.length > 0 && allFilteredSelected && (
-        <HStack mb={4} spacing={4}>
+        <HStack mb={4} gapX={4}>
           <Button colorScheme="red" onClick={handleDeleteAll}>
             Delete All
           </Button>
@@ -223,13 +227,13 @@ export default function CombinedProductList() {
           isSelected={selectedIds.includes(prod.id)}
           onSelectChange={(checked) => handleSelectProduct(prod.id, checked)}
           onUpdate={(updatedData) =>
-            updateMutation.mutate({ id: prod.id, updatedData })
+            updateMutation.mutate({ id: Number(prod.id), updatedData })
           }
           onDelete={() => {
             if (
               window.confirm(`Anda yakin ingin menghapus produk ${prod.name}?`)
             ) {
-              deleteMutation.mutate(prod.id);
+              deleteMutation.mutate(Number(prod.id));
             }
           }}
         />
@@ -274,7 +278,7 @@ function ProductCard({
     >
       <HStack alignItems="center" mb={2}>
         <Checkbox
-          isChecked={isSelected}
+          checked={isSelected}
           onChange={(e) => onSelectChange(e.target.checked)}
         />
         {/* Gambar Produk */}
@@ -287,9 +291,9 @@ function ProductCard({
           />
         </Box>
         {/* Informasi Produk */}
-        <VStack alignItems="flex-start" spacing={1} flex="1">
+        <VStack alignItems="flex-start" gapY={1} flex="1">
           <Text fontWeight="medium">{product.name}</Text>
-          <HStack spacing={2}>
+          <HStack gapX={2}>
             <Text fontSize="14px" color="gray.500">
               {product.sku}
             </Text>
@@ -299,7 +303,7 @@ function ProductCard({
           </HStack>
         </VStack>
         {/* Harga dan Switch */}
-        <VStack alignItems="flex-end" spacing={1}>
+        <VStack alignItems="flex-end" gapY={1}>
           <Text fontWeight="medium" fontSize="14px">
             Rp{Number(product.price).toLocaleString()}
           </Text>
@@ -308,7 +312,7 @@ function ProductCard({
       </HStack>
 
       {/* Tombol-tombol aksi */}
-      <HStack spacing={2}>
+      <HStack gapX={2}>
         {/* Dialog Ubah Harga */}
         <DialogRoot>
           <DialogTrigger asChild>
