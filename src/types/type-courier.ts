@@ -25,3 +25,17 @@ export type courierType = {
   shipment_duration_range: string;
   shipment_duration_unit: string;
 };
+
+export type GroupedCourier = {
+  courier_name: string;
+  courier_code: string;
+  id: string;
+  shipping: {
+    serviceId: string;
+    service_name: string;
+    service_code: string;
+    duration_range: string;
+    duration_unit: string;
+    shipping_type: string;
+  }[];
+};
