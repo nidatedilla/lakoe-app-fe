@@ -1,4 +1,4 @@
-import { Button, Text, Icon } from '@chakra-ui/react';
+import { Text, Icon } from '@chakra-ui/react';
 import {
   DialogActionTrigger,
   DialogBody,
@@ -14,6 +14,7 @@ import { LuTrash } from 'react-icons/lu';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteMessageTemplate } from '../hooks/use-message';
 import Swal from 'sweetalert2';
+import { Button } from './ui/button';
 
 export default function DialogDeleteTemplateMessage({
   templateId,
