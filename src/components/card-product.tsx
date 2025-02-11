@@ -108,18 +108,17 @@ export default function CombinedProductList() {
   }, [filteredProducts]);
 
   // Handle perubahan "Select All"
-  const handleSelectAllChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
+  const handleSelectAllChange: React.FormEventHandler<HTMLLabelElement> = (
+    e
+  ) => {
+    const target = e.currentTarget as unknown as HTMLInputElement; // Cast ke HTMLInputElement
+    const checked = target.checked;
     if (checked) {
-      // Set selectedIds menjadi semua id dari produk terfilter
-      const newSelected = filteredProducts.map((prod) => prod.id);
-      setSelectedIds(newSelected);
+      setSelectedIds(filteredProducts.map((prod) => prod.id));
     } else {
-      // Hapus id produk terfilter dari selectedIds
-      const remainingSelected = selectedIds.filter(
-        (id) => !filteredProducts.some((prod) => prod.id === id)
+      setSelectedIds((prev) =>
+        prev.filter((id) => !filteredProducts.some((prod) => prod.id === id))
       );
-      setSelectedIds(remainingSelected);
     }
   };
 
@@ -200,7 +199,7 @@ export default function CombinedProductList() {
           </select>
         </Box>
         <Checkbox
-          isChecked={allFilteredSelected}
+          checked={allFilteredSelected}
           onChange={handleSelectAllChange}
         >
           Select All
@@ -245,7 +244,7 @@ export default function CombinedProductList() {
   );
 }
 
-interface ProductCardProps {
+interface CardProductProps {
   product: product;
   isSelected: boolean;
   onSelectChange: (checked: boolean) => void;
@@ -259,7 +258,7 @@ function ProductCard({
   onSelectChange,
   onUpdate,
   onDelete,
-}: ProductCardProps) {
+}: CardProductProps) {
   // State lokal untuk input di dialog update harga dan stok
   const [newPrice, setNewPrice] = useState('');
   const [newStock, setNewStock] = useState('');
@@ -279,7 +278,9 @@ function ProductCard({
       <HStack alignItems="center" mb={2}>
         <Checkbox
           checked={isSelected}
-          onChange={(e) => onSelectChange(e.target.checked)}
+          onChange={(e) =>
+            onSelectChange((e.target as HTMLInputElement).checked)
+          }
         />
         {/* Gambar Produk */}
         <Box width="45px" height="45px" overflow="hidden">

@@ -1,18 +1,17 @@
 import { Box, Tabs } from '@chakra-ui/react';
-import CardProduct from '../components/card-product';
 import { useGetProduct } from '../hooks/use-get-product';
 
 const ProductPage = () => {
   // Ambil data produk dari API atau database
-  const { data: products } = useGetProduct();
+  const { product: products } = useGetProduct();
 
   // Fungsi untuk menghitung jumlah produk berdasarkan status
   const getProductCountByStatus = (status: string) => {
     if (!products) return 0;
     if (status === 'Aktif') {
-      return products.filter((p) => p.status === 'Aktif').length;
+      return products.filter((p) => p.is_active === true).length;
     } else if (status === 'Non-Aktif') {
-      return products.filter((p) => p.status !== 'Aktif').length;
+      return products.filter((p) => p.is_active === false).length;
     }
     return products.length;
   };
@@ -94,21 +93,6 @@ const ProductPage = () => {
           </Tabs.Trigger>
         </Tabs.List>
       </Box>
-
-      {/* Konten Tab */}
-      <Tabs.Content value="semua">
-        <CardProduct products={products || []} />
-      </Tabs.Content>
-      <Tabs.Content value="Aktif">
-        <CardProduct
-          products={(products || []).filter((p) => p.status === 'Aktif')}
-        />
-      </Tabs.Content>
-      <Tabs.Content value="Non-Aktif">
-        <CardProduct
-          products={(products || []).filter((p) => p.status !== 'Aktif')}
-        />
-      </Tabs.Content>
     </Tabs.Root>
   );
 };
