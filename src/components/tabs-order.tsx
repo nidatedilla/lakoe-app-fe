@@ -22,6 +22,8 @@ import { useState } from 'react';
 import { Checkbox } from './ui/checkbox';
 import { useStoreOrders } from '../hooks/use-order';
 import { orderTypes } from '../types/types-order';
+import Lottie from 'lottie-react';
+import animationData from '../assets/lotties/loading-order.json';
 
 export default function TabsOrder() {
   const token = Cookies.get('token');
@@ -39,7 +41,7 @@ export default function TabsOrder() {
   //   }
   // }, [orders]);
 
-  if (isLoading) return <Text>Loading...</Text>;
+  if (isLoading) return <Lottie animationData={animationData} loop={true} />;
   if (error) return <Text>Error loading orders.</Text>;
 
   const getOrderCountByStatus = (status: string) => {

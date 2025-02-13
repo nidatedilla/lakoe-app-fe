@@ -1,5 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { fetchAllCouriers } from '../services/courier-service';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  fetchAllCouriers,
+  getSelectedCouriers,
+  toggleCourierSelection,
+} from '../services/courier-service';
 
 export const useCouriers = () => {
   return useQuery({
@@ -8,10 +12,20 @@ export const useCouriers = () => {
   });
 };
 
-// export const useCourierById = (courierId: string) => {
-//   return useQuery({
-//     queryKey: ['couriers', courierId],
-//     queryFn: () => fetchCouriersById(courierId),
-//     enabled: !!courierId,
-//   });
-// };
+export const useGetSelectedCouriers = () => {
+  return useQuery({
+    queryKey: ['couriers'],
+    queryFn: getSelectedCouriers,
+  });
+};
+
+export const useToggleCourier = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (courierId: string) => toggleCourierSelection(courierId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['couriers'] });
+    },
+  });
+};

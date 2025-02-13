@@ -24,6 +24,7 @@ export type courierType = {
   shipping_type: string;
   shipment_duration_range: string;
   shipment_duration_unit: string;
+  is_selected: boolean;
 };
 
 export type GroupedCourier = {
@@ -37,5 +38,6 @@ export type GroupedCourier = {
     duration_range: string;
     duration_unit: string;
     shipping_type: string;
+    is_selected: boolean;
   }[];
 };
