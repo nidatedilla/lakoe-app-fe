@@ -50,10 +50,10 @@ export default function LandingPage() {
         </motion.div>
 
         <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={animationFadeUp}
-          transition={{ duration: 1 }}
+             initial="hidden"
+             animate="visible"
+             variants={animationFadeUp}
+             transition={{ duration: 1 }}
         >
           <Box minW={'full'}>
             <Image w={'full'} src="src/assets/lakoe-banner.png" />
@@ -118,52 +118,52 @@ export default function LandingPage() {
 
         <Box>
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={animationFadeUp}
-            transition={{ duration: 1.2 }}
+           initial="hidden"
+           animate="visible"
+           variants={animationFadeUp}
+           transition={{ duration: 1.2 }}
           >
-            <Text textAlign="center" fontSize={'20px'} mb={8}>
-              Pilih Template Toko Online yang Sesuai
-            </Text>
+          <Text textAlign="center" fontSize={'20px'} mb={8}>
+            Pilih Template Toko Online yang Sesuai
+          </Text>
           </motion.div>
 
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={animationFadeUp}
-            transition={{ duration: 1.2 }}
+           initial="hidden"
+           animate="visible"
+           variants={animationFadeUp}
+           transition={{ duration: 1.2 }}
           >
-            <Box
-              display={'flex'}
-              justifyContent={'center'}
-              overflowX="auto"
-              py={4}
-              w={'full'}
-            >
-              <HStack gap={6} minWidth="max-content">
-                <Box
-                  p={5}
-                  borderWidth={1}
-                  borderRadius="lg"
-                  boxShadow="md"
-                  bg="white"
-                  textAlign="center"
-                  w="300px"
-                >
-                  <Image
-                    borderRadius="md"
-                    src="https://i.pinimg.com/736x/7b/4a/82/7b4a82a5f5b50f78720de9cc3ffad702.jpg"
-                    alt="Template 1"
-                    mb={4}
-                    boxSize="300px"
-                    objectFit="cover"
-                  />
-                  <Text mb={2}>Template Modern</Text>
-                  <Button colorScheme="teal" variant="outline">
-                    Pilih Template
-                  </Button>
-                </Box>
+          <Box
+            display={'flex'}
+            justifyContent={'center'}
+            overflowX="auto"
+            py={4}
+            w={'full'}
+          >
+            <HStack gap={6} minWidth="max-content">
+              <Box
+                p={5}
+                borderWidth={1}
+                borderRadius="lg"
+                boxShadow="md"
+                bg="white"
+                textAlign="center"
+                w="300px"
+              >
+                <Image
+                  borderRadius="md"
+                  src="https://i.pinimg.com/736x/7b/4a/82/7b4a82a5f5b50f78720de9cc3ffad702.jpg"
+                  alt="Template 1"
+                  mb={4}
+                  boxSize="300px"
+                  objectFit="cover"
+                />
+                <Text mb={2}>Template Modern</Text>
+                <Button colorScheme="teal" variant="outline">
+                  Pilih Template
+                </Button>
+              </Box>
 
                 <Box
                   p={5}
@@ -211,32 +211,32 @@ export default function LandingPage() {
                   </Button>
                 </Box>
 
-                <Box
-                  p={5}
-                  borderWidth={1}
-                  borderRadius="lg"
-                  boxShadow="md"
-                  bg="white"
-                  textAlign="center"
-                  w="300px"
-                >
-                  <Image
-                    borderRadius="md"
-                    src="https://i.pinimg.com/736x/9e/1d/58/9e1d58c8899fbd0bf24b9097cf66aada.jpg"
-                    alt="Template 4"
-                    mb={4}
-                    boxSize="300px"
-                    objectFit="cover"
-                  />
-                  <Heading size="md" mb={2}>
-                    Template Profesional
-                  </Heading>
-                  <Button colorScheme="teal" variant="outline">
-                    Pilih Template
-                  </Button>
-                </Box>
-              </HStack>
-            </Box>
+              <Box
+                p={5}
+                borderWidth={1}
+                borderRadius="lg"
+                boxShadow="md"
+                bg="white"
+                textAlign="center"
+                w="300px"
+              >
+                <Image
+                  borderRadius="md"
+                  src="https://i.pinimg.com/736x/9e/1d/58/9e1d58c8899fbd0bf24b9097cf66aada.jpg"
+                  alt="Template 4"
+                  mb={4}
+                  boxSize="300px"
+                  objectFit="cover"
+                />
+                <Heading size="md" mb={2}>
+                  Template Profesional
+                </Heading>
+                <Button colorScheme="teal" variant="outline">
+                  Pilih Template
+                </Button>
+              </Box>
+            </HStack>
+          </Box>
           </motion.div>
         </Box>
       </Box>
