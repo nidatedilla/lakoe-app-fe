@@ -19,6 +19,8 @@ import Layout from './pages/buyer-page/layout';
 import PrivateRoute from './routes/private-route';
 import CartPage from './pages/buyer-page/cart-page';
 import CheckoutPage from './pages/buyer-page/checkout-page';
+import './index.css'
+
 
 function App() {
   const router = createBrowserRouter([

@@ -10,7 +10,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { Button } from './ui/button';
 import {
@@ -20,9 +20,9 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogRoot,
   DialogTitle,
   DialogTrigger,
+  DialogRoot,
 } from './ui/dialog';
 import { Field } from './ui/field';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -32,7 +32,7 @@ import {
   useFindDistricts,
   useFindVillages,
 } from '../services/get-region';
-import { useCreateLocation } from '../hooks/use-create-locations';
+import { useUpdateLocation } from '../hooks/use-update-location';
 import { Location } from '../types/type-location';
 import { useGetMe } from '../hooks/use-find-me';
 import { useDialogStore } from '../store/dialog-store';
@@ -52,19 +52,28 @@ const MapClickHandler = ({
   return null;
 };
 
-export default function DialogAddLocation() {
+interface DialogUpdateLocationProps {
+  location: Location;
+}
+
+export const DialogUpdateLocation = ({
+  location,
+}: DialogUpdateLocationProps) => {
   const { User } = useGetMe();
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [type, setType] = useState('origin');
+  const [name, setName] = useState(location.name);
+  const [address, setAddress] = useState(location.address);
+  const [type, setType] = useState(location.type);
   const { isOpen, closeDialog, openDialog } = useDialogStore();
 
-  const [position, setPosition] = useState<[number, number]>(defaultPosition);
+  const [position, setPosition] = useState<[number, number]>([
+    parseFloat(location.latitude),
+    parseFloat(location.longitude),
+  ]);
 
-  const [selectedProvince, setSelectedProvince] = useState<string>('');
-  const [selectedRegency, setSelectedRegency] = useState<string>('');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
-  const [selectedVillage, setSelectedVillage] = useState<string>('');
+  const [selectedProvince, setSelectedProvince] = useState(location.provinces);
+  const [selectedRegency, setSelectedRegency] = useState(location.regencies);
+  const [selectedDistrict, setSelectedDistrict] = useState(location.districts);
+  const [selectedVillage, setSelectedVillage] = useState(location.villages);
 
   const { data: provinsi } = useFindProvince();
   const { data: regencies } = useFindRegencies(selectedProvince);
@@ -129,19 +138,13 @@ export default function DialogAddLocation() {
     listVillage.items.find((item) => item.value === selectedVillage)
       ?.postal_code || '';
 
-  console.log(
-    `provinsi : ${selectedProvinceName} kabupaten/kota: ${selectedRegencyName} kecamatan:  ${selectedDistrictName} desa: ${selectedVillageName}`
-  );
-
-  console.log(selectedDistrictName);
-  const { mutateAsync: createLocation, status } = useCreateLocation(() => {
-    setName('');
-    setAddress('');
-  });
+  const { mutateAsync: updateLocation, status } = useUpdateLocation();
 
   const isLoading = status === 'pending';
+
   const handleSubmit = async () => {
     const payload: Location = {
+      id: location.id,
       name,
       address,
       postal_code: selectPostalCode,
@@ -155,24 +158,21 @@ export default function DialogAddLocation() {
       contact_phone: User?.phone || '',
       type,
       storeId: User?.stores?.id || '',
-      is_main_location: User?.stores?.locations ? false : true,
+      is_main_location: false,
     };
 
     try {
-      const res = await createLocation(payload);
+      await updateLocation(payload);
       closeDialog();
-      console.log('Location created:', res);
-    } catch (err: any) {
-      console.error('Error creating location:', err);
+      console.log('Location updated');
+    } catch (err) {
+      console.error('Error updating location:', err);
     }
   };
 
-  console.log("Dialog state:", isOpen);
-
   return (
-    <DialogRoot
-      open={isOpen}
-    > <DialogTrigger asChild>
+    <DialogRoot open={isOpen}>
+      <DialogTrigger asChild>
         <Button
           bg="transparent"
           size="sm"
@@ -181,14 +181,14 @@ export default function DialogAddLocation() {
           borderRadius="full"
           height="30px"
           color="black"
-          onClick={() => openDialog("create")}
+          onClick={() => openDialog("update")}
         >
-          Tambah Lokasi
+          Edit Lokasi
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Tambah Lokasi Baru</DialogTitle>
+          <DialogTitle>Update Lokasi</DialogTitle>
         </DialogHeader>
         <DialogBody>
           <VStack gap={4}>
@@ -213,45 +213,34 @@ export default function DialogAddLocation() {
                   <IoIosArrowDown style={{ marginLeft: 'auto' }} />
                 </SelectTrigger>
                 <SelectContent>
-                  {listProvince.items.length > 0 ? (
-                    listProvince.items.map((prov) => (
-                      <SelectItem item={prov} key={prov.value}>
-                        {prov.label}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem item={{ label: 'Tidak ada data', value: '' }}>
-                      Tidak ada data
+                  {listProvince.items.map((prov) => (
+                    <SelectItem item={prov} key={prov.value}>
+                      {prov.label}
                     </SelectItem>
-                  )}
+                  ))}
                 </SelectContent>
               </SelectRoot>
             </Field>
+
             <Field label="Kabupaten / Kota" required>
               <SelectRoot
                 collection={listRegency}
                 size="sm"
                 width="full"
-                onValueChange={(details) =>
-                  setSelectedRegency(details.value?.[0] ?? '')
-                }
+                onValueChange={(details) => {
+                  setSelectedRegency(details.value?.[0] ?? '');
+                }}
               >
                 <SelectTrigger>
                   <SelectValueText placeholder="Cari Kabupaten / Kota" />
                   <IoIosArrowDown style={{ marginLeft: 'auto' }} />
                 </SelectTrigger>
                 <SelectContent>
-                  {listRegency.items.length > 0 ? (
-                    listRegency.items.map((regency) => (
-                      <SelectItem item={regency} key={regency.value}>
-                        {regency.label}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem item={{ label: 'Tidak ada data', value: '' }}>
-                      Pilih Provinsi terlebih dahulu
+                  {listRegency.items.map((reg) => (
+                    <SelectItem item={reg} key={reg.value}>
+                      {reg.label}
                     </SelectItem>
-                  )}
+                  ))}
                 </SelectContent>
               </SelectRoot>
             </Field>
@@ -260,26 +249,20 @@ export default function DialogAddLocation() {
                 collection={listDistrict}
                 size="sm"
                 width="full"
-                onValueChange={(details) =>
-                  setSelectedDistrict(details.value?.[0] ?? '')
-                }
+                onValueChange={(details) => {
+                  setSelectedDistrict(details.value?.[0] ?? '');
+                }}
               >
                 <SelectTrigger>
                   <SelectValueText placeholder="Cari Kecamatan" />
                   <IoIosArrowDown style={{ marginLeft: 'auto' }} />
                 </SelectTrigger>
                 <SelectContent>
-                  {listDistrict.items.length > 0 ? (
-                    listDistrict.items.map((district) => (
-                      <SelectItem item={district} key={district.value}>
-                        {district.label}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem item={{ label: 'Tidak ada data', value: '' }}>
-                      Pilih Kabupaten/Kota terlebih dahulu
+                  {listDistrict.items.map((dis) => (
+                    <SelectItem item={dis} key={dis.value}>
+                      {dis.label}
                     </SelectItem>
-                  )}
+                  ))}
                 </SelectContent>
               </SelectRoot>
             </Field>
@@ -288,29 +271,24 @@ export default function DialogAddLocation() {
                 collection={listVillage}
                 size="sm"
                 width="full"
-                onValueChange={(details) =>
-                  setSelectedVillage(details.value?.[0] ?? '')
-                }
+                onValueChange={(details) => {
+                  setSelectedVillage(details.value?.[0] ?? '');
+                }}
               >
                 <SelectTrigger>
                   <SelectValueText placeholder="Cari Kelurahan" />
                   <IoIosArrowDown style={{ marginLeft: 'auto' }} />
                 </SelectTrigger>
                 <SelectContent>
-                  {listVillage.items.length > 0 ? (
-                    listVillage.items.map((village) => (
-                      <SelectItem item={village} key={village.value}>
-                        {village.label}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem item={{ label: 'Tidak ada data', value: '' }}>
-                      Pilih Kecamatan terlebih dahulu
+                  {listVillage.items.map((prov) => (
+                    <SelectItem item={prov} key={prov.value}>
+                      {prov.label}
                     </SelectItem>
-                  )}
+                  ))}
                 </SelectContent>
               </SelectRoot>
             </Field>
+
             <Field label="Alamat" required>
               <Input
                 placeholder="Alamat lengkap"
@@ -362,8 +340,8 @@ export default function DialogAddLocation() {
             Simpan
           </Button>
         </DialogFooter>
-        
       </DialogContent>
     </DialogRoot>
   );
-}
+};
+
