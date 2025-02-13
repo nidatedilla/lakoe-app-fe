@@ -1,116 +1,138 @@
 import {
   Box,
   Button,
-  Center,
   Flex,
-  Stack,
   Text,
   Icon,
-  Badge,
-  Input,
+  Stat,
+  HStack,
+  VStack,
 } from '@chakra-ui/react';
 import { Avatar } from '../components/ui/avatar';
-import { FaSquareXTwitter } from 'react-icons/fa6';
-import {
-  FaStore,
-  FaEdit,
-  FaShoppingCart,
-  FaFacebook,
-  FaInstagram,
-  FaUserFriends,
-} from 'react-icons/fa';
-import { Field } from '../components/ui/field';
 import { useGetMe } from '../hooks/use-find-me';
+import { useColorModeValue } from '../components/ui/color-mode';
+import { Skeleton } from '../components/ui/skeleton';
+import {
+  Mail,
+  MapPin,
+  Package2,
+  PenSquare,
+  Store,
+  UserIcon,
+} from 'lucide-react';
+import { useNavigate } from 'react-router';
+
+function StatCard({ label, value }: { label: string; value: string | number }) {
+  const bgColor = useColorModeValue('white', 'gray.700');
+
+  return (
+    <Box bg={bgColor} p={6} rounded="lg" shadow="sm" width="full">
+      <Stat.Root>
+        <Stat.Label color="gray.500">{label}</Stat.Label>
+        <Stat.ValueText fontSize="2xl" fontWeight="bold">
+          {value}
+        </Stat.ValueText>
+      </Stat.Root>
+    </Box>
+  );
+}
+
+function InfoRow({
+  icon: IconComponent,
+  text,
+}: {
+  icon: React.ElementType;
+  text: string;
+}) {
+  return (
+    <HStack gap={2} color="gray.600">
+      <Icon as={IconComponent} boxSize={4} />
+      <Text>{text}</Text>
+    </HStack>
+  );
+}
 
 export default function ProfilePage() {
   const { User } = useGetMe();
+  const navigate = useNavigate();
+  const bgColor = useColorModeValue('gray.50', 'gray.900');
 
   if (!User) {
-    return <Center>Loading...</Center>;
+    return (
+      <Box maxW="4xl" py={6}>
+        <Skeleton height="400px" />
+      </Box>
+    );
   }
 
   return (
-    <Box w="full" p={4}>
-      <Flex
-        direction="column"
-        alignItems="center"
-        bg="white"
-        p={10}
-        borderRadius="xl"
-        textAlign="center"
-      >
-        <Avatar size="2xl" src={User.stores?.logo || ''} mb={4} />
+    <Box minH="100vh" bg={bgColor}>
+      <Box maxW="4xl" p={4}>
+        <Box bg="white" rounded="xl" overflow="hidden" shadow="sm">
+          <Box
+            h={'32'}
+            bgGradient="to-r"
+            gradientFrom="blue.400"
+            gradientTo="blue.300"
+          />
 
-        <Box
-          mb={4}
-          px={4}
-          py={3}
-          bg="gray.100"
-          boxShadow="md"
-          borderRadius="md"
-          w="full"
-        >
-          <Flex alignItems="center" justifyContent="center" gap={2}>
-            <Icon size={'2xl'} as={FaStore} color="blue.500" />
-            <Text fontWeight="bold" fontSize="22px" color="black">
-              {User.stores?.name || ''}
-            </Text>
-          </Flex>
-          <Flex justifyContent="space-around" mt={2}>
-            <Badge p={2} borderRadius="md" fontSize={'14px'}>
-              <Icon size={'lg'} as={FaShoppingCart} mr={2} />
-              20 Produk
-            </Badge>
-            <Badge p={2} borderRadius="md" fontSize={'14px'}>
-              <Icon size={'lg'} as={FaUserFriends} mr={2} />
-              12 Pengikut
-            </Badge>
-          </Flex>
+          <Box px={6} pb={6}>
+            <Flex direction="column" alignItems="center" mt="-12">
+              <Avatar
+                w={'100px'}
+                h={'100px'}
+                src={User?.stores?.logo}
+                name={User?.stores?.name}
+                border="4px"
+                borderColor="white"
+                shadow="lg"
+              />
+
+              <VStack mt={4} gap={1} textAlign="center">
+                <HStack>
+                  <Icon as={Store} boxSize={5} />
+                  <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+                    {User?.stores?.name}
+                  </Text>
+                </HStack>
+                <Text color="gray.500" px={4}>
+                  {User?.stores?.slogan}
+                </Text>
+              </VStack>
+
+              <HStack mt={6} gap={3}>
+                <Button
+                  bg="blue.500"
+                  size="lg"
+                  borderRadius={'lg'}
+                  onClick={() => navigate('/setting-store')}
+                >
+                  <Icon as={PenSquare} /> Ubah Profil
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  borderRadius={'lg'}
+                  onClick={() => navigate('/product')}
+                >
+                  <Icon as={Package2} /> Kelola Produk
+                </Button>
+              </HStack>
+            </Flex>
+
+            <Flex gap={4} mt={8}>
+              <StatCard label="Produk" value={'12'} />
+              <StatCard label="Bergabung Sejak" value={''} />
+            </Flex>
+
+            <VStack mt={8} gap={3} maxW="lg" mx="auto" align="stretch">
+              <InfoRow icon={UserIcon} text={User.name} />
+              <InfoRow icon={Mail} text={User.email} />
+              <InfoRow icon={MapPin} text={'Jakarta'} />
+            </VStack>
+          </Box>
         </Box>
-
-        <Field label="Username">
-          <Input value={User.name} readOnly />
-        </Field>
-
-        <Field label="E-mail" mt={2}>
-          <Input value={User.email} readOnly />
-        </Field>
-
-        <Field label="Slogan" mt={4}>
-          <Input value={User.stores?.slogan} readOnly />
-        </Field>
-
-        <Stack direction="row" rowGap={4} mt={4}>
-          <Button bg={'transparent'}>
-            <Icon size={'2xl'}>
-              <FaFacebook color="black" />
-            </Icon>
-          </Button>
-          <Button bg={'transparent'}>
-            <Icon size={'2xl'}>
-              <FaSquareXTwitter color="black" />
-            </Icon>
-          </Button>
-          <Button bg={'transparent'}>
-            <Icon size={'2xl'}>
-              <FaInstagram color="black" />
-            </Icon>
-          </Button>
-        </Stack>
-
-        <Button
-          colorScheme="blue"
-          size="lg"
-          borderRadius="full"
-          mt={6}
-          _hover={{ bg: 'blue.600' }}
-        >
-          <Icon>
-            <FaEdit />
-          </Icon>
-          Edit Profile
-        </Button>
-      </Flex>
+      </Box>
     </Box>
   );
 }

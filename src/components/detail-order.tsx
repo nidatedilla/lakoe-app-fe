@@ -27,6 +27,8 @@ import DialogTrackDelivery from './dialog-track-delivery';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { useOrder } from '../hooks/use-order';
 import Cookies from 'js-cookie';
+import Lottie from 'lottie-react';
+import animationData from '../assets/lotties/loading-order.json';
 
 export default function DetailOrder() {
   const token = Cookies.get('token');
@@ -39,7 +41,7 @@ export default function DetailOrder() {
   } = useOrder(orderId || '', token || '');
 
   if (isLoading) {
-    return <Text>Loading...</Text>;
+    return <Lottie animationData={animationData} loop={true} />;
   }
 
   if (error || !order) {

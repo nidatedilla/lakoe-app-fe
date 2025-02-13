@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Container,
   Flex,
   Heading,
   HStack,
@@ -9,17 +10,31 @@ import {
   Stack,
   Text,
   VStack,
+  Badge,
+  Icon,
 } from '@chakra-ui/react';
 import { Field } from '../../components/ui/field';
 import { Radio, RadioGroup } from '../../components/ui/radio';
 import { useState } from 'react';
 import { orderDummy } from '../../components/order-dummy';
+import DialogChangeShippingMethod from './components/change-shipping-method-dialog';
+import { useLocation } from 'react-router-dom';
+import { FiMapPin, FiUser, FiTruck, FiCreditCard } from 'react-icons/fi';
+import { useColorModeValue } from '../../components/ui/color-mode';
+import DialogChangeLocation from './components/change-location-dialog';
 // import { useCreateOrder } from '../../hooks/use-order';
 
 const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
   const order = orderDummy[0];
+  const location = useLocation();
+  const selectedShipping = location.state?.selectedShipping;
   // const { mutate: createOrder } = useCreateOrder();
+
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  const headerBg = useColorModeValue('blue.50', 'blue.900');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
 
   // const handleSubmit = () => {
   //   const orderData = {
@@ -51,200 +66,214 @@ const CheckoutPage = () => {
   // };
 
   return (
-    <Box maxW="full" mx="auto" color={'black'}>
-      <HStack
+    <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
+      <Box
         w="full"
-        h={'90px'}
-        align="center"
-        px={10}
-        borderBottomWidth={'1px'}
-        borderColor={'gray.300'}
-        bgGradient="to-r"
-        gradientFrom="whiteAlpha.700"
-        gradientTo="blue.100"
-        justifyContent="space-between"
+        bg={headerBg}
+        py={3}
+        borderBottomWidth="1px"
+        borderColor={borderColor}
       >
-        <HStack>
-          <Image src="../src/assets/lakoe-logo.png" width={'130px'} />
-          <Box
-            borderLeftWidth="1px"
-            borderColor="gray.300"
-            height="50px"
-            mx={4}
-          />
-          <Heading fontSize="24px" color={'blue.700'}>
-            Checkout
-          </Heading>
-        </HStack>
-      </HStack>
+        <Container maxW="7xl">
+          <HStack gap={6}>
+            <Image src="../src/assets/lakoe-logo.png" h="55px" />
+            <Box borderRightWidth={'1px'} borderColor={'blue.400'} h={'35px'} />
+            <Heading size="2xl" color="blue.700">
+              Checkout
+            </Heading>
+          </HStack>
+        </Container>
+      </Box>
 
-      <HStack alignItems={'start'} gap={5} py={5} px={20}>
-        <Box flex={1}>
-          <Box p={5} borderWidth="1px" borderRadius="lg" mb={4}>
-            <Text fontWeight="bold">Penerima</Text>
-            <Flex justifyContent="space-between" mt={2}>
-              <Text>
-                {order.buyer.name} - {order.buyer.phone}
-              </Text>
-              <Button size="sm" variant={'outline'} color={'blue.500'}>
-                Ubah
-              </Button>
-            </Flex>
-          </Box>
-
-          <Box p={5} borderWidth="1px" borderRadius="lg" mb={4}>
-            <Text fontWeight="bold">Alamat</Text>
-            <Flex justifyContent="space-between" mt={2}>
-              <Text>{order.shipping.address}</Text>
-              <Button size="sm" variant={'outline'} color={'blue.500'}>
-                Ubah
-              </Button>
-            </Flex>
-          </Box>
-
-          <Box p={5} borderWidth="1px" borderRadius="lg" mb={4}>
-            <Text fontWeight="bold">Metode Pembayaran</Text>
-            <RadioGroup
-              onChange={(e) =>
-                setPaymentMethod((e.target as HTMLInputElement).value)
-              }
-              value={paymentMethod}
-              mt={2}
-              colorPalette={'blue'}
-            >
-              <Stack gap={3}>
-                <Radio value="kartu-kredit">Kartu Kredit/ Debit</Radio>
-                <Radio value="transfer-bank">Transfer Bank</Radio>
-                <Radio value="cod">COD</Radio>
-              </Stack>
-            </RadioGroup>
-
-            {paymentMethod === 'kartu-kredit' && (
-              <Box mt={4}>
-                <Field label="Masukkan No Kartu Kredit" mb={2}>
-                  <Input type="text" placeholder="XXXX XXXX XXXX XXXX" />
-                </Field>
-                <Flex>
-                  <Field label="Valid date" mr={2}>
-                    <Input type="month" />
-                  </Field>
-                  <Field label="CVV">
-                    <Input type="password" placeholder="XXX" />
-                  </Field>
-                </Flex>
-              </Box>
-            )}
-
-            {paymentMethod === 'transfer-bank' && (
-              <Box mt={4}>
-                <Text fontWeight="bold" mb={2}>
-                  Pilih Bank:
-                </Text>
-                <RadioGroup colorPalette={'blue'}>
-                  <Stack gap={3}>
-                    <Radio value="bca">BCA</Radio>
-                    <Radio value="bni">BNI</Radio>
-                    <Radio value="mandiri">Mandiri</Radio>
-                  </Stack>
-                </RadioGroup>
-              </Box>
-            )}
-          </Box>
-
-          <Box p={5} borderWidth="1px" borderRadius="lg" mb={4}>
-            <Flex justifyContent="space-between" mt={2}>
-              <Text>Subtotal untuk Produk</Text>
-              <Text>
-                Rp{order.product.price.toLocaleString()} x
-                {order.product.quantity}
-              </Text>
-            </Flex>
-            <Flex justifyContent="space-between" mt={2}>
-              <Text>Ongkos Kirim</Text>
-              <Text>Rp{order.details.shippingCost.toLocaleString()}</Text>
-            </Flex>
-            <Flex justifyContent="space-between" mt={2}>
-              <Text>Diskon</Text>
-              <Text>-Rp{order.details.discount.toLocaleString()}</Text>
-            </Flex>
-            <Flex justifyContent="space-between" fontWeight="bold" mt={2}>
-              <Text>Total Pembayaran</Text>
-              <Text>Rp{order.details.totalAmount.toLocaleString()}</Text>
-            </Flex>
-          </Box>
-
-          <Button
-            variant={'outline'}
-            borderColor={'blue'}
-            size="lg"
-            width="full"
-            // onClick={handleSubmit}
-          >
-            Buat Pesanan
-          </Button>
-        </Box>
-
-        <Box boxShadow={'md'} width={'55%'} borderRadius={'md'} p={5}>
-          <Text fontSize={'18px'} fontWeight={'medium'}>
-            Produk Dipesan
-          </Text>
-          <Box borderTopWidth={'1px'} borderColor={'gray.200'} mt={3}>
-            <HStack alignItems={'center'} p={3}>
-              <Box width={'70px'} height={'70px'} overflow={'hidden'}>
-                <Image
-                  src={order.product.image}
-                  objectFit={'cover'}
-                  width={'100%'}
-                  height={'100%'}
-                />
-              </Box>
-              <VStack alignItems={'flex-start'} gap={0}>
-                <Text fontWeight={'medium'} fontSize={'16px'}>
-                  {order.product.name}
-                </Text>
-                <Text fontSize={'14px'} color={'gray.500'}>
-                  {order.product.quantity} Barang
-                </Text>
-                <Text fontWeight={'medium'} fontSize={'16px'}>
-                  Rp{order.product.price.toLocaleString()}
-                </Text>
-              </VStack>
-            </HStack>
-
-            <Box
-              borderTopWidth={'1px'}
-              borderColor={'gray.200'}
-              mt={3}
-              color={'gray.500'}
-            >
-              <Flex justifyContent="space-between" mt={2}>
-                <Text>Subtotal untuk Produk</Text>
-                <Text>
-                  Rp{order.product.price.toLocaleString()} x
-                  {order.product.quantity}
-                </Text>
-              </Flex>
-              <Flex justifyContent="space-between" mt={2}>
-                <Text>Ongkos Kirim</Text>
-                <Text>Rp{order.details.shippingCost.toLocaleString()}</Text>
-              </Flex>
-              <Flex justifyContent="space-between" mt={2}>
-                <Text>Diskon</Text>
-                <Text>-Rp{order.details.discount.toLocaleString()}</Text>
-              </Flex>
-              <Flex
-                justifyContent="space-between"
-                fontWeight="bold"
-                mt={2}
-                color={'blue.600'}
-              >
-                <Text>Total Pembayaran</Text>
-                <Text>Rp{order.details.totalAmount.toLocaleString()}</Text>
+      <Container maxW="7xl" py={8}>
+        <Stack
+          direction={{ base: 'column', lg: 'row' }}
+          gap={8}
+          align="flex-start"
+        >
+          <VStack flex="1" gap={4} align="stretch" w="full">
+            <Box bg={bgColor} p={6} borderRadius="xl" borderWidth="1px">
+              <HStack mb={4}>
+                <Icon as={FiUser} color="blue.500" boxSize={5} />
+                <Heading size="md">Informasi Penerima</Heading>
+              </HStack>
+              <Flex justify="space-between" align="center">
+                <VStack align="start" gap={1}>
+                  <Text fontWeight="medium">
+                    {order.buyer.name} - {order.buyer.phone}
+                  </Text>
+                </VStack>
+                <Button size="sm" colorPalette="blue" variant="outline">
+                  Ubah
+                </Button>
               </Flex>
             </Box>
+
+            <Box bg={bgColor} p={6} borderRadius="xl" borderWidth="1px">
+              <HStack mb={4}>
+                <Icon as={FiMapPin} color="blue.500" boxSize={5} />
+                <Heading size="md">Alamat Pengiriman</Heading>
+              </HStack>
+              <Flex justify="space-between" align="center">
+                <Text>{order.shipping.address}</Text>
+                <DialogChangeLocation />
+              </Flex>
+            </Box>
+
+            <Box bg={bgColor} p={6} borderRadius="xl" borderWidth="1px">
+              <HStack mb={4}>
+                <Icon as={FiTruck} color="blue.500" boxSize={5} />
+                <Heading size="md">Opsi Pengiriman</Heading>
+              </HStack>
+              <Flex justify="space-between" align="center">
+                {selectedShipping ? (
+                  <VStack align="start" gap={2}>
+                    <Text fontWeight="medium">
+                      {selectedShipping.courierName} -{' '}
+                      {selectedShipping.serviceName}
+                    </Text>
+                    <HStack>
+                      <Badge colorPalette="blue">
+                        {selectedShipping.duration}
+                      </Badge>
+                      <Text color="blue.500" fontWeight="semibold">
+                        Rp {selectedShipping.price.toLocaleString()}
+                      </Text>
+                    </HStack>
+                  </VStack>
+                ) : (
+                  <Text color={textColor}>Pilih metode pengiriman</Text>
+                )}
+                <DialogChangeShippingMethod />
+              </Flex>
+            </Box>
+
+            <Box bg={bgColor} p={6} borderRadius="xl" borderWidth="1px">
+              <HStack mb={4}>
+                <Icon as={FiCreditCard} color="blue.500" boxSize={5} />
+                <Heading size="md">Metode Pembayaran</Heading>
+              </HStack>
+              <RadioGroup
+                onChange={(e) =>
+                  setPaymentMethod((e.target as HTMLInputElement).value)
+                }
+                value={paymentMethod}
+                mt={2}
+                colorPalette={'blue'}
+              >
+                <Stack gap={3}>
+                  <Radio value="kartu-kredit">Kartu Kredit/ Debit</Radio>
+                  <Radio value="transfer-bank">Transfer Bank</Radio>
+                  <Radio value="cod">COD</Radio>
+                </Stack>
+              </RadioGroup>
+
+              {paymentMethod === 'kartu-kredit' && (
+                <Box mt={4}>
+                  <Field label="Masukkan No Kartu Kredit" mb={2}>
+                    <Input type="text" placeholder="XXXX XXXX XXXX XXXX" />
+                  </Field>
+                  <Flex>
+                    <Field label="Valid date" mr={2}>
+                      <Input type="month" />
+                    </Field>
+                    <Field label="CVV">
+                      <Input type="password" placeholder="XXX" />
+                    </Field>
+                  </Flex>
+                </Box>
+              )}
+
+              {paymentMethod === 'transfer-bank' && (
+                <Box mt={4}>
+                  <Text fontWeight="bold" mb={2}>
+                    Pilih Bank:
+                  </Text>
+                  <RadioGroup colorPalette={'blue'}>
+                    <Stack gap={3}>
+                      <Radio value="bca">BCA</Radio>
+                      <Radio value="bni">BNI</Radio>
+                      <Radio value="mandiri">Mandiri</Radio>
+                    </Stack>
+                  </RadioGroup>
+                </Box>
+              )}
+            </Box>
+          </VStack>
+
+          <Box
+            bg={bgColor}
+            p={6}
+            borderRadius="xl"
+            borderWidth="1px"
+            w={{ base: 'full', lg: '400px' }}
+            position="sticky"
+            top="20px"
+          >
+            <Heading size="md" mb={6}>
+              Ringkasan Pesanan
+            </Heading>
+
+            <Box mb={6}>
+              <HStack gap={4} pb={4} borderBottomWidth="1px">
+                <Image
+                  src={order.product.image}
+                  boxSize="80px"
+                  objectFit="cover"
+                  borderRadius="md"
+                />
+                <VStack align="start" flex="1">
+                  <Text fontWeight="medium">{order.product.name}</Text>
+                  <Text color={textColor}>{order.product.quantity} item</Text>
+                  <Text fontWeight="medium">
+                    Rp {order.product.price.toLocaleString()}
+                  </Text>
+                </VStack>
+              </HStack>
+            </Box>
+
+            <Stack gap={3}>
+              <Flex justify="space-between">
+                <Text color={textColor}>Subtotal Produk</Text>
+                <Text>
+                  Rp{' '}
+                  {(
+                    order.product.price * order.product.quantity
+                  ).toLocaleString()}
+                </Text>
+              </Flex>
+              <Flex justify="space-between">
+                <Text color={textColor}>Ongkos Kirim</Text>
+                <Text>Rp {order.details.shippingCost.toLocaleString()}</Text>
+              </Flex>
+              <Flex justify="space-between">
+                <Text color={textColor}>Diskon</Text>
+                <Text color="green.500">
+                  -Rp {order.details.discount.toLocaleString()}
+                </Text>
+              </Flex>
+              <Box borderBottomWidth={'1px'} />
+              <Flex justify="space-between" fontWeight="bold">
+                <Text>Total</Text>
+                <Text color="blue.500" fontSize="lg">
+                  Rp {order.details.totalAmount.toLocaleString()}
+                </Text>
+              </Flex>
+            </Stack>
+
+            <Button
+              borderRadius={'full'}
+              colorPalette="blue"
+              size="lg"
+              w="full"
+              mt={6}
+              disabled={!selectedShipping}
+            >
+              Buat Pesanan
+            </Button>
           </Box>
-        </Box>
-      </HStack>
+        </Stack>
+      </Container>
     </Box>
   );
 };
