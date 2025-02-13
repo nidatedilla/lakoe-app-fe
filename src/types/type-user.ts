@@ -1,5 +1,5 @@
-import { product } from "./type-product";
-
+import { product } from './type-product';
+import { Location } from './type-location';
 export interface User {
   id: string;
   email: string;
@@ -21,8 +21,9 @@ export interface stores {
   banner?: string;
   logo?: string;
   slogan?: string;
-  products? : product[]
-  _count:{
-    products: number
-  }
+  products?: product[];
+  locations?: Location[]
+  _count: {
+    products: number;
+  };
 }
