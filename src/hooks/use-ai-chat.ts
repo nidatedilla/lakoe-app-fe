@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { getAiResponse } from '../services/ai-service';
+import toast from 'react-hot-toast';
 
 type Message = {
   role: 'user' | 'ai';
@@ -10,6 +11,7 @@ type Message = {
 export const useAiChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentMessage, setCurrentMessage] = useState<Message | null>(null);
 
   const mutation = useMutation<string, Error, string>({
     mutationFn: getAiResponse,
@@ -17,11 +19,27 @@ export const useAiChat = () => {
       setIsLoading(true);
     },
     onSuccess: (data: string) => {
-      const aiMessage: Message = { role: 'ai', content: data };
-      setMessages((prev) => [...prev, aiMessage]);
+      const words = data.split(' ');
+      let currentContent = '';
+      const aiMessage: Message = { role: 'ai', content: '' };
+      setCurrentMessage(aiMessage);
       setIsLoading(false);
+
+      const interval = setInterval(() => {
+        if (words.length === 0) {
+          clearInterval(interval);
+          setMessages((prev) => [...prev, aiMessage]);
+          setCurrentMessage(null);
+          setIsLoading(false);
+        } else {
+          currentContent += words.shift() + ' ';
+          aiMessage.content = currentContent.trim();
+          setCurrentMessage({ ...aiMessage });
+        }
+      }, 100); 
     },
     onError: (error: Error) => {
+      toast.error("Error during AI response")
       console.error('Error during AI response:', error);
       setIsLoading(false);
     },
@@ -37,5 +55,6 @@ export const useAiChat = () => {
     messages,
     sendMessage,
     isLoading,
+    currentMessage,
   };
 };

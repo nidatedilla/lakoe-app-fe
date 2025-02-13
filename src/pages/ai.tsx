@@ -8,7 +8,7 @@ import { Button } from '../components/ui/button';
 import { useAiChat } from '../hooks/use-ai-chat';
 
 export const AiPage = () => {
-  const { messages, sendMessage, isLoading } = useAiChat();
+  const { messages, sendMessage, isLoading, currentMessage } = useAiChat();
   const [input, setInput] = useState('');
 
   const handleSendMessage = () => {
@@ -21,6 +21,10 @@ export const AiPage = () => {
     if (event.key === 'Enter') {
       handleSendMessage();
     }
+  };
+
+  const handleButtonClick = (message: string) => {
+    sendMessage(message);
   };
 
   return (
@@ -62,7 +66,6 @@ export const AiPage = () => {
               maxHeight="150px"
               marginBottom={4}
             />
-
             <Text fontSize="xl" fontWeight="bold" marginBottom={2}>
               Halo! Saya adalah LakoeAi asisten virtual Anda.
             </Text>
@@ -75,8 +78,10 @@ export const AiPage = () => {
                 variant="outline"
                 colorScheme="blue"
                 borderRadius="full"
-                onClick={() =>
+                onClick={() =>{
                   console.log('Coba tanyakan: Apa produk terlaris hari ini?')
+                handleButtonClick('Apa produk terlaris hari ini?')
+                }
                 }
               >
                 Apa produk terlaris hari ini?
@@ -85,10 +90,11 @@ export const AiPage = () => {
                 variant="outline"
                 colorScheme="blue"
                 borderRadius="full"
-                onClick={() =>
+                onClick={() =>{
                   console.log(
                     'Coba tanyakan: Berapa banyak produk yang telah terjual?'
                   )
+                  handleButtonClick("Berapa banyak produk yang telah terjual?")}
                 }
               >
                 Berapa banyak produk yang telah terjual?
@@ -97,8 +103,10 @@ export const AiPage = () => {
                 variant="outline"
                 colorScheme="blue"
                 borderRadius="full"
-                onClick={() =>
+                onClick={() =>{
                   console.log('Coba tanyakan: Apakah ada promo hari ini?')
+                  handleButtonClick(" Apakah ada promo hari ini?")
+                }
                 }
               >
                 Apakah ada promo hari ini?
@@ -106,13 +114,26 @@ export const AiPage = () => {
             </Flex>
           </Box>
         )}
+        {currentMessage && (
+          <Box
+            alignSelf="flex-start"
+            bg={'white'}
+            color={'black'}
+            borderRadius="3xl"
+            p={3}
+            marginBottom={'20px'}
+            maxWidth="70%"
+          >
+            <Text>{currentMessage.content}</Text>
+          </Box>
+        )}
         {isLoading && (
           <Box
-          alignSelf="flex-start"
-          p={1}
-          maxWidth="70%"
-          borderRadius="3xl"
-          bg={'white'}
+            alignSelf="flex-start"
+            p={1}
+            maxWidth="70%"
+            borderRadius="3xl"
+            bg={'white'}
           >
             <DotLottieReact
               src="https://lottie.host/0c0820e8-9a42-46cb-9d4d-6ef512896d3a/iPJTyNsohD.lottie"
@@ -134,6 +155,7 @@ export const AiPage = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+
         />
         <Box
           paddingRight={'7px'}
