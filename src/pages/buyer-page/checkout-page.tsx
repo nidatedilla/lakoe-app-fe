@@ -26,10 +26,13 @@ type Product = {
 };
 
 import DialogChangeShippingMethod from './components/change-shipping-method-dialog';
-import { useLocation } from 'react-router-dom';
+import { data, useLocation } from 'react-router';
 import { FiMapPin, FiUser, FiTruck, FiCreditCard } from 'react-icons/fi';
 import { useColorModeValue } from '../../components/ui/color-mode';
 import DialogChangeLocation from './components/change-location-dialog';
+import { useGetGuestLocations } from '../../hooks/use-get-location';
+import { getGuestId } from '../../utils/guest';
+
 // import { useCreateOrder } from '../../hooks/use-order';
 
 const CheckoutPage = () => {
@@ -38,7 +41,7 @@ const CheckoutPage = () => {
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const headerBg = useColorModeValue('blue.50', 'blue.900');
   const textColor = useColorModeValue('gray.600', 'gray.300');
-
+        
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
   const storedData = localStorage.getItem('checkout');
   const product = storedData ? JSON.parse(storedData) : [];
@@ -48,8 +51,17 @@ const CheckoutPage = () => {
   const location = useLocation();
   const selectedShipping = location.state?.selectedShipping;
   // const { mutate: createOrder } = useCreateOrder();
-
+  const guestId = getGuestId();
+  console.log('Guest ID di location get:', guestId);
+        
   if (!productList.length) return <p>Produk tidak ditemukan</p>;
+
+  const {
+    data: guestLocations,
+    isLoading,
+    error,
+  } = useGetGuestLocations(guestId);
+
   // const handleSubmit = () => {
   //   const orderData = {
   //     userId: order.userId,
@@ -78,6 +90,8 @@ const CheckoutPage = () => {
 
   //   createOrder(orderData);
   // };
+
+  console.log('guest lokasi: ', guestLocations);
 
   return (
     <Box minH="100vh" bg={bgPage}>
@@ -111,21 +125,28 @@ const CheckoutPage = () => {
                 <Icon as={FiUser} color="blue.500" boxSize={5} />
                 <Heading size="md">Informasi Penerima</Heading>
               </HStack>
-              <Flex justify="space-between" align="center">
-                <VStack align="start" gap={2} w={'full'}>
-                  <Input placeholder="Masukkan nama" />
-                  <Input placeholder="Masukkan no handphone" />
-                </VStack>
-              </Flex>
-            </Box>
-
-            <Box bg={bgColor} p={6} borderRadius="xl" borderWidth="1px">
-              <HStack mb={4}>
-                <Icon as={FiMapPin} color="blue.500" boxSize={5} />
-                <Heading size="md">Alamat Pengiriman</Heading>
-              </HStack>
-              <Flex justify="space-between" align="center">
-                <Text>{''}</Text>
+              <Flex justify="space-between" alignItems="center">
+              {guestLocations? (
+                 <Box gap={"20px"} display={"flex"} flexDirection={"column"}>
+                
+                 <Text>
+                   <Text as={'span'} fontWeight={'semibold'}>
+                     {guestLocations.contact_name}
+                   </Text>{' '}
+                   <Text as={'span'}>|</Text>{' '} {guestLocations.contact_phone
+                   }
+                 </Text>
+                 <Text>
+                   {guestLocations.address
+                   }{"  "} {guestLocations.villages}{"  "}{guestLocations.
+                     districts}{"  "}{guestLocations.regencies}{"  "}{guestLocations.provinces}{"  "}{guestLocations.postal_code}
+                 </Text>
+                 </Box>
+              ): 
+              (
+                <Text>Isi Alamat mu</Text>
+              )
+              }
                 <DialogChangeLocation />
               </Flex>
             </Box>
