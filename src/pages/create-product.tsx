@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent } from 'react';
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -11,6 +11,7 @@ import {
 import MultiColumnCategory from '../components/MultiColumnCategory'; // Komponen kategori
 import DynamicVariantCombinationUI from '../components/DynamicVariantCombinationUI'; // Komponen variant
 import Cookies from 'js-cookie';
+import { useStoreDomain } from '../hooks/use-store';
 
 // Contoh tipe data varian yang diterima (berupa array Variant)
 interface Variant {
@@ -24,6 +25,7 @@ interface Variant {
 
 function App() {
   // State untuk input teks
+  const { data: storeDomain } = useStoreDomain();
   const [productName, setProductName] = useState('');
   const [checkoutUrl, setCheckoutUrl] = useState('');
   const [price, setPrice] = useState('');
@@ -47,6 +49,17 @@ function App() {
   );
   // State loading
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (storeDomain) {
+      setCheckoutUrl(storeDomain + '/');
+    }
+  }, [storeDomain]);
+
+  const handleCheckoutUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCheckoutUrl(value);
+  };
 
   // Handle perubahan gambar utama
   const handleImageChange = (
@@ -183,7 +196,7 @@ function App() {
                   variant="outlined"
                   sx={{ mt: 2 }}
                   value={checkoutUrl}
-                  onChange={(e) => setCheckoutUrl(e.target.value)}
+                  onChange={handleCheckoutUrlChange}
                   InputProps={{
                     startAdornment: (
                       <Typography sx={{ mr: 1 }}>lakoe.store/</Typography>

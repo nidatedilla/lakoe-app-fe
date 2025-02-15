@@ -14,10 +14,9 @@ import {
   Alert,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import { productDummy } from '../../components/product-dummy';
 import { DeleteIcon } from '@chakra-ui/icons';
 import { BsCartX } from 'react-icons/bs';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import toast from 'react-hot-toast';
 import { useColorModeValue } from '../../components/ui/color-mode';
 import { Checkbox } from '../../components/ui/checkbox';
@@ -25,20 +24,22 @@ import { Tooltip } from '../../components/ui/tooltip';
 import { StepperInput } from '../../components/ui/stepper-input';
 
 interface CartItem {
-  id: number;
-  status: string;
-  kode: string;
-  product: {
-    nama: string;
-    jumlah: number;
-    harga: number;
-    imageUrl: string;
-  };
+  id: string;
+  name: string;
+  attachments: string;
+  price: number;
+  quantity: number;
 }
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>(productDummy);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartItems(storedCart);
+  }, []);
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.800', 'white');
@@ -56,15 +57,17 @@ export default function CartPage() {
     setSelectedItems([]);
   }, [cartItems]);
 
-  const handleRemoveItem = (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
+  const handleRemoveItem = (id: string) => {
+    const updatedCart = cartItems.filter((item) => item.id !== id);
+    setCartItems(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
     setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
     toast.success('Item telah dihapus dari keranjang belanja Anda.', {
       duration: 3000,
     });
   };
 
-  const handleQuantityChange = (id: number, newQuantity: number) => {
+  const handleQuantityChange = (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     if (newQuantity > 99) {
       toast.error('Anda tidak bisa menambahkan lebih dari 99 item', {
@@ -73,16 +76,20 @@ export default function CartPage() {
       return;
     }
 
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id
-          ? { ...item, product: { ...item.product, jumlah: newQuantity } }
-          : item
-      )
-    );
+    setCartItems((prevCart) => {
+      const updatedCart = prevCart.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      );
+
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+
+      window.dispatchEvent(new Event('storage'));
+
+      return updatedCart;
+    });
   };
 
-  const handleSelectItem = (id: number) => {
+  const handleSelectItem = (id: string) => {
     setSelectedItems((prevSelected) => {
       const isCurrentlySelected = prevSelected.includes(id);
       const newSelected = isCurrentlySelected
@@ -100,7 +107,7 @@ export default function CartPage() {
   const calculateSubtotal = () => {
     return selectedItems.reduce((total, id) => {
       const item = cartItems.find((item) => item.id === id);
-      return total + (item?.product.harga || 0) * (item?.product.jumlah || 0);
+      return total + (item?.price || 0) * (item?.quantity || 0);
     }, 0);
   };
 
@@ -121,9 +128,19 @@ export default function CartPage() {
       return;
     }
 
-    toast('Mengarahkan ke halaman pembayaran...', {
+    const selectedProducts = cartItems.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+    console.log('Selected products:', selectedProducts);
+    localStorage.setItem('checkout', JSON.stringify(selectedProducts));
+
+    toast('Mengarahkan ke halaman checkout...', {
       duration: 2000,
     });
+
+    setTimeout(() => {
+      navigate('/lakoe-app/checkout-page');
+    }, 1000);
   };
 
   if (cartItems.length === 0) {
@@ -195,8 +212,8 @@ export default function CartPage() {
                       boxSize="120px"
                       objectFit="cover"
                       borderRadius="lg"
-                      src={item.product.imageUrl}
-                      alt={item.product.nama}
+                      src={item.attachments}
+                      alt={item.name}
                     />
                     <Box flex="1">
                       <Flex justify="space-between" align="start">
@@ -206,14 +223,14 @@ export default function CartPage() {
                             fontWeight="semibold"
                             color={textColor}
                           >
-                            {item.product.nama}
+                            {item.name}
                           </Text>
                           <Text
                             color={highlightColor}
                             fontSize="xl"
                             fontWeight="bold"
                           >
-                            Rp{item.product.harga.toLocaleString()}
+                            Rp{item.price.toLocaleString()}
                           </Text>
                         </VStack>
                         <Tooltip
@@ -237,15 +254,17 @@ export default function CartPage() {
                         <StepperInput
                           bg={bgColor}
                           color={textColor}
-                          defaultValue="1"
                           min={1}
                           max={99}
-                          onChange={(e) =>
-                            handleQuantityChange(
-                              item.id,
-                              parseInt((e.target as HTMLInputElement).value)
-                            )
-                          }
+                          step={1}
+                          value={String(item.quantity)}
+                          onValueChange={(details) => {
+                            const newQuantity = Number(details.value);
+                            handleQuantityChange(item.id, newQuantity);
+                          }}
+                          allowOverflow={false}
+                          spinOnPress={true}
+                          focusInputOnChange={false}
                         />
                       </Flex>
                     </Box>
@@ -307,7 +326,7 @@ export default function CartPage() {
                 onClick={handleCheckout}
                 w="100%"
               >
-                Lanjutkan ke Pembayaran
+                Checkout
               </Button>
             </VStack>
           </Box>

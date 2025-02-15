@@ -1,6 +1,7 @@
 import {
   Box,
   Collapsible,
+  Flex,
   Grid,
   HStack,
   Icon,
@@ -41,7 +42,21 @@ export default function DetailOrder() {
   } = useOrder(orderId || '', token || '');
 
   if (isLoading) {
-    return <Lottie animationData={animationData} loop={true} />;
+    return (
+      <Flex
+        width="100vw"
+        height="100vh"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Box>
+          <Lottie
+            animationData={animationData}
+            style={{ width: 300, height: 300 }}
+          />
+        </Box>
+      </Flex>
+    );
   }
 
   if (error || !order) {

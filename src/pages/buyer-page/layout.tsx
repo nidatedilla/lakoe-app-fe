@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Group,
   HStack,
@@ -11,8 +12,37 @@ import { BsCart3 } from 'react-icons/bs';
 import { Link, Outlet } from 'react-router';
 import { Button } from '../../components/ui/button';
 import { IoIosSearch } from 'react-icons/io';
+import { useEffect, useState } from 'react';
+
+interface CartItem {
+  quantity: number;
+}
 
 export default function Layout() {
+  const [cartCount, setCartCount] = useState(0);
+
+  const updateCartCount = () => {
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const totalItems = storedCart.reduce(
+      (acc: number, item: CartItem) => acc + item.quantity,
+      0
+    );
+    setCartCount(totalItems);
+  };
+
+  useEffect(() => {
+    updateCartCount();
+
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'cart') {
+        updateCartCount();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   return (
     <Box minW={'100vh'} minH="100vh" color={'white'}>
       <HStack
@@ -44,9 +74,24 @@ export default function Layout() {
           </InputAddon>
         </Group>
         <Link to={'/lakoe-app/cart-page'}>
-          <Icon size={'lg'} color={'blue.400'}>
-            <BsCart3 />
-          </Icon>
+          <Box position="relative">
+            <Icon size={'lg'} color={'blue.400'} aria-label="Cart">
+              <BsCart3 />
+            </Icon>
+            {cartCount > 0 && (
+              <Badge
+                position="absolute"
+                top="-8px"
+                right="-5px"
+                bg="blue.700"
+                color="white"
+                borderRadius="full"
+                fontSize="xs"
+              >
+                {cartCount}
+              </Badge>
+            )}
+          </Box>
         </Link>
       </HStack>
 

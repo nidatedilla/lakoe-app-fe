@@ -6,6 +6,7 @@ import {
   Tabs,
   VStack,
   Text,
+  Flex,
 } from '@chakra-ui/react';
 import { InputGroup } from './ui/input-group';
 import Cookies from 'js-cookie';
@@ -41,7 +42,17 @@ export default function TabsOrder() {
   //   }
   // }, [orders]);
 
-  if (isLoading) return <Lottie animationData={animationData} loop={true} />;
+  if (isLoading)
+    return (
+      <Flex justifyContent="center" alignItems="center">
+        <Box>
+          <Lottie
+            animationData={animationData}
+            style={{ width: 200, height: 200 }}
+          />
+        </Box>
+      </Flex>
+    );
   if (error) return <Text>Error loading orders.</Text>;
 
   const getOrderCountByStatus = (status: string) => {

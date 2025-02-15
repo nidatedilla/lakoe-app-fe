@@ -13,3 +13,14 @@ export interface product {
   price: number;
   weight: number;
 }
+
+export type Item = {
+  name: string;
+  description: string;
+  value: number;
+  length: number;
+  width: number;
+  height: number;
+  weight: number;
+  quantity: number;
+};
