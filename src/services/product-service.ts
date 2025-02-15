@@ -1,6 +1,8 @@
+import axios from 'axios';
 import { Api } from '../libs/api';
 import { product } from '../types/type-product';
 import { useQuery } from '@tanstack/react-query';
+import { apiURL } from '../utils/constants';
 
 // Hook untuk mengambil seluruh produk
 export function useFindProducts() {
@@ -38,3 +40,8 @@ export async function deleteProduct(id: number): Promise<{ message: string }> {
   const res = await Api.delete<{ message: string }>(`/product/${id}`);
   return res.data;
 }
+
+export const getProductById = async (id: string) => {
+  const response = await axios.get(`${apiURL}/store/product/${id}`);
+  return response.data;
+};

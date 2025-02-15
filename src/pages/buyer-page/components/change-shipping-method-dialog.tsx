@@ -1,8 +1,10 @@
 import { Box, HStack, Image, Text, VStack, Icon, Flex } from '@chakra-ui/react';
 import { Button } from '../../../components/ui/button';
 import {
+  DialogActionTrigger,
   DialogCloseTrigger,
   DialogContent,
+  DialogFooter,
   DialogRoot,
   DialogTrigger,
 } from '../../../components/ui/dialog';
@@ -146,25 +148,25 @@ export default function DialogChangeShippingMethod() {
             </VStack>
           </RadioGroup>
 
-          <HStack justify="flex-end" gap={4}>
-            <Button
-              variant="outline"
-              colorPalette="gray"
-              onClick={() => navigate(-1)}
-            >
-              Nanti Saja
-            </Button>
-            <Button
-              colorPalette="blue"
-              onClick={handleConfirm}
-              disabled={!selectedService}
-            >
-              <HStack gap={2}>
-                <FiTruck />
-                <Text>Konfirmasi Pengiriman</Text>
-              </HStack>
-            </Button>
-          </HStack>
+          <DialogFooter>
+            <HStack justify="flex-end" gap={4}>
+              <DialogActionTrigger asChild>
+                <Button variant="outline" colorPalette="gray">
+                  Nanti Saja
+                </Button>
+              </DialogActionTrigger>
+              <Button
+                colorPalette="blue"
+                onClick={handleConfirm}
+                disabled={!selectedService}
+              >
+                <HStack gap={2}>
+                  <FiTruck />
+                  <Text>Konfirmasi Pengiriman</Text>
+                </HStack>
+              </Button>
+            </HStack>
+          </DialogFooter>
         </Box>
       </DialogContent>
     </DialogRoot>

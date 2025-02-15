@@ -2,7 +2,6 @@ import {
   Badge,
   Box,
   Container,
-  Flex,
   HStack,
   Icon,
   Image,
@@ -11,95 +10,126 @@ import {
   Heading,
   SimpleGrid,
   IconButton,
-  createListCollection,
   Button,
+  Spinner,
 } from '@chakra-ui/react';
 import { BsCartPlus, BsHeart, BsShare } from 'react-icons/bs';
-import { TbTruckDelivery } from 'react-icons/tb';
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router';
-import { productDummy } from '../../components/product-dummy';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { useColorModeValue } from '../../components/ui/color-mode';
-import {
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText,
-} from '../../components/ui/select';
 import toast from 'react-hot-toast';
 import { StepperInput } from '../../components/ui/stepper-input';
+import { useProduct } from '../../hooks/use-get-product';
 
-interface Product {
-  id: number;
-  status: string;
-  kode: string;
-  product: {
-    nama: string;
-    jumlah: number;
-    harga: number;
-    imageUrl: string;
-  };
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  attachments: string;
+  variant: string;
+  quantity: number;
 }
 
-const cities = createListCollection({
-  items: [
-    { label: 'Jakarta', value: 'jakarta' },
-    { label: 'Bandung', value: 'bandung' },
-    { label: 'Surabaya', value: 'surabaya' },
-  ],
-});
-
-const shippingMethods = createListCollection({
-  items: [
-    { label: 'Regular (2-3 days)', value: 'regular' },
-    { label: 'Express (1 day)', value: 'express' },
-  ],
-});
+// interface Product {
+//   id: number;
+//   status: string;
+//   kode: string;
+//   product: {
+//     nama: string;
+//     jumlah: number;
+//     harga: number;
+//     imageUrl: string;
+//   };
+// }
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product | null>(null);
+  const { data: product, isLoading, isError, error } = useProduct(id || '');
+  const [quantity, setQuantity] = useState<number>(1);
+  const navigate = useNavigate();
+
   const [selectedVariant, setSelectedVariant] = useState<string>('varian1');
-  const [selectedCity, setSelectedCity] = useState('jakarta');
-  const [selectedShipping, setSelectedShipping] = useState('regular');
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.800', 'white');
   const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const accentColor = useColorModeValue('blue.500', 'blue.300');
-  const sectionBg = useColorModeValue('gray.50', 'gray.700');
   const buttonHoverBg = useColorModeValue('blue.50', 'blue.700');
-  const selectBg = useColorModeValue('white', 'gray.700');
-
-  useEffect(() => {
-    const foundProduct = productDummy.find(
-      (p) => p.id === parseInt(id || '', 10)
-    );
-    if (foundProduct) {
-      setProduct(foundProduct);
-    }
-  }, [id]);
 
   const handleVariantClick = (variant: string) => {
     setSelectedVariant(variant);
   };
 
   const handleAddToCart = () => {
-    toast.success('Produk telah ditambahkan ke keranjang', {
-      duration: 3000,
-    });
+    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existingItem: CartItem | undefined = cartItems.find(
+      (item: CartItem) =>
+        item.id === product.id && item.variant === selectedVariant
+    );
+
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cartItems.push({
+        ...product,
+        variant: selectedVariant,
+        quantity: quantity,
+      });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    toast.success('Produk telah ditambahkan ke keranjang', { duration: 3000 });
   };
+
+  const handleBuyNow = () => {
+    const checkoutItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      attachments: product.attachments,
+      variant: selectedVariant,
+      quantity: quantity,
+    };
+
+    localStorage.setItem('checkout', JSON.stringify(checkoutItem));
+
+    toast('Mengarahkan ke halaman checkout...', {
+      duration: 2000,
+    });
+
+    setTimeout(() => {
+      navigate('/lakoe-app/checkout-page');
+    }, 1000);
+  };
+
+  if (isLoading) {
+    return (
+      <Container maxW="container.xl" h="100vh" centerContent>
+        <Spinner size="xl" />
+        <Text mt={4} fontSize="xl" color={textColor}>
+          Loading product details...
+        </Text>
+      </Container>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Container maxW="container.xl" h="100vh" centerContent>
+        <Text fontSize="xl" color="red.500">
+          {error instanceof Error ? error.message : 'Something went wrong'}
+        </Text>
+      </Container>
+    );
+  }
 
   if (!product) {
     return (
       <Container maxW="container.xl" h="100vh" centerContent>
-        <VStack gap={4} mt={20}>
-          <Text fontSize="xl" color={textColor}>
-            Loading product details...
-          </Text>
-        </VStack>
+        <Text fontSize="xl" color={textColor}>
+          Product not found.
+        </Text>
       </Container>
     );
   }
@@ -118,8 +148,8 @@ export default function ProductDetail() {
               objectFit="cover"
               w="100%"
               h="600px"
-              src={product.product.imageUrl}
-              alt={product.product.nama}
+              src={product.attachments}
+              alt={product.name}
             />
             <HStack position="absolute" top={4} right={4} gap={2}>
               <IconButton
@@ -145,7 +175,7 @@ export default function ProductDetail() {
         <VStack align="stretch" gap={6}>
           <VStack align="stretch" gap={4}>
             <Heading size="xl" color={textColor}>
-              {product.product.nama}
+              {product.name}
             </Heading>
             <Badge
               colorScheme="blue"
@@ -154,11 +184,11 @@ export default function ProductDetail() {
               borderRadius="lg"
               width="fit-content"
             >
-              Rp{product.product.harga.toLocaleString()}
+              Rp{product.price.toLocaleString()}
             </Badge>
           </VStack>
 
-          <Box bg={sectionBg} p={6} borderRadius="xl">
+          {/* <Box bg={sectionBg} p={6} borderRadius="xl">
             <VStack align="stretch" gap={4}>
               <Flex align="center" gap={4}>
                 <Icon as={TbTruckDelivery} boxSize={6} color={accentColor} />
@@ -231,7 +261,7 @@ export default function ProductDetail() {
                 </Box>
               </SimpleGrid>
             </VStack>
-          </Box>
+          </Box> */}
 
           <Box>
             <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
@@ -278,8 +308,14 @@ export default function ProductDetail() {
             <StepperInput
               bg={bgColor}
               color={textColor}
-              defaultValue="1"
               min={1}
+              max={99}
+              step={1}
+              value={String(quantity)}
+              onValueChange={(details) => setQuantity(Number(details.value))}
+              allowOverflow={false}
+              spinOnPress={true}
+              focusInputOnChange={false}
             />
           </Box>
 
@@ -315,6 +351,7 @@ export default function ProductDetail() {
               fontWeight="medium"
               transition="all 0.2s"
               _hover={{ bg: 'blue.600' }}
+              onClick={handleBuyNow}
             >
               Beli
             </Button>

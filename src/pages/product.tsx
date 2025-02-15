@@ -2,6 +2,7 @@ import { Box, Text, Button, Flex, Spacer } from '@chakra-ui/react';
 import { Link } from 'react-router';
 import { CiCirclePlus } from 'react-icons/ci';
 import TabsProduk from '../components/tabs-product';
+import CombinedProductList from '../components/card-product';
 
 function Product() {
   return (
@@ -18,6 +19,7 @@ function Product() {
       </Flex>
 
       <TabsProduk />
+      <CombinedProductList />
     </Box>
   );
 }

@@ -16,7 +16,15 @@ import {
 import { Field } from '../../components/ui/field';
 import { Radio, RadioGroup } from '../../components/ui/radio';
 import { useState } from 'react';
-import { orderDummy } from '../../components/order-dummy';
+
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  attachments: string;
+};
+
 import DialogChangeShippingMethod from './components/change-shipping-method-dialog';
 import { data, useLocation } from 'react-router';
 import { FiMapPin, FiUser, FiTruck, FiCreditCard } from 'react-icons/fi';
@@ -28,23 +36,32 @@ import { getGuestId } from '../../utils/guest';
 // import { useCreateOrder } from '../../hooks/use-order';
 
 const CheckoutPage = () => {
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const bgPage = useColorModeValue('gray.50', 'gray.900');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  const headerBg = useColorModeValue('blue.50', 'blue.900');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
+        
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
-  const order = orderDummy[0];
+  const storedData = localStorage.getItem('checkout');
+  const product = storedData ? JSON.parse(storedData) : [];
+
+  const productList = Array.isArray(product) ? product : [product];
+
   const location = useLocation();
   const selectedShipping = location.state?.selectedShipping;
   // const { mutate: createOrder } = useCreateOrder();
   const guestId = getGuestId();
   console.log('Guest ID di location get:', guestId);
+        
+  if (!productList.length) return <p>Produk tidak ditemukan</p>;
 
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.600');
-  const headerBg = useColorModeValue('blue.50', 'blue.900');
-  const textColor = useColorModeValue('gray.600', 'gray.300');
   const {
     data: guestLocations,
     isLoading,
     error,
   } = useGetGuestLocations(guestId);
+
   // const handleSubmit = () => {
   //   const orderData = {
   //     userId: order.userId,
@@ -77,7 +94,7 @@ const CheckoutPage = () => {
   console.log('guest lokasi: ', guestLocations);
 
   return (
-    <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
+    <Box minH="100vh" bg={bgPage}>
       <Box
         w="full"
         bg={headerBg}
@@ -215,77 +232,75 @@ const CheckoutPage = () => {
             </Box>
           </VStack>
 
-          <Box
-            bg={bgColor}
-            p={6}
-            borderRadius="xl"
-            borderWidth="1px"
-            w={{ base: 'full', lg: '400px' }}
-            position="sticky"
-            top="20px"
-          >
-            <Heading size="md" mb={6}>
-              Ringkasan Pesanan
-            </Heading>
-
-            <Box mb={6}>
-              <HStack gap={4} pb={4} borderBottomWidth="1px">
-                <Image
-                  src={order.product.image}
-                  boxSize="80px"
-                  objectFit="cover"
-                  borderRadius="md"
-                />
-                <VStack align="start" flex="1">
-                  <Text fontWeight="medium">{order.product.name}</Text>
-                  <Text color={textColor}>{order.product.quantity} item</Text>
-                  <Text fontWeight="medium">
-                    Rp {order.product.price.toLocaleString()}
-                  </Text>
-                </VStack>
-              </HStack>
-            </Box>
-
-            <Stack gap={3}>
-              <Flex justify="space-between">
-                <Text color={textColor}>Subtotal Produk</Text>
-                <Text>
-                  Rp{' '}
-                  {(
-                    order.product.price * order.product.quantity
-                  ).toLocaleString()}
-                </Text>
-              </Flex>
-              <Flex justify="space-between">
-                <Text color={textColor}>Ongkos Kirim</Text>
-                <Text>Rp {order.details.shippingCost.toLocaleString()}</Text>
-              </Flex>
-              <Flex justify="space-between">
-                <Text color={textColor}>Diskon</Text>
-                <Text color="green.500">
-                  -Rp {order.details.discount.toLocaleString()}
-                </Text>
-              </Flex>
-              <Box borderBottomWidth={'1px'} />
-              <Flex justify="space-between" fontWeight="bold">
-                <Text>Total</Text>
-                <Text color="blue.500" fontSize="lg">
-                  Rp {order.details.totalAmount.toLocaleString()}
-                </Text>
-              </Flex>
-            </Stack>
-
-            <Button
-              borderRadius={'full'}
-              colorPalette="blue"
-              size="lg"
-              w="full"
-              mt={6}
-              disabled={!selectedShipping}
+          {productList.map((item: Product) => (
+            <Box
+              bg={bgColor}
+              p={6}
+              borderRadius="xl"
+              borderWidth="1px"
+              w={{ base: 'full', lg: '400px' }}
+              position="sticky"
+              top="20px"
+              key={item.id}
             >
-              Buat Pesanan
-            </Button>
-          </Box>
+              <Heading size="md" mb={6}>
+                Ringkasan Pesanan
+              </Heading>
+
+              <Box mb={6}>
+                <HStack gap={4} pb={4} borderBottomWidth="1px">
+                  <Image
+                    src={item.attachments}
+                    boxSize="80px"
+                    objectFit="cover"
+                    borderRadius="md"
+                  />
+                  <VStack align="start" flex="1">
+                    <Text fontWeight="medium">{item.name}</Text>
+                    <Text color={textColor}>{item.quantity} item</Text>
+                    <Text fontWeight="medium">
+                      Rp {item.price.toLocaleString()}
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Box>
+
+              <Stack gap={3}>
+                <Flex justify="space-between">
+                  <Text color={textColor}>Subtotal Produk</Text>
+                  <Text>
+                    Rp {(item.price * item.quantity).toLocaleString()}
+                  </Text>
+                </Flex>
+                <Flex justify="space-between">
+                  <Text color={textColor}>Ongkos Kirim</Text>
+                  <Text>Rp {''}</Text>
+                </Flex>
+                <Flex justify="space-between">
+                  <Text color={textColor}>Diskon</Text>
+                  <Text color="green.500">-Rp {''}</Text>
+                </Flex>
+                <Box borderBottomWidth={'1px'} />
+                <Flex justify="space-between" fontWeight="bold">
+                  <Text>Total</Text>
+                  <Text color="blue.500" fontSize="lg">
+                    Rp {(item.price * item.quantity).toLocaleString()}
+                  </Text>
+                </Flex>
+              </Stack>
+
+              <Button
+                borderRadius={'full'}
+                colorPalette="blue"
+                size="lg"
+                w="full"
+                mt={6}
+                disabled={!selectedShipping}
+              >
+                Buat Pesanan
+              </Button>
+            </Box>
+          ))}
         </Stack>
       </Container>
     </Box>

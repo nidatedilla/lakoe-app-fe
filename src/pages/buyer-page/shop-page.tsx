@@ -16,10 +16,26 @@ import { FiShoppingCart, FiStar } from 'react-icons/fi';
 import { useColorModeValue } from '../../components/ui/color-mode';
 import { useStoreData } from '../../hooks/use-store';
 import { product } from '../../types/type-product';
+import toast from 'react-hot-toast';
 
 export default function ShopPage() {
   const { domain } = useParams<{ domain: string }>();
   const { data: store, isLoading, error } = useStoreData(domain || '');
+  const addToCart = (product: product) => {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existingProduct = cart.find(
+      (item: product) => item.id === product.id
+    );
+
+    if (existingProduct) {
+      existingProduct.quantity += 1;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    toast.success(`${product.name} ditambahkan ke keranjang!`);
+  };
 
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -124,7 +140,15 @@ export default function ShopPage() {
                       <Text fontSize="xl" fontWeight="bold" color={accentColor}>
                         Rp{product.price.toLocaleString()}
                       </Text>
-                      <Button size="sm" colorScheme="blue" variant="ghost">
+                      <Button
+                        size="sm"
+                        colorScheme="blue"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addToCart(product);
+                        }}
+                      >
                         <Icon as={FiShoppingCart} />
                       </Button>
                     </Flex>
