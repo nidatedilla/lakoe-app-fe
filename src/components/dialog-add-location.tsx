@@ -130,7 +130,7 @@ export default function DialogAddLocation() {
       ?.postal_code || '';
 
   console.log(
-    `provinsi : ${selectedProvinceName} kabupaten/kota: ${selectedRegencyName} kecamatan:  ${selectedDistrictName} desa: ${selectedVillageName}`
+    `provinsi : ${selectedProvinceName} kabupaten/kota: ${selectedRegencyName} kecamatan:  ${selectedDistrictName} desa: ${selectedVillageName} kode pos: ${selectPostalCode}`
   );
 
   console.log(selectedDistrictName);
