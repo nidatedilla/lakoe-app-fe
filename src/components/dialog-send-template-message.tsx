@@ -1,4 +1,4 @@
-import { Text, Icon, VStack, Box, HStack, Spinner } from '@chakra-ui/react';
+import { Text, Icon, VStack, Box, HStack } from '@chakra-ui/react';
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import { useState } from 'react';
 import { MessageTemplate } from 'types/type-message';
 import { Button } from './ui/button';
+import { Spinner } from '../components/spinner';
 
 interface DialogSendTemplateMessageProps {
   buyerName: string;

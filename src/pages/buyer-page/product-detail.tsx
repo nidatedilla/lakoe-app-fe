@@ -11,8 +11,8 @@ import {
   SimpleGrid,
   IconButton,
   Button,
-  Spinner,
 } from '@chakra-ui/react';
+import { Spinner } from '../../components/spinner';
 import { BsCartPlus, BsHeart, BsShare } from 'react-icons/bs';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';

@@ -3,11 +3,11 @@
 import {
   Toaster as ChakraToaster,
   Portal,
-  Spinner,
   Stack,
   Toast,
   createToaster,
 } from '@chakra-ui/react';
+import { Spinner } from '../../components/spinner';
 
 export const toaster = createToaster({
   placement: 'bottom-end',
