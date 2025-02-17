@@ -14,7 +14,6 @@ import {
   Alert,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import { DeleteIcon } from '@chakra-ui/icons';
 import { BsCartX } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router';
 import toast from 'react-hot-toast';
@@ -22,6 +21,7 @@ import { useColorModeValue } from '../../components/ui/color-mode';
 import { Checkbox } from '../../components/ui/checkbox';
 import { Tooltip } from '../../components/ui/tooltip';
 import { StepperInput } from '../../components/ui/stepper-input';
+import { DeleteIcon } from 'lucide-react';
 
 interface CartItem {
   id: string;
