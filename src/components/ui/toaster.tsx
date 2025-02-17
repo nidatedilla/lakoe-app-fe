@@ -4,10 +4,10 @@ import {
   Toaster as ChakraToaster,
   Portal,
   Stack,
+  Text,
   Toast,
   createToaster,
 } from '@chakra-ui/react';
-import { Spinner } from '../../components/spinner';
 
 export const toaster = createToaster({
   placement: 'bottom-end',
@@ -21,7 +21,7 @@ export const Toaster = () => {
         {(toast) => (
           <Toast.Root width={{ md: 'sm' }}>
             {toast.type === 'loading' ? (
-              <Spinner size="sm" color="blue.solid" />
+              <Text>Loading...</Text>
             ) : (
               <Toast.Indicator />
             )}

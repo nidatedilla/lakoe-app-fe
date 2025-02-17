@@ -1,7 +1,11 @@
 import type { ButtonProps as ChakraButtonProps } from '@chakra-ui/react';
-import { AbsoluteCenter, Button as ChakraButton, Span } from '@chakra-ui/react';
+import {
+  AbsoluteCenter,
+  Button as ChakraButton,
+  Span,
+  Text,
+} from '@chakra-ui/react';
 import * as React from 'react';
-import { Spinner } from '../../components/spinner';
 
 interface ButtonLoadingProps {
   loading?: boolean;
@@ -18,13 +22,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {loading && !loadingText ? (
           <>
             <AbsoluteCenter display="inline-flex">
-              <Spinner size="inherit" color="inherit" />
+              <Text>Loading...</Text>
             </AbsoluteCenter>
             <Span opacity={0}>{children}</Span>
           </>
         ) : loading && loadingText ? (
           <>
-            <Spinner size="inherit" color="inherit" />
+            <Text>Loading...</Text>
             {loadingText}
           </>
         ) : (

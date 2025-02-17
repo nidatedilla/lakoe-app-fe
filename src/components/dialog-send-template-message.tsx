@@ -13,7 +13,6 @@ import Swal from 'sweetalert2';
 import { useState } from 'react';
 import { MessageTemplate } from 'types/type-message';
 import { Button } from './ui/button';
-import { Spinner } from '../components/spinner';
 
 interface DialogSendTemplateMessageProps {
   buyerName: string;
@@ -100,7 +99,7 @@ export default function DialogSendTemplateMessage({
                 </Text>
 
                 {isLoading ? (
-                  <Spinner size="xl" />
+                  <Text>Loading...</Text>
                 ) : templates.length > 0 ? (
                   templates.map((template: MessageTemplate) => (
                     <Box

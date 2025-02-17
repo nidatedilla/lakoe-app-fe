@@ -12,7 +12,6 @@ import {
   IconButton,
   Button,
 } from '@chakra-ui/react';
-import { Spinner } from '../../components/spinner';
 import { BsCartPlus, BsHeart, BsShare } from 'react-icons/bs';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -106,7 +105,6 @@ export default function ProductDetail() {
   if (isLoading) {
     return (
       <Container maxW="container.xl" h="100vh" centerContent>
-        <Spinner size="xl" />
         <Text mt={4} fontSize="xl" color={textColor}>
           Loading product details...
         </Text>
