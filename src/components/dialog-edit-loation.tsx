@@ -10,13 +10,12 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { Button } from './ui/button';
 import {
   DialogActionTrigger,
   DialogBody,
-  DialogCloseTrigger,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -36,8 +35,6 @@ import { useUpdateLocation } from '../hooks/use-update-location';
 import { Location } from '../types/type-location';
 import { useGetMe } from '../hooks/use-find-me';
 import { useDialogStore } from '../store/dialog-store';
-
-const defaultPosition: [number, number] = [-6.2088, 106.8456];
 
 const MapClickHandler = ({
   setPosition,
@@ -62,7 +59,7 @@ export const DialogUpdateLocation = ({
   const { User } = useGetMe();
   const [name, setName] = useState(location.name);
   const [address, setAddress] = useState(location.address);
-  const [type, setType] = useState(location.type);
+  const [type] = useState(location.type);
   const { isOpen, closeDialog, openDialog } = useDialogStore();
 
   const [position, setPosition] = useState<[number, number]>([
@@ -181,7 +178,7 @@ export const DialogUpdateLocation = ({
           borderRadius="full"
           height="30px"
           color="black"
-          onClick={() => openDialog("update")}
+          onClick={() => openDialog('update')}
         >
           Edit Lokasi
         </Button>
@@ -344,4 +341,3 @@ export const DialogUpdateLocation = ({
     </DialogRoot>
   );
 };
-

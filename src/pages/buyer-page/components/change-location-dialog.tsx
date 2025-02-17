@@ -1,4 +1,3 @@
-
 import {
   Box,
   createListCollection,
@@ -12,12 +11,12 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { IoIosArrowDown } from 'react-icons/io';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 import { Button } from '../../../components/ui/button';
 import {
   DialogActionTrigger,
   DialogBody,
-  DialogCloseTrigger,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -26,17 +25,15 @@ import {
   DialogTrigger,
 } from '../../../components/ui/dialog';
 import { Field } from '../../../components/ui/field';
-import { IoIosArrowDown } from 'react-icons/io';
+import { useCreateGuestLocation } from '../../../hooks/use-create-locations';
 import {
+  useFindDistricts,
   useFindProvince,
   useFindRegencies,
-  useFindDistricts,
   useFindVillages,
 } from '../../../services/get-region';
-import { useCreateGuestLocation } from '../../../hooks/use-create-locations';
-import { Location, LocationGuest } from '../../../types/type-location';
-import { useGetMe } from '../../../hooks/use-find-me';
 import { useDialogNew } from '../../../store/dialog-store';
+import { LocationGuest } from '../../../types/type-location';
 import { getGuestId } from '../../../utils/guest';
 
 const defaultPosition: [number, number] = [-6.2088, 106.8456];
@@ -55,9 +52,9 @@ const MapClickHandler = ({
 };
 
 export default function DialogChangeLocation() {
-  const [name, setName] = useState('');
+  const [name] = useState('');
   const [address, setAddress] = useState('');
-  const [type, setType] = useState('destination');
+  const [type] = useState('destination');
   const [nameGuest, setNameGuest] = useState('');
   const [phone, setPhone] = useState('');
   const { isOpen, closeDialog, openDialog } = useDialogNew();
@@ -137,7 +134,7 @@ export default function DialogChangeLocation() {
   );
 
   console.log(selectedDistrictName);
-  const { mutateAsync: createLocation, status } = useCreateGuestLocation()
+  const { mutateAsync: createLocation, status } = useCreateGuestLocation();
 
   const guestId = getGuestId();
 
@@ -146,7 +143,7 @@ export default function DialogChangeLocation() {
     const payload: LocationGuest = {
       name,
       address,
-      guestId : guestId,
+      guestId: guestId,
       postal_code: selectPostalCode,
       provinces: selectedProvinceName,
       regencies: selectedRegencyName,
@@ -166,17 +163,17 @@ export default function DialogChangeLocation() {
       closeDialog();
       console.log('Location created:', res);
       console.log('guesId:', res.guestId);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error creating location:', err);
     }
   };
 
-  console.log("Dialog state:", isOpen);
+  console.log('Dialog state:', isOpen);
 
   return (
-    <DialogRoot
-      open={isOpen}
-    > <DialogTrigger asChild>
+    <DialogRoot open={isOpen}>
+      {' '}
+      <DialogTrigger asChild>
         <Button
           bg="transparent"
           size="sm"
@@ -187,7 +184,7 @@ export default function DialogChangeLocation() {
           color="black"
           onClick={() => openDialog()}
         >
-        Ubah Informasi
+          Ubah Informasi
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -196,18 +193,18 @@ export default function DialogChangeLocation() {
         </DialogHeader>
         <DialogBody>
           <VStack gap={4}>
-          <Field label="Nama" required>
+            <Field label="Nama" required>
               <Input
                 placeholder="Nama lengkap"
                 value={nameGuest}
                 onChange={(e) => setNameGuest(e.target.value)}
               />
             </Field>
-          <Field label="No Hp" required>
+            <Field label="No Hp" required>
               <Input
                 placeholder="No hp"
                 value={phone}
-                type='number'
+                type="number"
                 onChange={(e) => setPhone(e.target.value)}
               />
             </Field>
@@ -374,7 +371,6 @@ export default function DialogChangeLocation() {
             Simpan
           </Button>
         </DialogFooter>
-        
       </DialogContent>
     </DialogRoot>
   );

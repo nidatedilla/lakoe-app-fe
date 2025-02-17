@@ -16,7 +16,6 @@ import { Button } from './ui/button';
 import {
   DialogActionTrigger,
   DialogBody,
-  DialogCloseTrigger,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -56,7 +55,7 @@ export default function DialogAddLocation() {
   const { User } = useGetMe();
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
-  const [type, setType] = useState('origin');
+  const [type] = useState('origin');
   const { isOpen, closeDialog, openDialog } = useDialogStore();
 
   const [position, setPosition] = useState<[number, number]>(defaultPosition);
@@ -162,17 +161,17 @@ export default function DialogAddLocation() {
       const res = await createLocation(payload);
       closeDialog();
       console.log('Location created:', res);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error creating location:', err);
     }
   };
 
-  console.log("Dialog state:", isOpen);
+  console.log('Dialog state:', isOpen);
 
   return (
-    <DialogRoot
-      open={isOpen}
-    > <DialogTrigger asChild>
+    <DialogRoot open={isOpen}>
+      {' '}
+      <DialogTrigger asChild>
         <Button
           bg="transparent"
           size="sm"
@@ -181,7 +180,7 @@ export default function DialogAddLocation() {
           borderRadius="full"
           height="30px"
           color="black"
-          onClick={() => openDialog("create")}
+          onClick={() => openDialog('create')}
         >
           Tambah Lokasi
         </Button>
@@ -362,7 +361,6 @@ export default function DialogAddLocation() {
             Simpan
           </Button>
         </DialogFooter>
-        
       </DialogContent>
     </DialogRoot>
   );

@@ -10,7 +10,7 @@ import {
 } from '../../../components/ui/dialog';
 import { Radio, RadioGroup } from '../../../components/ui/radio';
 import { useState } from 'react';
-import { useGetSelectedCouriers } from '../../../hooks/use-courier';
+import { useCourierRates } from '../../../hooks/use-courier';
 import { courierType } from '../../../types/type-courier';
 import { useNavigate } from 'react-router-dom';
 import { FiTruck, FiClock } from 'react-icons/fi';
@@ -25,9 +25,42 @@ interface ShippingOption {
   price: number;
 }
 
-export default function DialogChangeShippingMethod() {
+interface DialogChangeShippingMethodProps {
+  storeId: string;
+  destinationAreaId: string;
+  items: {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    description: string;
+    value: number;
+    length: number;
+    width: number;
+    height: number;
+    weight: number;
+  }[];
+}
+
+export default function DialogChangeShippingMethod({
+  storeId,
+  destinationAreaId,
+  items,
+}: DialogChangeShippingMethodProps) {
   const [selectedService, setSelectedService] = useState<string>('');
-  const { data: selectedCouriers, isLoading } = useGetSelectedCouriers();
+  const { data: courierRates, isLoading } = useCourierRates(
+    storeId,
+    destinationAreaId,
+    items.map((item) => ({
+      ...item,
+      description: '',
+      value: item.price,
+      length: 0,
+      width: 0,
+      height: 0,
+      weight: 0,
+    }))
+  );
   const navigate = useNavigate();
 
   const bgColor = useColorModeValue('white', 'gray.800');
@@ -37,8 +70,8 @@ export default function DialogChangeShippingMethod() {
 
   if (isLoading) return <Text>Loading...</Text>;
 
-  const selectedShippingOptions: ShippingOption[] = selectedCouriers?.data
-    ? selectedCouriers.data.map((courier: courierType) => ({
+  const selectedShippingOptions: ShippingOption[] = courierRates?.data
+    ? courierRates.data.map((courier: courierType) => ({
         id: courier.id,
         courierName: courier.courier_name,
         courierCode: courier.courier_code,

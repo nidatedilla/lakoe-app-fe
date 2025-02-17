@@ -1,21 +1,30 @@
 import {
+  Badge,
   Box,
   Button,
   Container,
   Flex,
   Heading,
   HStack,
+  Icon,
   Image,
   Input,
   Stack,
   Text,
   VStack,
-  Badge,
-  Icon,
 } from '@chakra-ui/react';
+import { useState } from 'react';
+import { FiCreditCard, FiTruck, FiUser } from 'react-icons/fi';
+import { useLocation } from 'react-router';
+import { useColorModeValue } from '../../components/ui/color-mode';
 import { Field } from '../../components/ui/field';
 import { Radio, RadioGroup } from '../../components/ui/radio';
-import { useState } from 'react';
+import { useGetGuestLocations } from '../../hooks/use-get-location';
+import { getGuestId } from '../../utils/guest';
+import DialogChangeLocation from './components/change-location-dialog';
+import DialogChangeShippingMethod from './components/change-shipping-method-dialog';
+
+// import { useCreateOrder } from '../../hooks/use-order';
 
 type Product = {
   id: number;
@@ -25,23 +34,13 @@ type Product = {
   attachments: string;
 };
 
-import DialogChangeShippingMethod from './components/change-shipping-method-dialog';
-import { data, useLocation } from 'react-router';
-import { FiMapPin, FiUser, FiTruck, FiCreditCard } from 'react-icons/fi';
-import { useColorModeValue } from '../../components/ui/color-mode';
-import DialogChangeLocation from './components/change-location-dialog';
-import { useGetGuestLocations } from '../../hooks/use-get-location';
-import { getGuestId } from '../../utils/guest';
-
-// import { useCreateOrder } from '../../hooks/use-order';
-
-const CheckoutPage = () => {
+export default function CheckoutPage() {
   const bgColor = useColorModeValue('white', 'gray.800');
   const bgPage = useColorModeValue('gray.50', 'gray.900');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const headerBg = useColorModeValue('blue.50', 'blue.900');
   const textColor = useColorModeValue('gray.600', 'gray.300');
-        
+
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
   const storedData = localStorage.getItem('checkout');
   const product = storedData ? JSON.parse(storedData) : [];
@@ -52,15 +51,10 @@ const CheckoutPage = () => {
   const selectedShipping = location.state?.selectedShipping;
   // const { mutate: createOrder } = useCreateOrder();
   const guestId = getGuestId();
+  const { data: guestLocations } = useGetGuestLocations(guestId);
   console.log('Guest ID di location get:', guestId);
-        
-  if (!productList.length) return <p>Produk tidak ditemukan</p>;
 
-  const {
-    data: guestLocations,
-    isLoading,
-    error,
-  } = useGetGuestLocations(guestId);
+  if (!productList.length) return <Text>Produk tidak ditemukan</Text>;
 
   // const handleSubmit = () => {
   //   const orderData = {
@@ -68,6 +62,7 @@ const CheckoutPage = () => {
   //     storeId: order.storeId,
   //     total_price: order.details.totalAmount,
   //     shipper_contact_name: order.shipping.shipper_name,
+
   //     shipper_contact_phone: order.shipping.shipper_phone,
   //     origin_contact_name: order.shipping.origin_name,
   //     origin_contact_phone: order.shipping.origin_phone,
@@ -126,27 +121,23 @@ const CheckoutPage = () => {
                 <Heading size="md">Informasi Penerima</Heading>
               </HStack>
               <Flex justify="space-between" alignItems="center">
-              {guestLocations? (
-                 <Box gap={"20px"} display={"flex"} flexDirection={"column"}>
-                
-                 <Text>
-                   <Text as={'span'} fontWeight={'semibold'}>
-                     {guestLocations.contact_name}
-                   </Text>{' '}
-                   <Text as={'span'}>|</Text>{' '} {guestLocations.contact_phone
-                   }
-                 </Text>
-                 <Text>
-                   {guestLocations.address
-                   }{"  "} {guestLocations.villages}{"  "}{guestLocations.
-                     districts}{"  "}{guestLocations.regencies}{"  "}{guestLocations.provinces}{"  "}{guestLocations.postal_code}
-                 </Text>
-                 </Box>
-              ): 
-              (
-                <Text>Isi Alamat mu</Text>
-              )
-              }
+                {guestLocations ? (
+                  <Box gap={'20px'} display={'flex'} flexDirection={'column'}>
+                    <Text>
+                      <Text as={'span'} fontWeight={'semibold'}>
+                        {guestLocations.contact_name}
+                      </Text>{' '}
+                      <Text as={'span'}>|</Text> {guestLocations.contact_phone}
+                    </Text>
+                    <Text>
+                      {guestLocations.address}, {guestLocations.villages},{' '}
+                      {guestLocations.districts}, {guestLocations.regencies},{' '}
+                      {guestLocations.provinces}, {guestLocations.postal_code}
+                    </Text>
+                  </Box>
+                ) : (
+                  <Text>Isi informasi penerima</Text>
+                )}
                 <DialogChangeLocation />
               </Flex>
             </Box>
@@ -175,7 +166,22 @@ const CheckoutPage = () => {
                 ) : (
                   <Text color={textColor}>Pilih metode pengiriman</Text>
                 )}
-                <DialogChangeShippingMethod />
+                <DialogChangeShippingMethod
+                  storeId={product.storeId}
+                  destinationAreaId={guestLocations?.destination_area_id}
+                  items={productList.map((item) => ({
+                    id: item.id.toString(),
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    description: item.description,
+                    value: item.price * item.quantity,
+                    length: 0,
+                    width: 0,
+                    height: 0,
+                    weight: 0,
+                  }))}
+                />
               </Flex>
             </Box>
 
@@ -305,6 +311,4 @@ const CheckoutPage = () => {
       </Container>
     </Box>
   );
-};
-
-export default CheckoutPage;
+}
