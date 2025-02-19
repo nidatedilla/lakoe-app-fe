@@ -1,3 +1,4 @@
+// src/services/productService.ts
 import axios from 'axios';
 import { Api } from '../libs/api';
 import { product } from '../types/type-product';
@@ -8,8 +9,8 @@ import { apiURL } from '../utils/constants';
 export function useFindProducts() {
   return useQuery<product[]>({
     queryKey: ['product'],
-    queryFn: async (): Promise<product[]> => {
-      const res = await Api.get<product[]>('/product');
+    queryFn: async () => {
+      const res = await Api.get('/product');
       return res.data;
     },
   });
@@ -19,8 +20,8 @@ export function useFindProducts() {
 export function useFindActiveProducts(isActive: boolean) {
   return useQuery<product[]>({
     queryKey: ['product', isActive],
-    queryFn: async (): Promise<product[]> => {
-      const res = await Api.get<product[]>(`/product/status/${isActive}`);
+    queryFn: async () => {
+      const res = await Api.get(`/product/status/${isActive}`);
       return res.data;
     },
   });
@@ -31,13 +32,20 @@ export async function updateProduct(
   id: number,
   updatedData: Partial<product>
 ): Promise<product> {
-  const res = await Api.put<product>(`/product/${id}`, updatedData);
+  const res = await Api.put(`/product/${id}`, updatedData);
   return res.data;
 }
 
+// Tipe response untuk delete produk
+export interface DeleteProductResponse {
+  message: string;
+}
+
 // Fungsi untuk delete produk
-export async function deleteProduct(id: number): Promise<{ message: string }> {
-  const res = await Api.delete<{ message: string }>(`/product/${id}`);
+export async function deleteProduct(
+  id: number
+): Promise<DeleteProductResponse> {
+  const res = await Api.delete(`/product/${id}`);
   return res.data;
 }
 

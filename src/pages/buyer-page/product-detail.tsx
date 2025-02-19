@@ -14,33 +14,30 @@ import {
   Spinner,
 } from '@chakra-ui/react';
 import { BsCartPlus, BsHeart, BsShare } from 'react-icons/bs';
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom'; // Use react-router-dom for hooks
 import { useColorModeValue } from '../../components/ui/color-mode';
 import toast from 'react-hot-toast';
 import { StepperInput } from '../../components/ui/stepper-input';
 import { useProduct } from '../../hooks/use-get-product';
+
+interface Variant {
+  combination: { [key: string]: string }; // contoh: { Warna: "Merah", Ukuran: "S" }
+  price: number;
+  sku: string;
+  stock: number;
+  weight: number;
+  photo: string;
+}
 
 interface CartItem {
   id: string;
   name: string;
   price: number;
   attachments: string;
-  variant: string;
+  variant: Variant;
   quantity: number;
 }
-
-// interface Product {
-//   id: number;
-//   status: string;
-//   kode: string;
-//   product: {
-//     nama: string;
-//     jumlah: number;
-//     harga: number;
-//     imageUrl: string;
-//   };
-// }
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -48,31 +45,78 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState<number>(1);
   const navigate = useNavigate();
 
-  const [selectedVariant, setSelectedVariant] = useState<string>('varian1');
+  // State untuk varian yang terpilih
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  // State untuk atribut pilihan (misal: warna dan ukuran)
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string>('');
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.800', 'white');
-  const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
-  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  // const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
+  // const borderColor = useColorModeValue('gray.200', 'gray.600');
   const accentColor = useColorModeValue('blue.500', 'blue.300');
   const buttonHoverBg = useColorModeValue('blue.50', 'blue.700');
 
-  const handleVariantClick = (variant: string) => {
-    setSelectedVariant(variant);
-  };
+  // Mengambil daftar warna dan ukuran secara unik dari data varian
+  const availableColors = useMemo<string[]>(() => {
+    if (!product || !product.variant) return [];
+    const colors = product.variant.map((v: Variant) => v.combination.Warna);
+    return Array.from(new Set(colors));
+  }, [product]);
+
+  const availableSizes = useMemo<string[]>(() => {
+    if (!product || !product.variant) return [];
+    const sizes = product.variant.map((v: Variant) => v.combination.Ukuran);
+    return Array.from(new Set(sizes));
+  }, [product]);
+
+  // Set default pilihan warna dan ukuran apabila tersedia
+  useEffect(() => {
+    if (availableColors.length > 0 && !selectedColor) {
+      setSelectedColor(availableColors[0]);
+    }
+  }, [availableColors, selectedColor]);
+
+  useEffect(() => {
+    if (availableSizes.length > 0 && !selectedSize) {
+      setSelectedSize(availableSizes[0]);
+    }
+  }, [availableSizes, selectedSize]);
+
+  // Cari varian yang sesuai berdasarkan pilihan warna dan ukuran
+  useEffect(() => {
+    if (product && product.variant && selectedColor && selectedSize) {
+      const found = product.variant.find(
+        (v: Variant) =>
+          v.combination.Warna === selectedColor &&
+          v.combination.Ukuran === selectedSize
+      );
+      setSelectedVariant(found || null);
+    }
+  }, [product, selectedColor, selectedSize]);
 
   const handleAddToCart = () => {
-    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+    if (!selectedVariant) {
+      toast.error('Varian tidak tersedia');
+      return;
+    }
+    const cartItems: CartItem[] = JSON.parse(
+      localStorage.getItem('cart') || '[]'
+    );
     const existingItem: CartItem | undefined = cartItems.find(
       (item: CartItem) =>
-        item.id === product.id && item.variant === selectedVariant
+        item.id === product.id && item.variant.sku === selectedVariant.sku
     );
 
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
       cartItems.push({
-        ...product,
+        id: product.id,
+        name: product.name,
+        price: selectedVariant.price,
+        attachments: product.attachments,
         variant: selectedVariant,
         quantity: quantity,
       });
@@ -83,10 +127,14 @@ export default function ProductDetail() {
   };
 
   const handleBuyNow = () => {
+    if (!selectedVariant) {
+      toast.error('Varian tidak tersedia');
+      return;
+    }
     const checkoutItem = {
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: selectedVariant.price, // gunakan harga varian
       attachments: product.attachments,
       variant: selectedVariant,
       quantity: quantity,
@@ -135,8 +183,9 @@ export default function ProductDetail() {
   }
 
   return (
-    <Box py={10} px={20} bg={'gray.50'}>
-      <SimpleGrid bg={'white'} columns={{ base: 1, lg: 2 }} p={5} gap={10}>
+    <Box py={10} px={20} bg="gray.50">
+      <SimpleGrid bg="white" columns={{ base: 1, lg: 2 }} p={5} gap={10}>
+        {/* Tampilan Gambar */}
         <Box>
           <Box
             position="relative"
@@ -148,14 +197,14 @@ export default function ProductDetail() {
               objectFit="cover"
               w="100%"
               h="600px"
-              src={product.attachments}
+              src={selectedVariant?.photo || product.attachments}
               alt={product.name}
             />
             <HStack position="absolute" top={4} right={4} gap={2}>
               <IconButton
                 as={BsHeart}
                 aria-label="Add to wishlist"
-                bg={'transparent'}
+                bg="transparent"
                 color={textColor}
                 size="xs"
                 _hover={{ transform: 'scale(1.1)' }}
@@ -163,7 +212,7 @@ export default function ProductDetail() {
               <IconButton
                 aria-label="Share product"
                 as={BsShare}
-                bg={'transparent'}
+                bg="transparent"
                 color={textColor}
                 size="xs"
                 _hover={{ transform: 'scale(1.1)' }}
@@ -172,6 +221,7 @@ export default function ProductDetail() {
           </Box>
         </Box>
 
+        {/* Detail Produk */}
         <VStack align="stretch" gap={6}>
           <VStack align="stretch" gap={4}>
             <Heading size="xl" color={textColor}>
@@ -184,123 +234,53 @@ export default function ProductDetail() {
               borderRadius="lg"
               width="fit-content"
             >
-              Rp{product.price.toLocaleString()}
+              Rp
+              {(selectedVariant
+                ? selectedVariant.price
+                : product.price
+              ).toLocaleString()}
             </Badge>
           </VStack>
 
-          {/* <Box bg={sectionBg} p={6} borderRadius="xl">
-            <VStack align="stretch" gap={4}>
-              <Flex align="center" gap={4}>
-                <Icon as={TbTruckDelivery} boxSize={6} color={accentColor} />
-                <Text fontSize="lg" fontWeight="medium" color={textColor}>
-                  Pengiriman
-                </Text>
-              </Flex>
-
-              <SimpleGrid columns={2} gap={4}>
-                <Box>
-                  <Text color={secondaryTextColor} mb={2}>
-                    Pengiriman Ke
-                  </Text>
-                  <SelectRoot
-                    value={[selectedCity]}
-                    onChange={(e) =>
-                      setSelectedCity((e.target as HTMLSelectElement).value)
-                    }
-                    bg={selectBg}
-                    borderColor={borderColor}
-                    color={textColor}
-                    _hover={{ borderColor: accentColor }}
-                    _focus={{ borderColor: accentColor, boxShadow: 'outline' }}
-                    collection={cities}
-                    size="sm"
-                    width="full"
-                  >
-                    <SelectTrigger>
-                      <SelectValueText placeholder="Select movie" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cities.items.map((city) => (
-                        <SelectItem item={city} key={city.value}>
-                          {city.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </SelectRoot>
-                </Box>
-
-                <Box>
-                  <Text color={secondaryTextColor} mb={2}>
-                    Ongkos Kirim
-                  </Text>
-                  <SelectRoot
-                    value={[selectedShipping]}
-                    onChange={(e) =>
-                      setSelectedShipping((e.target as HTMLSelectElement).value)
-                    }
-                    bg={selectBg}
-                    borderColor={borderColor}
-                    color={textColor}
-                    _hover={{ borderColor: accentColor }}
-                    _focus={{ borderColor: accentColor, boxShadow: 'outline' }}
-                    collection={shippingMethods}
-                    size="sm"
-                    width="full"
-                  >
-                    <SelectTrigger>
-                      <SelectValueText placeholder="Select movie" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {shippingMethods.items.map((method) => (
-                        <SelectItem item={method} key={method.value}>
-                          {method.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </SelectRoot>
-                </Box>
-              </SimpleGrid>
-            </VStack>
-          </Box> */}
-
+          {/* Pilihan Warna */}
           <Box>
             <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
-              Varian
+              Warna
             </Text>
             <HStack gap={4}>
-              {['varian1', 'varian2', 'varian3'].map((variant) => (
-                <Box
-                  key={variant}
-                  px={6}
-                  py={3}
-                  borderWidth={2}
-                  borderRadius="lg"
-                  borderColor={
-                    selectedVariant === variant ? accentColor : borderColor
-                  }
-                  cursor="pointer"
-                  onClick={() => handleVariantClick(variant)}
-                  _hover={{ borderColor: accentColor }}
-                  transition="all 0.2s"
-                  bg={selectedVariant === variant ? buttonHoverBg : bgColor}
+              {availableColors.map((color) => (
+                <Button
+                  key={color}
+                  variant={selectedColor === color ? 'solid' : 'outline'}
+                  colorScheme="blue"
+                  onClick={() => setSelectedColor(color)}
                 >
-                  <Text
-                    color={
-                      selectedVariant === variant
-                        ? accentColor
-                        : secondaryTextColor
-                    }
-                    fontWeight={
-                      selectedVariant === variant ? 'medium' : 'normal'
-                    }
-                  >
-                    {variant.charAt(0).toUpperCase() + variant.slice(1)}
-                  </Text>
-                </Box>
+                  {color}
+                </Button>
               ))}
             </HStack>
           </Box>
 
+          {/* Pilihan Ukuran */}
+          <Box>
+            <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
+              Ukuran
+            </Text>
+            <HStack gap={4}>
+              {availableSizes.map((size) => (
+                <Button
+                  key={size}
+                  variant={selectedSize === size ? 'solid' : 'outline'}
+                  colorScheme="blue"
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </Button>
+              ))}
+            </HStack>
+          </Box>
+
+          {/* Kuantitas */}
           <Box>
             <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
               Kuantitas
@@ -319,6 +299,7 @@ export default function ProductDetail() {
             />
           </Box>
 
+          {/* Tombol Aksi */}
           <HStack gap={4}>
             <Button
               flex={1}
