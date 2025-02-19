@@ -2,13 +2,14 @@ import { Box, Text, Button, Flex, Spacer } from '@chakra-ui/react';
 import { Link } from 'react-router';
 import { CiCirclePlus } from 'react-icons/ci';
 import TabsProduk from '../components/tabs-product';
-import CombinedProductList from '../components/card-product';
 
 function Product() {
   return (
     <Box bg={'white'} m={4} p={3} borderRadius={'lg'}>
       <Flex align="center" mb={4}>
-        <Text fontWeight={'medium'}>Daftar Produk</Text>
+        <Text fontWeight={'medium'} fontSize={'2xl'}>
+          Daftar Produk
+        </Text>
         <Spacer />
         <Link to="/create-product">
           <Button bgColor="blue.500" borderRadius={60}>
@@ -19,7 +20,6 @@ function Product() {
       </Flex>
 
       <TabsProduk />
-      <CombinedProductList />
     </Box>
   );
 }
