@@ -37,6 +37,8 @@ export const useCourierRates = (
   destinationAreaId: string,
   items: Item[]
 ) => {
+  console.log('useCourierRates Params:', storeId, destinationAreaId, items);
+
   return useQuery({
     queryKey: ['courierRates', storeId, destinationAreaId, items],
     queryFn: () => fetchCourierRates(storeId, destinationAreaId, items),

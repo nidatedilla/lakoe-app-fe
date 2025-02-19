@@ -127,12 +127,14 @@ export default function CardOrder({
                     buttonText === 'Hubungi Pembeli' ||
                     buttonText === 'Kabari Pembeli'
                   ) {
-                    setSelectedOrder({
+                    const orderDetails = {
                       buyerName: order.destination_contact_name,
                       buyerPhone: order.destination_contact_phone,
                       productName: order.order_items[0].product.name,
                       storeName: order.store.name,
-                    });
+                    };
+                    setSelectedOrder(orderDetails);
+                    console.log(orderDetails);
                   }
                 }}
               >

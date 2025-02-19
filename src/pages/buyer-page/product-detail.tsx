@@ -9,13 +9,11 @@ import {
   VStack,
   Heading,
   SimpleGrid,
-  IconButton,
   Button,
-  Spinner,
 } from '@chakra-ui/react';
-import { BsCartPlus, BsHeart, BsShare } from 'react-icons/bs';
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom'; // Use react-router-dom for hooks
+import { BsCartPlus } from 'react-icons/bs';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { useColorModeValue } from '../../components/ui/color-mode';
 import toast from 'react-hot-toast';
 import { StepperInput } from '../../components/ui/stepper-input';
@@ -108,6 +106,17 @@ export default function ProductDetail() {
       (item: CartItem) =>
         item.id === product.id && item.variant.sku === selectedVariant.sku
     );
+    const totalQuantity = (existingItem?.quantity || 0) + quantity;
+
+    if (totalQuantity > (product?.stock || 0)) {
+      toast.error(
+        `Stok produk hanya tersisa ${product?.stock} item, termasuk yang sudah ada di keranjang belanja anda`,
+        {
+          duration: 2000,
+        }
+      );
+      return;
+    }
 
     if (existingItem) {
       existingItem.quantity += quantity;
@@ -123,6 +132,7 @@ export default function ProductDetail() {
     }
 
     localStorage.setItem('cart', JSON.stringify(cartItems));
+
     toast.success('Produk telah ditambahkan ke keranjang', { duration: 3000 });
   };
 
@@ -151,10 +161,19 @@ export default function ProductDetail() {
     }, 1000);
   };
 
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity > (product?.stock || 0)) {
+      toast.error(`Stok produk hanya tersisa ${product?.stock} item`, {
+        duration: 2000,
+      });
+      return;
+    }
+    setQuantity(newQuantity);
+  };
+
   if (isLoading) {
     return (
       <Container maxW="container.xl" h="100vh" centerContent>
-        <Spinner size="xl" />
         <Text mt={4} fontSize="xl" color={textColor}>
           Loading product details...
         </Text>
@@ -200,24 +219,6 @@ export default function ProductDetail() {
               src={selectedVariant?.photo || product.attachments}
               alt={product.name}
             />
-            <HStack position="absolute" top={4} right={4} gap={2}>
-              <IconButton
-                as={BsHeart}
-                aria-label="Add to wishlist"
-                bg="transparent"
-                color={textColor}
-                size="xs"
-                _hover={{ transform: 'scale(1.1)' }}
-              />
-              <IconButton
-                aria-label="Share product"
-                as={BsShare}
-                bg="transparent"
-                color={textColor}
-                size="xs"
-                _hover={{ transform: 'scale(1.1)' }}
-              />
-            </HStack>
           </Box>
         </Box>
 
@@ -292,7 +293,9 @@ export default function ProductDetail() {
               max={99}
               step={1}
               value={String(quantity)}
-              onValueChange={(details) => setQuantity(Number(details.value))}
+              onValueChange={(details) =>
+                handleQuantityChange(Number(details.value))
+              }
               allowOverflow={false}
               spinOnPress={true}
               focusInputOnChange={false}

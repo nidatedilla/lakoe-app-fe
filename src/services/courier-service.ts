@@ -33,5 +33,7 @@ export const fetchCourierRates = async (
     items,
   });
 
+  console.log('Courier Rates Response:', response.data);
+
   return response.data;
 };

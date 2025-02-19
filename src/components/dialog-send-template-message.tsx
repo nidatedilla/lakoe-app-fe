@@ -1,4 +1,4 @@
-import { Text, Icon, VStack, Box, HStack, Spinner } from '@chakra-ui/react';
+import { Text, Icon, VStack, Box, HStack } from '@chakra-ui/react';
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -99,7 +99,7 @@ export default function DialogSendTemplateMessage({
                 </Text>
 
                 {isLoading ? (
-                  <Spinner size="xl" />
+                  <Text>Loading...</Text>
                 ) : templates.length > 0 ? (
                   templates.map((template: MessageTemplate) => (
                     <Box

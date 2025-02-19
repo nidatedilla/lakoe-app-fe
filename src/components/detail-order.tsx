@@ -41,23 +41,17 @@ export default function DetailOrder() {
     error,
   } = useOrder(orderId || '', token || '');
 
-  if (isLoading) {
+  if (isLoading)
     return (
-      <Flex
-        width="100vw"
-        height="100vh"
-        justifyContent="center"
-        alignItems="center"
-      >
+      <Flex justifyContent="center" alignItems="center">
         <Box>
           <Lottie
             animationData={animationData}
-            style={{ width: 300, height: 300 }}
+            style={{ width: 200, height: 200 }}
           />
         </Box>
       </Flex>
     );
-  }
 
   if (error || !order) {
     return <Text>Pesanan tidak ditemukan.</Text>;
@@ -185,7 +179,21 @@ export default function DetailOrder() {
               </Box>
               <Text fontWeight="medium">Tanggal:</Text>
             </HStack>
-            <Text>{order.created_at}</Text>
+            <Text>
+              {new Date(order.created_at).toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+              })}{' '}
+              -{' '}
+              {new Date(order.created_at)
+                .toLocaleTimeString('id-ID', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  timeZoneName: 'short',
+                })
+                .replace('GMT+7', 'WIB')}
+            </Text>
           </HStack>
           <HStack w="full" justifyContent="space-between">
             <HStack>
@@ -201,7 +209,7 @@ export default function DetailOrder() {
                 cursor="pointer"
                 onClick={() => navigator.clipboard.writeText(order.code)}
               />
-              <Text>{order.code}</Text>
+              <Text>{order.invoices?.invoice_number || ''}</Text>
             </HStack>
           </HStack>
           <HStack w="full" justifyContent="space-between">
@@ -306,7 +314,9 @@ export default function DetailOrder() {
 
             <Grid templateColumns="1fr 2fr" w="full" gap={2}>
               <Text fontWeight="medium">Kurir:</Text>
-              <Text fontWeight={'medium'}>{order.courier.courier_company}</Text>
+              <Text fontWeight={'medium'}>
+                {`${order.courier.courier_name} - ${order.courier.courier_service_name}`}
+              </Text>
 
               <Text fontWeight="medium">No. Resi:</Text>
               <Text>{order.tracking_number || '-'}</Text>
@@ -347,26 +357,12 @@ export default function DetailOrder() {
             </HStack>
             <HStack w="full" justifyContent="space-between">
               <Text>Total Ongkos Kirim ({order.order_items[0].weight} kg)</Text>
-              <Text>
-                {formatCurrency(order.order_items[0]?.courier?.price ?? 0)}
-              </Text>
+              <Text>{formatCurrency(order.rate_courier ?? 0)}</Text>
             </HStack>
-            <HStack w="full" justifyContent="space-between">
-              <Text>Diskon</Text>
-              <Text>{formatCurrency(order.discount)}</Text>
-            </HStack>
-            {/* <HStack w="full" justifyContent="space-between">
-              <Text>Biaya Layanan</Text>
-              <Text>{formatCurrency(order.details.serviceFee)}</Text>
-            </HStack> */}
             <HStack w="full" justifyContent="space-between">
               <Text fontWeight="medium">Total Penjualan</Text>
               <Text fontWeight="medium" fontSize={'16px'}>
-                {formatCurrency(
-                  order.total_price +
-                    (order.order_items[0]?.courier?.price ?? 0) -
-                    order.discount
-                )}
+                {formatCurrency(order.total_price + (order.rate_courier ?? 0))}
               </Text>
             </HStack>
           </VStack>

@@ -14,7 +14,6 @@ import {
   Alert,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import { DeleteIcon } from '@chakra-ui/icons';
 import { BsCartX } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router';
 import toast from 'react-hot-toast';
@@ -22,24 +21,19 @@ import { useColorModeValue } from '../../components/ui/color-mode';
 import { Checkbox } from '../../components/ui/checkbox';
 import { Tooltip } from '../../components/ui/tooltip';
 import { StepperInput } from '../../components/ui/stepper-input';
-
-interface CartItem {
-  id: string;
-  name: string;
-  attachments: string;
-  price: number;
-  quantity: number;
-}
+import { DeleteIcon } from 'lucide-react';
+import {
+  useCart,
+  useRemoveFromCart,
+  useUpdateCartQuantity,
+} from '../../hooks/use-cart';
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { data: cartItems, refetch } = useCart();
+  const removeFromCartMutation = useRemoveFromCart();
+  const updateCartQuantityMutation = useUpdateCartQuantity();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    setCartItems(storedCart);
-  }, []);
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.800', 'white');
@@ -49,44 +43,47 @@ export default function CartPage() {
   const highlightColor = useColorModeValue('blue.500', 'blue.300');
 
   const allSelected =
-    cartItems.length > 0 && selectedItems.length === cartItems.length;
+    cartItems &&
+    cartItems.length > 0 &&
+    selectedItems.length === cartItems.length;
   const someSelected =
-    selectedItems.length > 0 && selectedItems.length < cartItems.length;
+    selectedItems.length > 0 &&
+    cartItems &&
+    selectedItems.length < cartItems.length;
 
   useEffect(() => {
     setSelectedItems([]);
   }, [cartItems]);
 
   const handleRemoveItem = (id: string) => {
-    const updatedCart = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
-    toast.success('Item telah dihapus dari keranjang belanja Anda.', {
-      duration: 3000,
+    removeFromCartMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success('Item telah dihapus dari keranjang belanja Anda.', {
+          duration: 3000,
+        });
+        refetch();
+      },
     });
   };
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
-    if (newQuantity > 99) {
-      toast.error('Anda tidak bisa menambahkan lebih dari 99 item', {
+    const item = cartItems?.find((item) => item.id === id);
+    if (newQuantity > (item?.stock || 0)) {
+      toast.error(`Stok produk hanya tersisa ${item?.stock} item`, {
         duration: 2000,
       });
       return;
     }
 
-    setCartItems((prevCart) => {
-      const updatedCart = prevCart.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      );
-
-      localStorage.setItem('cart', JSON.stringify(updatedCart));
-
-      window.dispatchEvent(new Event('storage'));
-
-      return updatedCart;
-    });
+    updateCartQuantityMutation.mutate(
+      { id, quantity: newQuantity },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   const handleSelectItem = (id: string) => {
@@ -101,22 +98,20 @@ export default function CartPage() {
   };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedItems(e.target.checked ? cartItems.map((item) => item.id) : []);
+    setSelectedItems(
+      e.target.checked && cartItems ? cartItems.map((item) => item.id) : []
+    );
   };
 
   const calculateSubtotal = () => {
     return selectedItems.reduce((total, id) => {
-      const item = cartItems.find((item) => item.id === id);
+      const item = cartItems?.find((item) => item.id === id);
       return total + (item?.price || 0) * (item?.quantity || 0);
     }, 0);
   };
 
-  const calculateShipping = () => {
-    return selectedItems.length > 0 ? 15000 : 0;
-  };
-
   const calculateTotal = () => {
-    return calculateSubtotal() + calculateShipping();
+    return calculateSubtotal();
   };
 
   const handleCheckout = () => {
@@ -128,7 +123,7 @@ export default function CartPage() {
       return;
     }
 
-    const selectedProducts = cartItems.filter((item) =>
+    const selectedProducts = cartItems?.filter((item) =>
       selectedItems.includes(item.id)
     );
     console.log('Selected products:', selectedProducts);
@@ -143,7 +138,7 @@ export default function CartPage() {
     }, 1000);
   };
 
-  if (cartItems.length === 0) {
+  if (!cartItems || cartItems.length === 0) {
     return (
       <Container maxW="container.xl" py={16}>
         <VStack gap={8} align="center">
@@ -179,7 +174,8 @@ export default function CartPage() {
               <Heading size="lg" color={textColor}>
                 Keranjang Belanja
                 <Badge ml={2} colorScheme="blue" fontSize="md">
-                  {cartItems.length} item
+                  {cartItems.reduce((total, item) => total + item.quantity, 0)}{' '}
+                  item
                 </Badge>
               </Heading>
               <Checkbox
@@ -293,13 +289,6 @@ export default function CartPage() {
                 <Text color={secondaryText}>Subtotal</Text>
                 <Text color={textColor} fontWeight="medium">
                   Rp{calculateSubtotal().toLocaleString()}
-                </Text>
-              </Flex>
-
-              <Flex justify="space-between">
-                <Text color={secondaryText}>Pengiriman</Text>
-                <Text color={textColor} fontWeight="medium">
-                  Rp{calculateShipping().toLocaleString()}
                 </Text>
               </Flex>
 

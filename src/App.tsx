@@ -11,7 +11,6 @@ import SettingStore from './pages/setting-store';
 import LandingPage from './pages/landing-page';
 import { Toaster } from 'react-hot-toast';
 import SettingShipping from './pages/setting-shipping';
-import SettingPaymentMethod from './pages/setting-payment-method';
 import ProfilePage from './pages/profile';
 import ShopPage from './pages/buyer-page/shop-page';
 import ProductDetail from './pages/buyer-page/product-detail';
@@ -19,8 +18,8 @@ import Layout from './pages/buyer-page/layout';
 import PrivateRoute from './routes/private-route';
 import CartPage from './pages/buyer-page/cart-page';
 import CheckoutPage from './pages/buyer-page/checkout-page';
-import './index.css'
-
+import StatusPaymentPage from './pages/buyer-page/status-payment-page';
+import './index.css';
 
 function App() {
   const router = createBrowserRouter([
@@ -84,11 +83,6 @@ function App() {
           HydrateFallback: Fallback,
         },
         {
-          path: '/payment-method',
-          Component: SettingPaymentMethod,
-          HydrateFallback: Fallback,
-        },
-        {
           path: '/profile',
           Component: ProfilePage,
           HydrateFallback: Fallback,
@@ -110,7 +104,7 @@ function App() {
           HydrateFallback: Fallback,
         },
         {
-          path: '/lakoe-app/product-detail/:id',
+          path: '/lakoe-app/:domain/:id',
           Component: ProductDetail,
           HydrateFallback: Fallback,
         },
@@ -124,6 +118,11 @@ function App() {
     {
       path: '/lakoe-app/checkout-page',
       Component: CheckoutPage,
+      HydrateFallback: Fallback,
+    },
+    {
+      path: '/lakoe-app/status-payment-page/:orderId',
+      Component: StatusPaymentPage,
       HydrateFallback: Fallback,
     },
   ]);
