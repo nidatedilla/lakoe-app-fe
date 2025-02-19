@@ -12,12 +12,30 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { BsCartPlus } from 'react-icons/bs';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useColorModeValue } from '../../components/ui/color-mode';
 import toast from 'react-hot-toast';
 import { StepperInput } from '../../components/ui/stepper-input';
 import { useProduct } from '../../hooks/use-get-product';
+
+interface Variant {
+  combination: { [key: string]: string }; // contoh: { Warna: "Merah", Ukuran: "S" }
+  price: number;
+  sku: string;
+  stock: number;
+  weight: number;
+  photo: string;
+}
+
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  attachments: string;
+  variant: Variant;
+  quantity: number;
+}
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -25,25 +43,68 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState<number>(1);
   const navigate = useNavigate();
 
-  const [selectedVariant, setSelectedVariant] = useState<string>('varian1');
+  // State untuk varian yang terpilih
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  // State untuk atribut pilihan (misal: warna dan ukuran)
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string>('');
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.800', 'white');
-  const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
-  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  // const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
+  // const borderColor = useColorModeValue('gray.200', 'gray.600');
   const accentColor = useColorModeValue('blue.500', 'blue.300');
   const buttonHoverBg = useColorModeValue('blue.50', 'blue.700');
 
-  const handleVariantClick = (variant: string) => {
-    setSelectedVariant(variant);
-  };
+  // Mengambil daftar warna dan ukuran secara unik dari data varian
+  const availableColors = useMemo<string[]>(() => {
+    if (!product || !product.variant) return [];
+    const colors = product.variant.map((v: Variant) => v.combination.Warna);
+    return Array.from(new Set(colors));
+  }, [product]);
+
+  const availableSizes = useMemo<string[]>(() => {
+    if (!product || !product.variant) return [];
+    const sizes = product.variant.map((v: Variant) => v.combination.Ukuran);
+    return Array.from(new Set(sizes));
+  }, [product]);
+
+  // Set default pilihan warna dan ukuran apabila tersedia
+  useEffect(() => {
+    if (availableColors.length > 0 && !selectedColor) {
+      setSelectedColor(availableColors[0]);
+    }
+  }, [availableColors, selectedColor]);
+
+  useEffect(() => {
+    if (availableSizes.length > 0 && !selectedSize) {
+      setSelectedSize(availableSizes[0]);
+    }
+  }, [availableSizes, selectedSize]);
+
+  // Cari varian yang sesuai berdasarkan pilihan warna dan ukuran
+  useEffect(() => {
+    if (product && product.variant && selectedColor && selectedSize) {
+      const found = product.variant.find(
+        (v: Variant) =>
+          v.combination.Warna === selectedColor &&
+          v.combination.Ukuran === selectedSize
+      );
+      setSelectedVariant(found || null);
+    }
+  }, [product, selectedColor, selectedSize]);
 
   const handleAddToCart = () => {
-    const storedCart = localStorage.getItem('cart');
-    const cartItems = storedCart ? JSON.parse(storedCart) : [];
-
-    const existingItem = cartItems.find(
-      (item: { id: string }) => item.id === product.id
+    if (!selectedVariant) {
+      toast.error('Varian tidak tersedia');
+      return;
+    }
+    const cartItems: CartItem[] = JSON.parse(
+      localStorage.getItem('cart') || '[]'
+    );
+    const existingItem: CartItem | undefined = cartItems.find(
+      (item: CartItem) =>
+        item.id === product.id && item.variant.sku === selectedVariant.sku
     );
     const totalQuantity = (existingItem?.quantity || 0) + quantity;
 
@@ -61,7 +122,10 @@ export default function ProductDetail() {
       existingItem.quantity += quantity;
     } else {
       cartItems.push({
-        ...product,
+        id: product.id,
+        name: product.name,
+        price: selectedVariant.price,
+        attachments: product.attachments,
         variant: selectedVariant,
         quantity: quantity,
       });
@@ -73,8 +137,15 @@ export default function ProductDetail() {
   };
 
   const handleBuyNow = () => {
+    if (!selectedVariant) {
+      toast.error('Varian tidak tersedia');
+      return;
+    }
     const checkoutItem = {
-      ...product,
+      id: product.id,
+      name: product.name,
+      price: selectedVariant.price, // gunakan harga varian
+      attachments: product.attachments,
       variant: selectedVariant,
       quantity: quantity,
     };
@@ -131,8 +202,9 @@ export default function ProductDetail() {
   }
 
   return (
-    <Box py={10} px={20} bg={'gray.50'}>
-      <SimpleGrid bg={'white'} columns={{ base: 1, lg: 2 }} p={5} gap={10}>
+    <Box py={10} px={20} bg="gray.50">
+      <SimpleGrid bg="white" columns={{ base: 1, lg: 2 }} p={5} gap={10}>
+        {/* Tampilan Gambar */}
         <Box>
           <Box
             position="relative"
@@ -144,12 +216,13 @@ export default function ProductDetail() {
               objectFit="cover"
               w="100%"
               h="600px"
-              src={product.attachments}
+              src={selectedVariant?.photo || product.attachments}
               alt={product.name}
             />
           </Box>
         </Box>
 
+        {/* Detail Produk */}
         <VStack align="stretch" gap={6}>
           <VStack align="stretch" gap={4}>
             <Heading size="xl" color={textColor}>
@@ -162,48 +235,53 @@ export default function ProductDetail() {
               borderRadius="lg"
               width="fit-content"
             >
-              Rp{product.price.toLocaleString()}
+              Rp
+              {(selectedVariant
+                ? selectedVariant.price
+                : product.price
+              ).toLocaleString()}
             </Badge>
           </VStack>
 
+          {/* Pilihan Warna */}
           <Box>
             <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
-              Varian
+              Warna
             </Text>
             <HStack gap={4}>
-              {['varian1', 'varian2', 'varian3'].map((variant) => (
-                <Box
-                  key={variant}
-                  px={6}
-                  py={3}
-                  borderWidth={2}
-                  borderRadius="lg"
-                  borderColor={
-                    selectedVariant === variant ? accentColor : borderColor
-                  }
-                  cursor="pointer"
-                  onClick={() => handleVariantClick(variant)}
-                  _hover={{ borderColor: accentColor }}
-                  transition="all 0.2s"
-                  bg={selectedVariant === variant ? buttonHoverBg : bgColor}
+              {availableColors.map((color) => (
+                <Button
+                  key={color}
+                  variant={selectedColor === color ? 'solid' : 'outline'}
+                  colorScheme="blue"
+                  onClick={() => setSelectedColor(color)}
                 >
-                  <Text
-                    color={
-                      selectedVariant === variant
-                        ? accentColor
-                        : secondaryTextColor
-                    }
-                    fontWeight={
-                      selectedVariant === variant ? 'medium' : 'normal'
-                    }
-                  >
-                    {variant.charAt(0).toUpperCase() + variant.slice(1)}
-                  </Text>
-                </Box>
+                  {color}
+                </Button>
               ))}
             </HStack>
           </Box>
 
+          {/* Pilihan Ukuran */}
+          <Box>
+            <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
+              Ukuran
+            </Text>
+            <HStack gap={4}>
+              {availableSizes.map((size) => (
+                <Button
+                  key={size}
+                  variant={selectedSize === size ? 'solid' : 'outline'}
+                  colorScheme="blue"
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </Button>
+              ))}
+            </HStack>
+          </Box>
+
+          {/* Kuantitas */}
           <Box>
             <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
               Kuantitas
@@ -224,6 +302,7 @@ export default function ProductDetail() {
             />
           </Box>
 
+          {/* Tombol Aksi */}
           <HStack gap={4}>
             <Button
               flex={1}

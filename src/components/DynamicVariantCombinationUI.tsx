@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent, useEffect, KeyboardEvent } from 'react';
 import {
   Box,
   Button,
@@ -37,17 +37,17 @@ interface DynamicVariantCombinationUIProps {
 const DynamicVariantCombinationUI: React.FC<
   DynamicVariantCombinationUIProps
 > = ({ onVariantChange }) => {
-  // Mengontrol tampilan panel varian
+  // State untuk mengontrol tampilan panel varian
   const [showVariantPanel, setShowVariantPanel] = useState<boolean>(false);
-  // Daftar variant option (tipe varian aktif) beserta nilainya
+  // Daftar tipe varian beserta nilainya
   const [variantOptions, setVariantOptions] = useState<VariantOption[]>([]);
-  // Input sementara untuk tiap variant option (key = type)
+  // Input sementara untuk tiap tipe varian (key = type)
   const [inputs, setInputs] = useState<{ [key: string]: string }>({});
   // Daftar kombinasi varian yang dihasilkan
   const [variants, setVariants] = useState<Variant[]>([]);
-  // State untuk mengontrol dialog "Atur Sekaligus"
+  // Dialog "Atur Sekaligus"
   const [openGlobalDialog, setOpenGlobalDialog] = useState(false);
-  // Input global untuk harga, SKU, stok, dan berat
+  // Global setting untuk harga, SKU, stok, dan berat
   const [globalSettings, setGlobalSettings] = useState({
     price: '',
     sku: '',
@@ -55,14 +55,25 @@ const DynamicVariantCombinationUI: React.FC<
     weight: '',
   });
 
-  // Panggil callback setiap kali data varian berubah
+  // Panggil callback ketika varian berubah
   useEffect(() => {
     onVariantChange(variants);
   }, [variants, onVariantChange]);
 
-  // === HANDLER PANEL VARIAN ===
+  // Auto generate varian ketika semua tipe varian memiliki setidaknya 1 nilai
+  useEffect(() => {
+    if (
+      variantOptions.length > 0 &&
+      variantOptions.every((opt) => opt.values.length > 0)
+    ) {
+      generateVariants();
+    } else {
+      setVariants([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [variantOptions]);
 
-  // Toggle panel varian; jika panel dihapus, reset semua data varian
+  // Toggle panel varian; jika panel dihilangkan, reset semua data
   const toggleVariantPanel = () => {
     if (showVariantPanel) {
       setVariantOptions([]);
@@ -72,12 +83,12 @@ const DynamicVariantCombinationUI: React.FC<
     setShowVariantPanel((prev) => !prev);
   };
 
-  // Update input untuk variant option tertentu
+  // Update input untuk tipe varian tertentu
   const handleInputChange = (type: string, value: string) => {
     setInputs((prev) => ({ ...prev, [type]: value }));
   };
 
-  // Tambah nilai ke variant option (misalnya: Warna)
+  // Tambah nilai varian (misal: "Merah" untuk tipe "Warna")
   const handleAddValue = (type: string) => {
     const inputValue = inputs[type];
     if (inputValue && inputValue.trim() !== '') {
@@ -93,7 +104,7 @@ const DynamicVariantCombinationUI: React.FC<
     }
   };
 
-  // Hapus nilai dari variant option
+  // Hapus nilai varian dari tipe tertentu
   const handleDeleteValue = (type: string, value: string) => {
     setVariantOptions((prev) =>
       prev.map((opt) => {
@@ -105,7 +116,7 @@ const DynamicVariantCombinationUI: React.FC<
     );
   };
 
-  // Tambah variant option baru (preset atau custom)
+  // Tambah tipe varian baru (preset atau custom)
   const handleAddVariantOptionType = (type: string) => {
     if (!variantOptions.find((opt) => opt.type === type)) {
       setVariantOptions((prev) => [...prev, { type, values: [] }]);
@@ -113,7 +124,7 @@ const DynamicVariantCombinationUI: React.FC<
     }
   };
 
-  // Hapus variant option secara keseluruhan
+  // Hapus tipe varian secara keseluruhan
   const handleDeleteVariantOption = (type: string) => {
     setVariantOptions((prev) => prev.filter((opt) => opt.type !== type));
     setInputs((prev) => {
@@ -123,9 +134,7 @@ const DynamicVariantCombinationUI: React.FC<
     });
   };
 
-  // === GENERATE VARIAN (CARTESIAN PRODUCT) ===
-
-  // Fungsi untuk mendapatkan kombinasi (cartesian product) dari array nilai tiap variant option
+  // Fungsi cartesian product untuk mendapatkan kombinasi varian
   const cartesian = (arrays: string[][]): string[][] => {
     return arrays.reduce<string[][]>(
       (acc, curr) =>
@@ -136,14 +145,9 @@ const DynamicVariantCombinationUI: React.FC<
     );
   };
 
-  // Generate kombinasi varian; inisialisasi properti photo sebagai string kosong
+  // Generate varian berdasarkan kombinasi nilai tiap tipe varian
   const generateVariants = () => {
-    if (variantOptions.length === 0) return;
     const arrays = variantOptions.map((opt) => opt.values);
-    if (arrays.some((arr) => arr.length === 0)) {
-      alert('Pastikan semua varian memiliki setidaknya satu nilai');
-      return;
-    }
     const combinations = cartesian(arrays);
     const newVariants: Variant[] = combinations.map((combo) => {
       const combinationObj: { [key: string]: string } = {};
@@ -156,14 +160,13 @@ const DynamicVariantCombinationUI: React.FC<
         sku: '',
         stock: '',
         weight: '',
-        photo: '', // 1 slot foto
+        photo: '',
       };
     });
     setVariants(newVariants);
   };
 
-  // === DIALOG "ATUR SEKALigus" ===
-
+  // Dialog "Atur Sekaligus"
   const handleOpenGlobalDialog = () => {
     setOpenGlobalDialog(true);
   };
@@ -188,8 +191,7 @@ const DynamicVariantCombinationUI: React.FC<
     setGlobalSettings((prev) => ({ ...prev, [field]: value }));
   };
 
-  // === HANDLER PREVIEW FOTO UNTUK SETIAP VARIAN ===
-
+  // Preview foto untuk tiap varian (digunakan di form upload foto khusus)
   const handleImageChange = (
     e: ChangeEvent<HTMLInputElement>,
     variantIndex: number
@@ -206,38 +208,84 @@ const DynamicVariantCombinationUI: React.FC<
     }
   };
 
-  return (
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Tambah Varian Produk
-      </Typography>
+  // Style tombol varian default
+  const variantButtonStyle = {
+    borderRadius: '50px',
+    textTransform: 'none',
+  };
 
+  return (
+    <Box sx={{ padding: 2 }}>
       {/* Tombol toggle panel varian */}
-      <Box sx={{ marginY: 2 }}>
-        <Button variant="contained" onClick={toggleVariantPanel}>
+      <Box sx={{ mt: 0, mb: 2 }}>
+        <Button
+          variant="outlined"
+          onClick={toggleVariantPanel}
+          startIcon={showVariantPanel ? <Delete /> : <Add />}
+          sx={{
+            color: 'black',
+            borderColor: 'black',
+            backgroundColor: 'white',
+            textTransform: 'none',
+          }}
+          size="small"
+        >
           {showVariantPanel ? 'Hapus Varian' : 'Tambah Varian'}
         </Button>
       </Box>
 
       {showVariantPanel && (
         <>
-          {/* Tombol pilihan variant */}
-          <Box sx={{ marginY: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          {/* Tombol pilihan tipe varian */}
+          <Box sx={{ my: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             <Button
-              variant="outlined"
+              variant={
+                variantOptions.some((opt) => opt.type === 'Warna')
+                  ? 'contained'
+                  : 'outlined'
+              }
+              color={
+                variantOptions.some((opt) => opt.type === 'Warna')
+                  ? 'primary'
+                  : 'inherit'
+              }
               onClick={() => handleAddVariantOptionType('Warna')}
+              sx={variantButtonStyle}
+              size="small"
             >
               Warna
             </Button>
             <Button
-              variant="outlined"
+              variant={
+                variantOptions.some((opt) => opt.type === 'Ukuran')
+                  ? 'contained'
+                  : 'outlined'
+              }
+              color={
+                variantOptions.some((opt) => opt.type === 'Ukuran')
+                  ? 'primary'
+                  : 'inherit'
+              }
               onClick={() => handleAddVariantOptionType('Ukuran')}
+              sx={variantButtonStyle}
+              size="small"
             >
               Ukuran
             </Button>
             <Button
-              variant="outlined"
+              variant={
+                variantOptions.some((opt) => opt.type === 'Kemasan')
+                  ? 'contained'
+                  : 'outlined'
+              }
+              color={
+                variantOptions.some((opt) => opt.type === 'Kemasan')
+                  ? 'primary'
+                  : 'inherit'
+              }
               onClick={() => handleAddVariantOptionType('Kemasan')}
+              sx={variantButtonStyle}
+              size="small"
             >
               Kemasan
             </Button>
@@ -249,16 +297,25 @@ const DynamicVariantCombinationUI: React.FC<
                   handleAddVariantOptionType(customType);
                 }
               }}
+              sx={{
+                backgroundColor: 'white',
+                color: 'black',
+                borderColor: 'black',
+                borderRadius: '50px',
+                textTransform: 'none',
+              }}
+              size="small"
             >
-              Tambah Varian Lagi
+              <Add fontSize="small" sx={{ mr: 0.5 }} />
+              Buat tipe varian
             </Button>
           </Box>
 
-          {/* Render input untuk tiap variant option */}
-          <Grid container spacing={3}>
+          {/* Form input untuk tiap tipe varian (full-width, disusun vertikal) */}
+          <Grid container spacing={2}>
             {variantOptions.map((opt) => (
-              <Grid item xs={12} md={4} key={opt.type}>
-                <Paper sx={{ padding: 2, position: 'relative' }}>
+              <Grid item xs={12} key={opt.type}>
+                <Paper sx={{ p: 1 }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -266,7 +323,7 @@ const DynamicVariantCombinationUI: React.FC<
                       alignItems: 'center',
                     }}
                   >
-                    <Typography variant="h6">{opt.type}</Typography>
+                    <Typography variant="subtitle2">{opt.type}</Typography>
                     <IconButton
                       onClick={() => handleDeleteVariantOption(opt.type)}
                       size="small"
@@ -275,28 +332,31 @@ const DynamicVariantCombinationUI: React.FC<
                       <Delete fontSize="small" />
                     </IconButton>
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 1, marginY: 1 }}>
+                  <Box sx={{ mt: 1 }}>
                     <TextField
                       label={opt.type}
                       value={inputs[opt.type] || ''}
                       onChange={(e) =>
                         handleInputChange(opt.type, e.target.value)
                       }
+                      onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddValue(opt.type);
+                        }
+                      }}
                       fullWidth
+                      size="small"
                     />
-                    <Button
-                      variant="contained"
-                      onClick={() => handleAddValue(opt.type)}
-                      startIcon={<Add />}
-                    >
-                      Tambah
-                    </Button>
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Box
+                    sx={{ mt: 1, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}
+                  >
                     {opt.values.map((value, idx) => (
                       <Chip
                         key={idx}
                         label={value}
+                        size="small"
                         onDelete={() => handleDeleteValue(opt.type, value)}
                       />
                     ))}
@@ -305,172 +365,134 @@ const DynamicVariantCombinationUI: React.FC<
               </Grid>
             ))}
           </Grid>
-
-          {/* Tombol Generate Varian dan Atur Sekaligus */}
-          <Box
-            sx={{ marginY: 3, display: 'flex', gap: 2, alignItems: 'center' }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={generateVariants}
-            >
-              Generate Varian
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleOpenGlobalDialog}
-            >
-              Atur Sekaligus
-            </Button>
-          </Box>
         </>
       )}
 
-      {/* Dialog "Atur Sekaligus" */}
-      <Dialog open={openGlobalDialog} onClose={handleCloseGlobalDialog}>
-        <DialogTitle>Atur Varian Secara Sekaligus</DialogTitle>
-        <DialogContent>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              marginTop: 1,
-            }}
+      {/* Header daftar varian dengan tombol "Atur Sekaligus" di kanan */}
+      {variants.length > 0 && (
+        <Box
+          sx={{
+            mt: 3,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h6">Daftar Varian</Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpenGlobalDialog}
+            sx={{ borderRadius: '50px', textTransform: 'none' }}
+            size="small"
           >
-            <TextField
-              label="Harga"
-              value={globalSettings.price}
-              onChange={(e) =>
-                handleGlobalSettingChange('price', e.target.value)
-              }
-              fullWidth
-            />
-            <TextField
-              label="SKU"
-              value={globalSettings.sku}
-              onChange={(e) => handleGlobalSettingChange('sku', e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="Stok"
-              value={globalSettings.stock}
-              onChange={(e) =>
-                handleGlobalSettingChange('stock', e.target.value)
-              }
-              fullWidth
-            />
-            <TextField
-              label="Berat (Gram)"
-              value={globalSettings.weight}
-              onChange={(e) =>
-                handleGlobalSettingChange('weight', e.target.value)
-              }
-              fullWidth
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseGlobalDialog}>Batal</Button>
-          <Button variant="contained" onClick={handleSaveGlobalSettings}>
-            Simpan
+            Atur Sekaligus
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      )}
 
-      {/* Tampilan daftar kombinasi varian */}
-      <Box sx={{ marginTop: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          Daftar Varian
+      {/* Tampilan daftar varian (tanpa form upload foto di masing-masing varian) */}
+      {variants.length === 0 ? (
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          Tidak ada varian yang dihasilkan
         </Typography>
-        {variants.length === 0 ? (
-          <Typography>Tidak ada varian yang dihasilkan</Typography>
-        ) : (
-          variants.map((variant, index) => (
-            <Paper key={index} sx={{ padding: 2, marginBottom: 2 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
+      ) : (
+        variants.map((variant, index) => (
+          <Paper key={index} sx={{ p: 1, mb: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Typography variant="caption">
+                {Object.entries(variant.combination)
+                  .map(([type, value]) => `${type}: ${value}`)
+                  .join(' - ')}
+              </Typography>
+              <IconButton
+                onClick={() =>
+                  setVariants(variants.filter((_, i) => i !== index))
+                }
+                size="small"
+                color="error"
               >
-                <Typography variant="subtitle1">
-                  {Object.entries(variant.combination)
-                    .map(([type, value]) => `${type}: ${value}`)
-                    .join(' - ')}
-                </Typography>
-                <IconButton
-                  onClick={() =>
-                    setVariants(variants.filter((_, i) => i !== index))
-                  }
-                  color="error"
-                >
-                  <Delete />
-                </IconButton>
-              </Box>
-              <Divider sx={{ my: 1 }} />
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={2}>
-                  <TextField
-                    label="Harga"
-                    value={variant.price}
-                    onChange={(e) => {
-                      const updated = [...variants];
-                      updated[index].price = e.target.value;
-                      setVariants(updated);
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={12} md={2}>
-                  <TextField
-                    label="SKU"
-                    value={variant.sku}
-                    onChange={(e) => {
-                      const updated = [...variants];
-                      updated[index].sku = e.target.value;
-                      setVariants(updated);
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={12} md={2}>
-                  <TextField
-                    label="Stok"
-                    value={variant.stock}
-                    onChange={(e) => {
-                      const updated = [...variants];
-                      updated[index].stock = e.target.value;
-                      setVariants(updated);
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={12} md={2}>
-                  <TextField
-                    label="Berat (Gram)"
-                    value={variant.weight}
-                    onChange={(e) => {
-                      const updated = [...variants];
-                      updated[index].weight = e.target.value;
-                      setVariants(updated);
-                    }}
-                    fullWidth
-                  />
-                </Grid>
+                <Delete fontSize="small" />
+              </IconButton>
+            </Box>
+            <Divider sx={{ my: 0.5 }} />
+            <Grid container spacing={1}>
+              <Grid item xs={3}>
+                <TextField
+                  label="Harga"
+                  value={variant.price}
+                  onChange={(e) => {
+                    const updated = [...variants];
+                    updated[index].price = e.target.value;
+                    setVariants(updated);
+                  }}
+                  fullWidth
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  label="SKU"
+                  value={variant.sku}
+                  onChange={(e) => {
+                    const updated = [...variants];
+                    updated[index].sku = e.target.value;
+                    setVariants(updated);
+                  }}
+                  fullWidth
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  label="Stok"
+                  value={variant.stock}
+                  onChange={(e) => {
+                    const updated = [...variants];
+                    updated[index].stock = e.target.value;
+                    setVariants(updated);
+                  }}
+                  fullWidth
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  label="Berat (Gram)"
+                  value={variant.weight}
+                  onChange={(e) => {
+                    const updated = [...variants];
+                    updated[index].weight = e.target.value;
+                    setVariants(updated);
+                  }}
+                  fullWidth
+                  size="small"
+                />
+              </Grid>
+            </Grid>
+          </Paper>
+        ))
+      )}
 
-                {/* Preview Foto Produk */}
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    Foto Produk*
-                  </Typography>
+      {/* Area khusus upload foto varian */}
+      {variants.length > 0 && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6">Upload Foto Produk Varian</Typography>
+          <Grid container spacing={1}>
+            {variants.map((variant, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <Paper sx={{ p: 1, textAlign: 'center' }}>
+                  <Typography variant="caption">Varian {index + 1}</Typography>
                   <Box
                     sx={{
                       width: '100%',
-                      height: '100px',
+                      height: 80,
                       border: '1px dashed #ddd',
                       display: 'flex',
                       alignItems: 'center',
@@ -492,7 +514,7 @@ const DynamicVariantCombinationUI: React.FC<
                         }}
                       />
                     ) : (
-                      <Typography variant="body2">Foto Produk</Typography>
+                      <Typography variant="caption">Upload Foto</Typography>
                     )}
                     <input
                       type="file"
@@ -505,15 +527,71 @@ const DynamicVariantCombinationUI: React.FC<
                         width: '100%',
                         height: '100%',
                         opacity: 0,
+                        cursor: 'pointer',
                       }}
                     />
                   </Box>
-                </Grid>
+                </Paper>
               </Grid>
-            </Paper>
-          ))
-        )}
-      </Box>
+            ))}
+          </Grid>
+        </Box>
+      )}
+
+      {/* Dialog "Atur Sekaligus" */}
+      <Dialog open={openGlobalDialog} onClose={handleCloseGlobalDialog}>
+        <DialogTitle>Atur Varian Secara Sekaligus</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
+            <TextField
+              label="Harga"
+              value={globalSettings.price}
+              onChange={(e) =>
+                handleGlobalSettingChange('price', e.target.value)
+              }
+              fullWidth
+              size="small"
+            />
+            <TextField
+              label="SKU"
+              value={globalSettings.sku}
+              onChange={(e) => handleGlobalSettingChange('sku', e.target.value)}
+              fullWidth
+              size="small"
+            />
+            <TextField
+              label="Stok"
+              value={globalSettings.stock}
+              onChange={(e) =>
+                handleGlobalSettingChange('stock', e.target.value)
+              }
+              fullWidth
+              size="small"
+            />
+            <TextField
+              label="Berat (Gram)"
+              value={globalSettings.weight}
+              onChange={(e) =>
+                handleGlobalSettingChange('weight', e.target.value)
+              }
+              fullWidth
+              size="small"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseGlobalDialog} size="small">
+            Batal
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveGlobalSettings}
+            size="small"
+          >
+            Simpan
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
