@@ -21,6 +21,7 @@ import Swal from 'sweetalert2';
 export default function DialogCreateTemplateMessage() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { mutate: createTemplate, isPending } = useCreateMessageTemplate();
 
@@ -46,6 +47,7 @@ export default function DialogCreateTemplateMessage() {
           });
           setTitle('');
           setMessage('');
+          setIsDialogOpen(false);
         },
         onError: (error) => {
           if (axios.isAxiosError(error)) {
@@ -61,7 +63,10 @@ export default function DialogCreateTemplateMessage() {
   };
 
   return (
-    <DialogRoot>
+    <DialogRoot
+      open={isDialogOpen}
+      onOpenChange={({ open }) => setIsDialogOpen(open)}
+    >
       <DialogTrigger asChild>
         <Button
           bg={'blue.500'}
@@ -69,6 +74,7 @@ export default function DialogCreateTemplateMessage() {
           borderRadius={'full'}
           height={'30px'}
           color={'white'}
+          onClick={() => setIsDialogOpen(true)}
         >
           Buat Template
         </Button>

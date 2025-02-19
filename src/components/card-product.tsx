@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import {
   useFindProducts,
@@ -97,15 +97,6 @@ export default function CombinedProductList() {
   const allFilteredSelected =
     filteredProducts.length > 0 &&
     filteredProducts.every((prod) => selectedIds.includes(prod.id));
-
-  // Saat filteredProducts berubah, pastikan selectedIds hanya berisi id yang masih ada di filteredProducts
-  useEffect(() => {
-    setSelectedIds((prevSelected) =>
-      prevSelected.filter((id) =>
-        filteredProducts.some((prod) => prod.id === id)
-      )
-    );
-  }, [filteredProducts]);
 
   // Handle perubahan "Select All"
   const handleSelectAllChange: React.FormEventHandler<HTMLLabelElement> = (

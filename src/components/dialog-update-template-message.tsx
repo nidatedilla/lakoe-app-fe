@@ -29,7 +29,7 @@ export default function DialogUpdateTemplateMessage({
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [message, setMessage] = useState(initialMessage);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { mutate: updateTemplate, isPending } = useUpdateMessageTemplate();
   const queryClient = useQueryClient();
 
@@ -38,6 +38,7 @@ export default function DialogUpdateTemplateMessage({
   };
 
   const handleSave = async () => {
+    setIsDialogOpen(false);
     const result = await Swal.fire({
       icon: 'warning',
       title: 'Apakah Anda yakin?',
@@ -78,7 +79,10 @@ export default function DialogUpdateTemplateMessage({
   }, [initialTitle, initialMessage]);
 
   return (
-    <DialogRoot>
+    <DialogRoot
+      open={isDialogOpen}
+      onOpenChange={({ open }) => setIsDialogOpen(open)}
+    >
       <DialogTrigger asChild>
         <Button
           bg="transparent"

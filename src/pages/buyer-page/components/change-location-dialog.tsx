@@ -1,6 +1,7 @@
 import {
   Box,
   createListCollection,
+  HStack,
   Input,
   SelectContent,
   SelectItem,
@@ -35,6 +36,7 @@ import {
 import { useDialogNew } from '../../../store/dialog-store';
 import { LocationGuest } from '../../../types/type-location';
 import { getGuestId } from '../../../utils/guest';
+import { FiUser } from 'react-icons/fi';
 
 const defaultPosition: [number, number] = [-6.2088, 106.8456];
 
@@ -175,16 +177,16 @@ export default function DialogChangeLocation() {
       {' '}
       <DialogTrigger asChild>
         <Button
-          bg="transparent"
           size="sm"
-          borderWidth="1px"
-          borderColor="gray.300"
-          borderRadius="full"
-          height="30px"
-          color="black"
+          variant="outline"
+          colorPalette="blue"
+          _hover={{ bg: 'blue.50' }}
           onClick={() => openDialog()}
         >
-          Ubah Informasi
+          <HStack gap={2}>
+            <FiUser />
+            <Text>Ubah</Text>
+          </HStack>
         </Button>
       </DialogTrigger>
       <DialogContent>

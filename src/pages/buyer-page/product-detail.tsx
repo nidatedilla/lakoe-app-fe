@@ -9,37 +9,15 @@ import {
   VStack,
   Heading,
   SimpleGrid,
-  IconButton,
   Button,
 } from '@chakra-ui/react';
-import { BsCartPlus, BsHeart, BsShare } from 'react-icons/bs';
+import { BsCartPlus } from 'react-icons/bs';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useColorModeValue } from '../../components/ui/color-mode';
 import toast from 'react-hot-toast';
 import { StepperInput } from '../../components/ui/stepper-input';
 import { useProduct } from '../../hooks/use-get-product';
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  attachments: string;
-  variant: string;
-  quantity: number;
-}
-
-// interface Product {
-//   id: number;
-//   status: string;
-//   kode: string;
-//   product: {
-//     nama: string;
-//     jumlah: number;
-//     harga: number;
-//     imageUrl: string;
-//   };
-// }
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -61,11 +39,23 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = () => {
-    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem: CartItem | undefined = cartItems.find(
-      (item: CartItem) =>
-        item.id === product.id && item.variant === selectedVariant
+    const storedCart = localStorage.getItem('cart');
+    const cartItems = storedCart ? JSON.parse(storedCart) : [];
+
+    const existingItem = cartItems.find(
+      (item: { id: string }) => item.id === product.id
     );
+    const totalQuantity = (existingItem?.quantity || 0) + quantity;
+
+    if (totalQuantity > (product?.stock || 0)) {
+      toast.error(
+        `Stok produk hanya tersisa ${product?.stock} item, termasuk yang sudah ada di keranjang belanja anda`,
+        {
+          duration: 2000,
+        }
+      );
+      return;
+    }
 
     if (existingItem) {
       existingItem.quantity += quantity;
@@ -78,15 +68,13 @@ export default function ProductDetail() {
     }
 
     localStorage.setItem('cart', JSON.stringify(cartItems));
+
     toast.success('Produk telah ditambahkan ke keranjang', { duration: 3000 });
   };
 
   const handleBuyNow = () => {
     const checkoutItem = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      attachments: product.attachments,
+      ...product,
       variant: selectedVariant,
       quantity: quantity,
     };
@@ -100,6 +88,16 @@ export default function ProductDetail() {
     setTimeout(() => {
       navigate('/lakoe-app/checkout-page');
     }, 1000);
+  };
+
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity > (product?.stock || 0)) {
+      toast.error(`Stok produk hanya tersisa ${product?.stock} item`, {
+        duration: 2000,
+      });
+      return;
+    }
+    setQuantity(newQuantity);
   };
 
   if (isLoading) {
@@ -149,24 +147,6 @@ export default function ProductDetail() {
               src={product.attachments}
               alt={product.name}
             />
-            <HStack position="absolute" top={4} right={4} gap={2}>
-              <IconButton
-                as={BsHeart}
-                aria-label="Add to wishlist"
-                bg={'transparent'}
-                color={textColor}
-                size="xs"
-                _hover={{ transform: 'scale(1.1)' }}
-              />
-              <IconButton
-                aria-label="Share product"
-                as={BsShare}
-                bg={'transparent'}
-                color={textColor}
-                size="xs"
-                _hover={{ transform: 'scale(1.1)' }}
-              />
-            </HStack>
           </Box>
         </Box>
 
@@ -185,81 +165,6 @@ export default function ProductDetail() {
               Rp{product.price.toLocaleString()}
             </Badge>
           </VStack>
-
-          {/* <Box bg={sectionBg} p={6} borderRadius="xl">
-            <VStack align="stretch" gap={4}>
-              <Flex align="center" gap={4}>
-                <Icon as={TbTruckDelivery} boxSize={6} color={accentColor} />
-                <Text fontSize="lg" fontWeight="medium" color={textColor}>
-                  Pengiriman
-                </Text>
-              </Flex>
-
-              <SimpleGrid columns={2} gap={4}>
-                <Box>
-                  <Text color={secondaryTextColor} mb={2}>
-                    Pengiriman Ke
-                  </Text>
-                  <SelectRoot
-                    value={[selectedCity]}
-                    onChange={(e) =>
-                      setSelectedCity((e.target as HTMLSelectElement).value)
-                    }
-                    bg={selectBg}
-                    borderColor={borderColor}
-                    color={textColor}
-                    _hover={{ borderColor: accentColor }}
-                    _focus={{ borderColor: accentColor, boxShadow: 'outline' }}
-                    collection={cities}
-                    size="sm"
-                    width="full"
-                  >
-                    <SelectTrigger>
-                      <SelectValueText placeholder="Select movie" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cities.items.map((city) => (
-                        <SelectItem item={city} key={city.value}>
-                          {city.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </SelectRoot>
-                </Box>
-
-                <Box>
-                  <Text color={secondaryTextColor} mb={2}>
-                    Ongkos Kirim
-                  </Text>
-                  <SelectRoot
-                    value={[selectedShipping]}
-                    onChange={(e) =>
-                      setSelectedShipping((e.target as HTMLSelectElement).value)
-                    }
-                    bg={selectBg}
-                    borderColor={borderColor}
-                    color={textColor}
-                    _hover={{ borderColor: accentColor }}
-                    _focus={{ borderColor: accentColor, boxShadow: 'outline' }}
-                    collection={shippingMethods}
-                    size="sm"
-                    width="full"
-                  >
-                    <SelectTrigger>
-                      <SelectValueText placeholder="Select movie" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {shippingMethods.items.map((method) => (
-                        <SelectItem item={method} key={method.value}>
-                          {method.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </SelectRoot>
-                </Box>
-              </SimpleGrid>
-            </VStack>
-          </Box> */}
 
           <Box>
             <Text fontSize="lg" fontWeight="medium" mb={3} color={textColor}>
@@ -310,7 +215,9 @@ export default function ProductDetail() {
               max={99}
               step={1}
               value={String(quantity)}
-              onValueChange={(details) => setQuantity(Number(details.value))}
+              onValueChange={(details) =>
+                handleQuantityChange(Number(details.value))
+              }
               allowOverflow={false}
               spinOnPress={true}
               focusInputOnChange={false}

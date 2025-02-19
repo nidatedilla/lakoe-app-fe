@@ -4,8 +4,6 @@ import Cookies from 'js-cookie';
 
 export const fetchStoreWithProducts = async (domain: string) => {
   const response = await axios.get(`${apiURL}/store/${domain}`);
-  console.log('Response:', response.data);
-
   return response.data;
 };
 
@@ -18,4 +16,9 @@ export const getStoreDomain = async () => {
     },
   });
   return response.data.domain;
+};
+
+export const getStoreLogo = async (domain: string) => {
+  const response = await axios.get(`${apiURL}/store/logo/${domain}`);
+  return response.data;
 };

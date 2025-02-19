@@ -196,27 +196,6 @@ const Navbar = () => {
                   </Link>
                 </Text>
               </HStack>
-
-              <HStack>
-                {activeTab === 'payment-method' && (
-                  <Box px={1}>
-                    <Icon color={'blue.500'}>
-                      <GoDotFill />
-                    </Icon>
-                  </Box>
-                )}
-                <Text
-                  pl={activeTab === 'payment-method' ? '0' : '8'}
-                  color={activeTab === 'payment-method' ? 'blue.500' : 'black'}
-                >
-                  <Link
-                    onClick={() => handleSetActiveTab('payment-method')}
-                    to={'/payment-method'}
-                  >
-                    Metode Pembayaran
-                  </Link>
-                </Text>
-              </HStack>
             </VStack>
           )}
         </Box>

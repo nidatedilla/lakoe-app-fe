@@ -9,39 +9,19 @@ import {
   InputAddon,
 } from '@chakra-ui/react';
 import { BsCart3 } from 'react-icons/bs';
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, useParams } from 'react-router';
 import { Button } from '../../components/ui/button';
 import { IoIosSearch } from 'react-icons/io';
-import { useEffect, useState } from 'react';
-
-interface CartItem {
-  quantity: number;
-}
+import { useStoreLogo } from '../../hooks/use-store';
+import { useCart } from '../../hooks/use-cart';
 
 export default function Layout() {
-  const [cartCount, setCartCount] = useState(0);
+  const { domain } = useParams<{ domain: string }>();
+  const { data: store } = useStoreLogo(domain || '');
+  const { data: cartItems } = useCart();
 
-  const updateCartCount = () => {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const totalItems = storedCart.reduce(
-      (acc: number, item: CartItem) => acc + item.quantity,
-      0
-    );
-    setCartCount(totalItems);
-  };
-
-  useEffect(() => {
-    updateCartCount();
-
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'cart') {
-        updateCartCount();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  const cartCount =
+    cartItems?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   return (
     <Box minW={'100vh'} minH="100vh" color={'white'}>
@@ -60,10 +40,11 @@ export default function Layout() {
         top={0}
         zIndex={1000}
       >
-        <Image src="../src/assets/lakoe-logo.png" width={'130px'} />
+        {store && <Image src={store.logo} width={'130px'} />}
         <Group attached flex="1" m={28}>
           <Input
             bg={'white'}
+            color={'black'}
             size={'md'}
             placeholder=" Cari produk yang diinginkan"
           />

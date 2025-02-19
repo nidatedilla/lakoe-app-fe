@@ -106,3 +106,22 @@ export type orderTypes = {
   created_at: string;
   updated_at: string;
 };
+
+export type OrderData = {
+  storeId: string;
+  payment_method?: string;
+  destination_contact_name: string;
+  destination_contact_phone: string;
+  destination_address: string;
+  destination_postal_code: string;
+  courierId: string;
+  rate_courier: number;
+  order_items: {
+    productId: string;
+    variants?: string[];
+    qty: number;
+    height?: number;
+    length?: number;
+    width?: number;
+  }[];
+};

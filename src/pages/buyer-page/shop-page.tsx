@@ -17,23 +17,15 @@ import { useColorModeValue } from '../../components/ui/color-mode';
 import { useStoreData } from '../../hooks/use-store';
 import { product } from '../../types/type-product';
 import toast from 'react-hot-toast';
+import { useAddToCart } from '../../hooks/use-cart';
 
 export default function ShopPage() {
   const { domain } = useParams<{ domain: string }>();
   const { data: store, isLoading, error } = useStoreData(domain || '');
+  const addToCartMutation = useAddToCart();
+
   const addToCart = (product: product) => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingProduct = cart.find(
-      (item: product) => item.id === product.id
-    );
-
-    if (existingProduct) {
-      existingProduct.quantity += 1;
-    } else {
-      cart.push({ ...product, quantity: 1 });
-    }
-
-    localStorage.setItem('cart', JSON.stringify(cart));
+    addToCartMutation.mutate({ ...product, quantity: 1 });
     toast.success(`${product.name} ditambahkan ke keranjang!`);
   };
 
@@ -87,10 +79,7 @@ export default function ShopPage() {
         >
           {store?.products?.length > 0 ? (
             store.products.map((product: product) => (
-              <Link
-                key={product.id}
-                to={`/lakoe-app/product-detail/${product.id}`}
-              >
+              <Link key={product.id} to={`/lakoe-app/${domain}/${product.id}`}>
                 <Box
                   bg={cardBg}
                   h={'300px'}

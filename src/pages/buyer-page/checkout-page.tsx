@@ -8,31 +8,58 @@ import {
   HStack,
   Icon,
   Image,
-  Input,
   Stack,
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import { FiCreditCard, FiTruck, FiUser } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
+import { FiTruck, FiUser } from 'react-icons/fi';
 import { useLocation } from 'react-router';
 import { useColorModeValue } from '../../components/ui/color-mode';
-import { Field } from '../../components/ui/field';
-import { Radio, RadioGroup } from '../../components/ui/radio';
 import { useGetGuestLocations } from '../../hooks/use-get-location';
 import { getGuestId } from '../../utils/guest';
 import DialogChangeLocation from './components/change-location-dialog';
 import DialogChangeShippingMethod from './components/change-shipping-method-dialog';
-
-// import { useCreateOrder } from '../../hooks/use-order';
+import { useCreateOrder } from '../../hooks/use-order';
+import { OrderData } from '../../types/types-order';
+import Swal from 'sweetalert2';
+import toast from 'react-hot-toast';
 
 type Product = {
-  id: number;
+  id: string;
   name: string;
   price: number;
   quantity: number;
   attachments: string;
 };
+
+declare global {
+  interface Window {
+    snap?: {
+      pay: (
+        token: string,
+        options: {
+          onSuccess: (result: SnapResult) => void;
+          onPending: (result: SnapResult) => void;
+          onError: (result: SnapResult) => void;
+          onClose: () => void;
+        }
+      ) => void;
+    };
+  }
+}
+
+interface SnapResult {
+  status_code: string;
+  status_message: string;
+  transaction_id: string;
+  order_id: string;
+  gross_amount: string;
+  payment_type: string;
+  transaction_time: string;
+  transaction_status: string;
+  fraud_status: string;
+}
 
 export default function CheckoutPage() {
   const bgColor = useColorModeValue('white', 'gray.800');
@@ -41,52 +68,144 @@ export default function CheckoutPage() {
   const headerBg = useColorModeValue('blue.50', 'blue.900');
   const textColor = useColorModeValue('gray.600', 'gray.300');
 
-  const [paymentMethod, setPaymentMethod] = useState('creditCard');
   const storedData = localStorage.getItem('checkout');
   const product = storedData ? JSON.parse(storedData) : [];
+  const { mutate: createOrder, isPending } = useCreateOrder();
+
+  console.log('Stored Data:', storedData);
+  console.log('Parsed Product:', product);
 
   const productList = Array.isArray(product) ? product : [product];
-
-  const location = useLocation();
-  const selectedShipping = location.state?.selectedShipping;
-  // const { mutate: createOrder } = useCreateOrder();
+  const storeId = productList.length > 0 ? productList[0].storeId : null;
+  console.log('Store Id:', storeId);
   const guestId = getGuestId();
   const { data: guestLocations } = useGetGuestLocations(guestId);
-  console.log('Guest ID di location get:', guestId);
+  const location = useLocation();
+
+  const [selectedShipping, setSelectedShipping] = useState(() => {
+    return (
+      location.state?.selectedShipping ||
+      JSON.parse(localStorage.getItem('selectedShipping') || 'null')
+    );
+  });
+
+  useEffect(() => {
+    if (location.state?.selectedShipping) {
+      setSelectedShipping(location.state.selectedShipping);
+      localStorage.setItem(
+        'selectedShipping',
+        JSON.stringify(location.state.selectedShipping)
+      );
+    }
+  }, [location.state?.selectedShipping]);
+
+  console.log('Data kurir yang dipilih:', selectedShipping);
+
+  useEffect(() => {
+    const midtransScriptUrl = 'https://app.sandbox.midtrans.com/snap/snap.js';
+    const scriptTag = document.createElement('script');
+    scriptTag.src = midtransScriptUrl;
+
+    const myMidtransClientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
+    scriptTag.setAttribute('data-client-key', myMidtransClientKey);
+
+    document.body.appendChild(scriptTag);
+
+    return () => {
+      document.body.removeChild(scriptTag);
+    };
+  }, []);
 
   if (!productList.length) return <Text>Produk tidak ditemukan</Text>;
 
-  // const handleSubmit = () => {
-  //   const orderData = {
-  //     userId: order.userId,
-  //     storeId: order.storeId,
-  //     total_price: order.details.totalAmount,
-  //     shipper_contact_name: order.shipping.shipper_name,
+  interface Shipping {
+    id: string;
+    courierName: string;
+    serviceName: string;
+    duration: string;
+    price: number;
+  }
 
-  //     shipper_contact_phone: order.shipping.shipper_phone,
-  //     origin_contact_name: order.shipping.origin_name,
-  //     origin_contact_phone: order.shipping.origin_phone,
-  //     origin_address: order.shipping.origin_address,
-  //     origin_postal_code: order.shipping.origin_postal_code,
-  //     destination_contact_name: order.shipping.destination_name,
-  //     destination_contact_phone: order.shipping.destination_phone,
-  //     destination_address: order.shipping.destination_address,
-  //     destination_postal_code: order.shipping.destination_postal_code,
-  //     courier_company: order.shipping.courier_company,
-  //     courier_type: order.shipping.courier_type,
-  //     items: [
-  //       {
-  //         name: order.product.name,
-  //         quantity: order.product.quantity,
-  //         price: order.product.price,
-  //       },
-  //     ],
-  //   };
+  const handleShippingChange = (selectedShipping: Shipping) => {
+    setSelectedShipping(selectedShipping);
+    localStorage.setItem('selectedShipping', JSON.stringify(selectedShipping));
+  };
 
-  //   createOrder(orderData);
-  // };
+  const handleCreateOrder = () => {
+    if (!guestLocations || !selectedShipping) {
+      alert('Silakan lengkapi informasi penerima dan metode pengiriman');
+      return;
+    }
 
-  console.log('guest lokasi: ', guestLocations);
+    Swal.fire({
+      title: 'Konfirmasi Checkout',
+      text: 'Apakah Anda yakin ingin melanjutkan pembayaran?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya, Checkout',
+      cancelButtonText: 'Batal',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const orderData: OrderData = {
+          storeId: productList[0].storeId,
+          destination_contact_name: guestLocations.contact_name,
+          destination_contact_phone: guestLocations.contact_phone,
+          destination_address: guestLocations.address,
+          destination_postal_code: guestLocations.postal_code,
+          courierId: selectedShipping.id,
+          rate_courier: selectedShipping.price,
+          order_items: productList.map((item) => ({
+            productId: item.id.toString(),
+            qty: item.quantity,
+            height: item.height,
+            length: item.length,
+            width: item.width,
+            variants: item.variant ? [item.variant] : [],
+          })),
+        };
+
+        createOrder(orderData, {
+          onSuccess: (orderResponse) => {
+            const token = orderResponse.midtrans_token;
+
+            console.log('Response token:', orderResponse);
+
+            localStorage.removeItem('guestId');
+            localStorage.removeItem('selectedShipping');
+            localStorage.removeItem('checkout');
+
+            if (window.snap) {
+              window.snap.pay(token, {
+                onSuccess: function (result: SnapResult) {
+                  console.log('Payment success:', result);
+
+                  window.location.href = `/lakoe-app/status-payment-page/${result.order_id}`;
+
+                  toast.success('Berhasil!! Pesanan Anda telah dibuat.', {
+                    duration: 2000,
+                  });
+                },
+                onPending: function (result: SnapResult) {
+                  console.log('Payment pending:', result);
+                },
+                onError: function (result: SnapResult) {
+                  console.log('Payment error:', result);
+                },
+                onClose: function () {
+                  console.log('Payment modal closed');
+                },
+              });
+            }
+          },
+          onError: (error) => {
+            console.error('Error creating order:', error);
+          },
+        });
+      }
+    });
+  };
 
   return (
     <Box minH="100vh" bg={bgPage}>
@@ -167,8 +286,8 @@ export default function CheckoutPage() {
                   <Text color={textColor}>Pilih metode pengiriman</Text>
                 )}
                 <DialogChangeShippingMethod
-                  storeId={product.storeId}
-                  destinationAreaId={guestLocations?.destination_area_id}
+                  storeId={storeId}
+                  destinationAreaId={guestLocations?.area_id}
                   items={productList.map((item) => ({
                     id: item.id.toString(),
                     name: item.name,
@@ -176,84 +295,30 @@ export default function CheckoutPage() {
                     quantity: item.quantity,
                     description: item.description,
                     value: item.price * item.quantity,
-                    length: 0,
-                    width: 0,
-                    height: 0,
-                    weight: 0,
+                    weight: item.weight,
                   }))}
+                  onShippingChange={handleShippingChange}
+                  isRecipientInfoAvailable={!!guestLocations}
                 />
               </Flex>
             </Box>
-
-            <Box bg={bgColor} p={6} borderRadius="xl" borderWidth="1px">
-              <HStack mb={4}>
-                <Icon as={FiCreditCard} color="blue.500" boxSize={5} />
-                <Heading size="md">Metode Pembayaran</Heading>
-              </HStack>
-              <RadioGroup
-                onChange={(e) =>
-                  setPaymentMethod((e.target as HTMLInputElement).value)
-                }
-                value={paymentMethod}
-                mt={2}
-                colorPalette={'blue'}
-              >
-                <Stack gap={3}>
-                  <Radio value="kartu-kredit">Kartu Kredit/ Debit</Radio>
-                  <Radio value="transfer-bank">Transfer Bank</Radio>
-                  <Radio value="cod">COD</Radio>
-                </Stack>
-              </RadioGroup>
-
-              {paymentMethod === 'kartu-kredit' && (
-                <Box mt={4}>
-                  <Field label="Masukkan No Kartu Kredit" mb={2}>
-                    <Input type="text" placeholder="XXXX XXXX XXXX XXXX" />
-                  </Field>
-                  <Flex>
-                    <Field label="Valid date" mr={2}>
-                      <Input type="month" />
-                    </Field>
-                    <Field label="CVV">
-                      <Input type="password" placeholder="XXX" />
-                    </Field>
-                  </Flex>
-                </Box>
-              )}
-
-              {paymentMethod === 'transfer-bank' && (
-                <Box mt={4}>
-                  <Text fontWeight="bold" mb={2}>
-                    Pilih Bank:
-                  </Text>
-                  <RadioGroup colorPalette={'blue'}>
-                    <Stack gap={3}>
-                      <Radio value="bca">BCA</Radio>
-                      <Radio value="bni">BNI</Radio>
-                      <Radio value="mandiri">Mandiri</Radio>
-                    </Stack>
-                  </RadioGroup>
-                </Box>
-              )}
-            </Box>
           </VStack>
 
-          {productList.map((item: Product) => (
-            <Box
-              bg={bgColor}
-              p={6}
-              borderRadius="xl"
-              borderWidth="1px"
-              w={{ base: 'full', lg: '400px' }}
-              position="sticky"
-              top="20px"
-              key={item.id}
-            >
-              <Heading size="md" mb={6}>
-                Ringkasan Pesanan
-              </Heading>
+          <Box
+            bg={bgColor}
+            p={6}
+            borderRadius="xl"
+            borderWidth="1px"
+            w={{ base: 'full', lg: '400px' }}
+            position="sticky"
+            top="20px"
+          >
+            <Heading size="md" mb={6}>
+              Ringkasan Pesanan
+            </Heading>
 
-              <Box mb={6}>
+            {productList.map((item: Product) => (
+              <Box mb={6} key={item.id}>
                 <HStack gap={4} pb={4} borderBottomWidth="1px">
                   <Image
                     src={item.attachments}
@@ -270,43 +335,50 @@ export default function CheckoutPage() {
                   </VStack>
                 </HStack>
               </Box>
+            ))}
 
-              <Stack gap={3}>
-                <Flex justify="space-between">
-                  <Text color={textColor}>Subtotal Produk</Text>
-                  <Text>
-                    Rp {(item.price * item.quantity).toLocaleString()}
-                  </Text>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text color={textColor}>Ongkos Kirim</Text>
-                  <Text>Rp {''}</Text>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text color={textColor}>Diskon</Text>
-                  <Text color="green.500">-Rp {''}</Text>
-                </Flex>
-                <Box borderBottomWidth={'1px'} />
-                <Flex justify="space-between" fontWeight="bold">
-                  <Text>Total</Text>
-                  <Text color="blue.500" fontSize="lg">
-                    Rp {(item.price * item.quantity).toLocaleString()}
-                  </Text>
-                </Flex>
-              </Stack>
+            <Stack gap={3}>
+              <Flex justify="space-between">
+                <Text color={textColor}>Subtotal Produk</Text>
+                <Text>
+                  Rp{' '}
+                  {productList
+                    .reduce((acc, item) => acc + item.price * item.quantity, 0)
+                    .toLocaleString()}
+                </Text>
+              </Flex>
+              <Flex justify="space-between">
+                <Text color={textColor}>Ongkos Kirim</Text>
+                <Text>Rp {selectedShipping?.price.toLocaleString() || 0}</Text>
+              </Flex>
+              <Box borderBottomWidth={'1px'} />
+              <Flex justify="space-between" fontWeight="bold">
+                <Text>Total</Text>
+                <Text color="blue.500" fontSize="lg">
+                  Rp{' '}
+                  {(
+                    productList.reduce(
+                      (acc, item) => acc + item.price * item.quantity,
+                      0
+                    ) + (selectedShipping?.price || 0)
+                  ).toLocaleString()}
+                </Text>
+              </Flex>
+            </Stack>
 
-              <Button
-                borderRadius={'full'}
-                colorPalette="blue"
-                size="lg"
-                w="full"
-                mt={6}
-                disabled={!selectedShipping}
-              >
-                Buat Pesanan
-              </Button>
-            </Box>
-          ))}
+            <Button
+              borderRadius="full"
+              colorPalette="blue"
+              size="lg"
+              w="full"
+              mt={6}
+              loading={isPending}
+              onClick={handleCreateOrder}
+              disabled={!selectedShipping}
+            >
+              Buat Pesanan
+            </Button>
+          </Box>
         </Stack>
       </Container>
     </Box>
