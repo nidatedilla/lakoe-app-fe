@@ -1,13 +1,14 @@
-// src/pages/CombinedProductPage.tsx
-import React, { useState } from 'react';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import {
   useFindProducts,
   updateProduct,
   deleteProduct,
 } from '../services/product-service';
-import { product } from '../types/type-product';
-import { useNavigate } from 'react-router-dom';
+import { product, variant } from '../types/type-product';
+import { useNavigate } from 'react-router';
+import axios from 'axios';
+import { apiURL } from '../utils/constants';
 
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
@@ -26,15 +27,19 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import InputAdornment from '@mui/material/InputAdornment';
-import { LuPackageSearch } from 'react-icons/lu';
 import Menu from '@mui/material/Menu';
+import MenuItemMUI from '@mui/material/MenuItem';
+
+import { LuPackageSearch } from 'react-icons/lu';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { RiLinksFill } from 'react-icons/ri';
-import { FaRegEdit } from 'react-icons/fa';
 import { GoCopy } from 'react-icons/go';
-import { MdDeleteOutline } from 'react-icons/md';
 
-// // Jika diperlukan, komponen TabPanel
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
+import EditProductDialog from '../components/EditProductDialog';
+
 // function TabPanel(props: { children?: React.ReactNode; value: string; index: string }) {
 //   const { children, value, index, ...other } = props;
 //   return (
@@ -51,49 +56,33 @@ const CombinedProductPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [sortOption, setSortOption] = useState('');
-  // Simpan id produk sebagai number untuk mencegah masalah konversi
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   // const navigate = useNavigate();
+
+  // Fungsi untuk update produk, memanggil service updateProduct
+  // dan meng-invalidate query sehingga data baru di-fetch secara otomatis
+  const handleUpdateProduct = async (
+    id: number,
+    updatedData: Partial<product>
+  ) => {
+    try {
+      await updateProduct(id, updatedData);
+      queryClient.invalidateQueries({ queryKey: ['product'] });
+    } catch (error) {
+      console.error(error);
+      toast.error('Gagal mengupdate produk', { autoClose: 1000 });
+      throw error;
+    }
+  };
 
   const getProductCountByStatus = (status: string) => {
     if (!products) return 0;
-    if (status === 'Aktif') {
-      return products.filter((p) => p.is_active).length;
-    } else if (status === 'Non-Aktif') {
+    if (status === 'Aktif') return products.filter((p) => p.is_active).length;
+    if (status === 'Non-Aktif')
       return products.filter((p) => !p.is_active).length;
-    }
     return products.length;
   };
 
-  // Mutation untuk update produk
-  const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      updatedData,
-    }: {
-      id: number;
-      updatedData: Partial<product>;
-    }) => updateProduct(id, updatedData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['product'] });
-    },
-    onError: (err) => {
-      console.error(err);
-    },
-  });
-
-  // Mutation untuk delete produk
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteProduct(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['product'] });
-    },
-    onError: (err) => {
-      console.error(err);
-    },
-  });
-
-  // Filter produk sesuai tab, pencarian, kategori, dan sorting
   const filteredProducts = (products || [])
     .filter((prod) => {
       if (selectedTab === 'Aktif') return prod.is_active;
@@ -107,26 +96,19 @@ const CombinedProductPage = () => {
       categoryFilter ? prod.categoryId === categoryFilter : true
     )
     .sort((a, b) => {
-      if (sortOption === 'harga-tertinggi') {
-        return b.price - a.price;
-      } else if (sortOption === 'harga-terendah') {
-        return a.price - b.price;
-      } else if (sortOption === 'stok-terdikit') {
-        return a.stock - b.stock;
-      } else if (sortOption === 'stok-terbanyak') {
-        return b.stock - a.stock;
-      }
+      if (sortOption === 'harga-tertinggi') return b.price - a.price;
+      if (sortOption === 'harga-terendah') return a.price - b.price;
+      if (sortOption === 'stok-terdikit') return a.stock - b.stock;
+      if (sortOption === 'stok-terbanyak') return b.stock - a.stock;
       return 0;
     });
 
-  // Cek apakah ada produk yang dipilih
   const isAnySelected = selectedIds.length > 0;
 
-  const handleSelectAllChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAllChange = (e: ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     if (checked) {
-      // Pastikan id dikonversi ke number
-      setSelectedIds(filteredProducts.map((prod) => Number(prod.id)));
+      setSelectedIds(filteredProducts.map((prod) => prod.id));
     } else {
       setSelectedIds([]);
     }
@@ -140,53 +122,61 @@ const CombinedProductPage = () => {
     }
   };
 
-  // Fungsi untuk menghapus semua produk yang dipilih
   const handleDeleteAll = async () => {
-    if (
-      window.confirm(
-        `Anda yakin ingin menghapus ${selectedIds.length} produk yang terpilih?`
-      )
-    ) {
+    const result = await Swal.fire({
+      title: 'Konfirmasi',
+      text: `Anda yakin ingin menghapus ${selectedIds.length} produk yang terpilih?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal',
+    });
+    if (result.isConfirmed) {
       try {
-        await Promise.all(
-          selectedIds.map((id) => deleteMutation.mutateAsync(id))
-        );
-        alert('Semua produk berhasil dihapus.');
+        await Promise.all(selectedIds.map((id) => deleteProduct(Number(id))));
+
+        toast.success('Semua produk berhasil dihapus', { autoClose: 1000 });
         setSelectedIds([]);
+        queryClient.invalidateQueries({ queryKey: ['product'] });
       } catch (error) {
         console.error(error);
-        alert('Gagal menghapus beberapa produk.');
+        toast.error('Gagal menghapus beberapa produk', { autoClose: 1000 });
       }
     }
   };
 
-  // Fungsi untuk mengubah status semua produk menjadi nonaktif
   const handleInactiveAll = async () => {
-    if (
-      window.confirm(
-        `Anda yakin ingin mengubah status ${selectedIds.length} produk menjadi tidak aktif?`
-      )
-    ) {
+    const result = await Swal.fire({
+      title: 'Konfirmasi',
+      text: `Anda yakin ingin mengubah status ${selectedIds.length} produk menjadi tidak aktif?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, ubah!',
+      cancelButtonText: 'Batal',
+    });
+    if (result.isConfirmed) {
       try {
         await Promise.all(
           selectedIds.map((id) =>
-            updateMutation.mutateAsync({
-              id,
-              updatedData: { is_active: false },
-            })
+            handleUpdateProduct(Number(id), { is_active: false })
           )
         );
-        alert('Semua produk berhasil diubah statusnya menjadi tidak aktif.');
+        toast.success(
+          'Semua produk berhasil diubah statusnya menjadi tidak aktif',
+          { autoClose: 1000 }
+        );
         setSelectedIds([]);
       } catch (error) {
         console.error(error);
-        alert('Gagal mengubah status beberapa produk.');
+        toast.error('Gagal mengubah status beberapa produk', {
+          autoClose: 1000,
+        });
       }
     }
   };
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
-    setSelectedTab(newValue);
+  const handleTabChange = (newValue: unknown) => {
+    setSelectedTab(newValue as string);
   };
 
   const getEmptyMessage = () => {
@@ -250,6 +240,12 @@ const CombinedProductPage = () => {
 
   return (
     <Box sx={{ p: 0 }}>
+      <ToastContainer
+        position="top-center"
+        autoClose={1000}
+        hideProgressBar={false}
+      />
+
       {/* Header Tabs */}
       <Tabs
         value={selectedTab}
@@ -325,7 +321,7 @@ const CombinedProductPage = () => {
         />
       </Tabs>
 
-      {/* Kontrol Pencarian, Filter & Sorting */}
+      {/* Search, Filter & Sorting Controls */}
       <Box sx={{ mt: 1, mb: 1, p: 1 }}>
         <Stack direction="row" spacing={1} alignItems="center">
           <TextField
@@ -377,7 +373,6 @@ const CombinedProductPage = () => {
             <MenuItem value="stok-terbanyak">Stok Tertinggi</MenuItem>
           </Select>
         </Stack>
-        {/* Kontrol Pilih Semua & Tombol Aksi */}
         <Box
           sx={{
             display: 'flex',
@@ -439,21 +434,26 @@ const CombinedProductPage = () => {
           <ProductCard
             key={prod.id}
             product={prod}
-            isSelected={selectedIds.includes(Number(prod.id))}
+            isSelected={selectedIds.includes(prod.id)}
             onSelectChange={(checked) =>
               handleSelectProduct(Number(prod.id), checked)
             }
             onUpdate={(updatedData) =>
-              updateMutation.mutate({ id: Number(prod.id), updatedData })
+              handleUpdateProduct(Number(prod.id), updatedData)
             }
             onDelete={() => {
-              if (
-                window.confirm(
-                  `Anda yakin ingin menghapus produk ${prod.name}?`
-                )
-              ) {
-                deleteMutation.mutate(Number(prod.id));
-              }
+              Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: `Anda yakin ingin menghapus produk ${prod.name}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal',
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  deleteProduct(Number(prod.id));
+                }
+              });
             }}
           />
         ))
@@ -483,11 +483,129 @@ function ProductCard({
   const [newStock, setNewStock] = useState('');
   const [isPriceDialogOpen, setIsPriceDialogOpen] = useState(false);
   const [isStockDialogOpen, setIsStockDialogOpen] = useState(false);
+  const [variantDialogOpen, setVariantDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [active, setActive] = useState(product.is_active);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  useEffect(() => {
+    setActive(product.is_active);
+  }, [product.is_active]);
+
   const navigate = useNavigate();
+
+  const {
+    data: variantData,
+    isLoading: isVariantLoading,
+    error: variantError,
+    refetch: refetchVariants,
+  } = useQuery<variant[]>({
+    queryKey: ['variants', product.id],
+    queryFn: () => {
+      const tokenCookie = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='));
+      const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+      return axios
+        .get(`${apiURL}/product/${product.id}/variants`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        })
+        .then((res) => res.data);
+    },
+    enabled: true,
+  });
+
+  const variantCount = variantData
+    ? variantData.length
+    : product.variant
+      ? product.variant.length
+      : 0;
+
+  const [editedVariants, setEditedVariants] = useState<
+    Record<number, { price: number; stock: number }>
+  >({});
+
+  useEffect(() => {
+    if (variantData) {
+      const initialData: Record<number, { price: number; stock: number }> = {};
+      variantData.forEach((v) => {
+        initialData[Number(v.id)] = { price: v.price, stock: v.stock };
+      });
+      setEditedVariants(initialData);
+    }
+  }, [variantData]);
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  let displayPrice: number | string;
+  let displayStock: number;
+  let displaySKU: string;
+
+  if (product.variant && product.variant.length > 0) {
+    const variants = product.variant;
+    if (variants.length === 1) {
+      displayPrice = variants[0].price;
+      displayStock = variants[0].stock;
+      displaySKU = variants[0].sku || '';
+    } else {
+      const prices = variants.map((v) => v.price);
+      const lowestPrice = Math.min(...prices);
+      const highestPrice = Math.max(...prices);
+      displayPrice =
+        lowestPrice === highestPrice
+          ? lowestPrice
+          : `${lowestPrice.toLocaleString()} - ${highestPrice.toLocaleString()}`;
+      displayStock = variants.reduce((sum, v) => sum + v.stock, 0);
+      displaySKU = variants[0].sku || '';
+    }
+  } else {
+    displayPrice = product.price;
+    displayStock = product.stock;
+    displaySKU = product.sku;
+  }
+
+  const handleSwitchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newStatus = e.target.checked;
+    setActive(newStatus);
+    try {
+      await onUpdate({ is_active: newStatus });
+    } catch {
+      setActive(!newStatus);
+    }
+  };
+
+  const handleSaveVariants = async () => {
+    const tokenCookie = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('token='));
+    const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+    try {
+      if (variantData) {
+        await Promise.all(
+          variantData.map((v) => {
+            const updatedData = editedVariants[Number(v.id)];
+            return axios.put(
+              `${apiURL}/product/${product.id}/variants/${v.id}`,
+              updatedData,
+              {
+                headers: {
+                  Authorization: token ? `Bearer ${token}` : '',
+                },
+              }
+            );
+          })
+        );
+        toast.success('Variant updated successfully', { autoClose: 1000 });
+        refetchVariants();
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to update variants', { autoClose: 1000 });
+    }
   };
 
   return (
@@ -500,7 +618,7 @@ function ProductCard({
         mb: 1,
       }}
     >
-      {/* Checkbox di sudut kanan atas */}
+      {/* Checkbox */}
       <Box sx={{ position: 'absolute', top: 4, right: 4, zIndex: 1 }}>
         <Checkbox
           checked={isSelected}
@@ -509,7 +627,6 @@ function ProductCard({
       </Box>
 
       <Stack direction="row" justifyContent="space-between" alignItems="center">
-        {/* Bagian kiri: Foto, detail, dan tombol aksi */}
         <Stack direction="row" spacing={2} alignItems="center">
           <Box
             component="img"
@@ -519,6 +636,21 @@ function ProductCard({
           />
           <Stack spacing={1}>
             <Typography
+              variant="caption"
+              sx={{
+                backgroundColor: 'blue',
+                color: 'white',
+                borderRadius: '2px',
+                padding: '0px 2px',
+                display: 'inline-block',
+                fontSize: '0.8rem',
+                lineHeight: 1,
+                width: 'fit-content',
+              }}
+            >
+              {isVariantLoading ? '...' : `${variantCount} varian`}
+            </Typography>
+            <Typography
               variant="subtitle1"
               sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}
             >
@@ -526,16 +658,18 @@ function ProductCard({
             </Typography>
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                Rp{Number(product.price).toLocaleString()}
+                Rp
+                {typeof displayPrice === 'number'
+                  ? Number(displayPrice).toLocaleString()
+                  : displayPrice}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                • Stok: {product.stock}
+                • Stok: {displayStock}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                • {product.sku}
+                • {displaySKU}
               </Typography>
             </Stack>
-            {/* Tombol aksi */}
             <Stack direction="row" spacing={1} alignItems="center">
               <Button
                 variant="outlined"
@@ -566,6 +700,22 @@ function ProductCard({
               <Button
                 variant="outlined"
                 size="small"
+                onClick={() => {
+                  setVariantDialogOpen(true);
+                  refetchVariants();
+                }}
+                sx={{
+                  color: 'black',
+                  borderColor: 'black',
+                  borderRadius: '999px',
+                  textTransform: 'none',
+                }}
+              >
+                Detail Variant
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
                 onClick={(e) => setAnchorEl(e.currentTarget)}
                 sx={{
                   color: 'black',
@@ -581,7 +731,7 @@ function ProductCard({
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
               >
-                <MenuItem
+                <MenuItemMUI
                   onClick={() => {
                     handleMenuClose();
                     navigate(`/product/${product.id}`);
@@ -589,50 +739,38 @@ function ProductCard({
                 >
                   <RiLinksFill />
                   Lihat Halaman
-                </MenuItem>
-                <MenuItem
+                </MenuItemMUI>
+                <MenuItemMUI
                   onClick={() => {
                     handleMenuClose();
-                    navigate(`/edit-product/${product.id}`);
-                  }}
-                >
-                  <FaRegEdit />
-                  Edit Produk
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleMenuClose();
-                    navigate(`/create-product?duplicate=${product.id}`);
+                    setIsEditDialogOpen(true);
                   }}
                 >
                   <GoCopy />
-                  Duplikat Produk
-                </MenuItem>
-                <MenuItem
+                  DuplikatProduk
+                </MenuItemMUI>
+                <MenuItemMUI
                   onClick={() => {
                     handleMenuClose();
-                    if (
-                      window.confirm(
-                        `Anda yakin ingin menghapus produk ${product.name}?`
-                      )
-                    ) {
-                      onDelete();
-                    }
+                    navigate(`/duplikat-product/${product.id}`);
+                  }}
+                ></MenuItemMUI>
+                <MenuItemMUI
+                  onClick={() => {
+                    handleMenuClose();
+                    onDelete();
                   }}
                 >
-                  <MdDeleteOutline />
                   Hapus Produk
-                </MenuItem>
+                </MenuItemMUI>
               </Menu>
             </Stack>
           </Stack>
         </Stack>
-
-        {/* Bagian kanan: Switch aktif/nonaktif */}
         <Stack spacing={1} alignItems="center">
           <Switch
-            checked={product.is_active}
-            onChange={(e) => onUpdate({ is_active: e.target.checked })}
+            checked={active}
+            onChange={handleSwitchChange}
             color="primary"
           />
         </Stack>
@@ -701,6 +839,89 @@ function ProductCard({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Dialog Detail Variant */}
+      <Dialog
+        open={variantDialogOpen}
+        onClose={() => setVariantDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Detail Variant - {product.name}</DialogTitle>
+        <DialogTitle>
+          <Typography>
+            Pastikan stok tersedia untuk mengaktifkan produk!
+          </Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          {isVariantLoading ? (
+            <Typography>Loading variant...</Typography>
+          ) : variantError ? (
+            <Typography color="error">Gagal mengambil variant.</Typography>
+          ) : variantData && variantData.length > 0 ? (
+            <Stack spacing={2}>
+              {variantData.map((v, index) => {
+                const variantName = v.combination
+                  ? Object.values(v.combination).join('-')
+                  : `Variant ${index + 1}`;
+                return (
+                  <Box
+                    key={v.id || index}
+                    sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}
+                  >
+                    <Typography variant="subtitle2">{variantName}</Typography>
+                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                      <TextField
+                        label="Price"
+                        type="number"
+                        size="small"
+                        value={editedVariants[Number(v.id)]?.price ?? v.price}
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          setEditedVariants((prev) => ({
+                            ...prev,
+                            [v.id]: { ...prev[Number(v.id)], price: value },
+                          }));
+                        }}
+                      />
+                      <TextField
+                        label="Stock"
+                        type="number"
+                        size="small"
+                        value={editedVariants[Number(v.id)]?.stock ?? v.stock}
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          setEditedVariants((prev) => ({
+                            ...prev,
+                            [v.id]: { ...prev[Number(v.id)], stock: value },
+                          }));
+                        }}
+                      />
+                    </Stack>
+                  </Box>
+                );
+              })}
+            </Stack>
+          ) : (
+            <Typography>No variant available.</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setVariantDialogOpen(false)}>Close</Button>
+          <Button onClick={handleSaveVariants}>Simpan</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog Edit Produk */}
+      <EditProductDialog
+        open={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        productData={product}
+        onProductUpdated={(updatedProduct) => {
+          onUpdate(updatedProduct);
+          setIsEditDialogOpen(false);
+        }}
+      />
     </Box>
   );
 }

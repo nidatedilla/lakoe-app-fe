@@ -215,9 +215,9 @@ const DynamicVariantCombinationUI: React.FC<
   };
 
   return (
-    <Box sx={{ padding: 2 }}>
+    <Box sx={{ padding: 1 }}>
       {/* Tombol toggle panel varian */}
-      <Box sx={{ mt: 0, mb: 2 }}>
+      <Box sx={{ mt: 0, mb: 0 }}>
         <Button
           variant="outlined"
           onClick={toggleVariantPanel}
@@ -393,9 +393,7 @@ const DynamicVariantCombinationUI: React.FC<
 
       {/* Tampilan daftar varian (tanpa form upload foto di masing-masing varian) */}
       {variants.length === 0 ? (
-        <Typography variant="body2" sx={{ mt: 1 }}>
-          Tidak ada varian yang dihasilkan
-        </Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}></Typography>
       ) : (
         variants.map((variant, index) => (
           <Paper key={index} sx={{ p: 1, mb: 1 }}>
