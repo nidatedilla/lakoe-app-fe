@@ -1,22 +1,13 @@
-import { Box, DialogContent, DialogRoot, Input, Text } from '@chakra-ui/react';
-import { LuSearch } from 'react-icons/lu';
+import { Box, DialogContent, DialogRoot, Text } from '@chakra-ui/react';
 import { CardPending } from '../components/Card-pending';
 import { CardProcessing } from '../components/Card-processing';
 import { CardRejected } from '../components/Card-rejected';
 import { CardSuccess } from '../components/Card-success';
 import { DialogDetailSeller } from '../components/dialog-detail-seller';
-import { InputGroup } from '../components/ui/input-group';
 import { useDialogAdmin } from '../store/dialog-store';
-import { useGetMe } from '../hooks/use-find-me';
-import { useGetPendingReqPayment } from '../services/withdrawal';
 export const DashboardAdminPage = () => {
-  const { isOpen, openDialog, selectedWithdrawal, closeDialog } =
-    useDialogAdmin();
-
-  const { data: pending } = useGetPendingReqPayment();
-
-  console.log('data pending: ', pending);
-
+  const { isOpen } =
+    useDialogAdmin()
   return (
     <Box position="relative" minHeight={'100vh'} display={'flex'}>
       <Box display={'flex'} gap={'20px'} margin={'10'} flexDirection={'column'}>

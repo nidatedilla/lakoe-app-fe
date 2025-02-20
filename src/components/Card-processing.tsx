@@ -9,7 +9,6 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { Avatar } from '../components/ui/avatar';
-import withdrawals from '../datas/saller.json';
 import { useDialogAdmin } from '../store/dialog-store';
 import {
   useGetProcessingReqPayment,
