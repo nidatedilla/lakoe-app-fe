@@ -1,6 +1,7 @@
 import {
   Box,
   createListCollection,
+  DialogCloseTrigger,
   Input,
   SelectContent,
   SelectItem,
@@ -337,6 +338,7 @@ export const DialogUpdateLocation = ({
             Simpan
           </Button>
         </DialogFooter>
+        <DialogCloseTrigger onClick={() => closeDialog()} />
       </DialogContent>
     </DialogRoot>
   );

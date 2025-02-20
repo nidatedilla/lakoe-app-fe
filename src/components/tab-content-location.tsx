@@ -11,15 +11,15 @@ import Swal from 'sweetalert2';
 import { DialogUpdateLocation } from './dialog-edit-loation';
 import { useDialogStore } from '../store/dialog-store';
 import { Link } from 'react-router';
+import { useUpdateMainLocation } from '../hooks/use-update-location';
 
 export default function TabLocation() {
   const { User } = useGetMe();
   const [locations, setLocations] = useState<Location[]>([]);
   const { mutate: deleteLocation } = useDeleteLocation();
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
-    null
-  );
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const { openDialog, isOpen, dialogType } = useDialogStore();
+  const {mutate} =useUpdateMainLocation()
 
   const handleDelete = (id: string) => {
     Swal.fire({
@@ -49,7 +49,7 @@ export default function TabLocation() {
           : { ...location, is_main_location: false }
       )
     );
-    //  buat Update ke backend
+    mutate({ id, isMain: isPrimary });
   };
 
   const handleOpenDialog = (
