@@ -156,13 +156,13 @@ const MultiColumnCategory: React.FC<MultiColumnCategoryProps> = ({
   return (
     <Paper elevation={3} sx={{ padding: 2, margin: 2, position: 'relative' }}>
       <Typography variant="h6" gutterBottom>
-        Kategori Produk
+        Kategori*
       </Typography>
       <Box sx={{ mb: 2 }}>
         <TextField
           fullWidth
           size="small"
-          label="Kategori Terpilih"
+          label="Pilih Kategori Produk"
           value={getSelectedCategoryPath()}
           onClick={() => setShowCategoryPanel((prev) => !prev)}
           InputProps={{
