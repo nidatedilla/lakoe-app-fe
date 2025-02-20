@@ -129,11 +129,6 @@ export default function DialogAddLocation() {
     listVillage.items.find((item) => item.value === selectedVillage)
       ?.postal_code || '';
 
-  console.log( 
-    `provinsi : ${selectedProvinceName} kabupaten/kota: ${selectedRegencyName} kecamatan:  ${selectedDistrictName} desa: ${selectedVillageName} kode pos: ${selectPostalCode}`
-  );
-
-  console.log(selectedDistrictName);
   const { mutateAsync: createLocation, status } = useCreateLocation(() => {
     setName('');
     setAddress('');
@@ -166,25 +161,11 @@ export default function DialogAddLocation() {
     }
   };
 
-  console.log('Dialog state:', isOpen);
 
   return (
     <DialogRoot open={isOpen}>
       {' '}
-      <DialogTrigger asChild>
-        <Button
-          bg="transparent"
-          size="sm"
-          borderWidth="1px"
-          borderColor="gray.300"
-          borderRadius="full"
-          height="30px"
-          color="black"
-          onClick={() => openDialog('create')}
-        >
-          Tambah Lokasi
-        </Button>
-      </DialogTrigger>
+     
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Tambah Lokasi Baru</DialogTitle>
