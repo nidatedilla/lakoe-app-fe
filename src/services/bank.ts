@@ -4,7 +4,7 @@ import { Bank } from '../types/type-user';
 
 export function getBankById(id: string) {
   return useQuery<Bank>({
-    queryKey: ['Bank'],
+    queryKey: ['Bank', id],
     queryFn: async () => {
       const res = await Api.get(`/bank/${id}`);
       console.log("res dari api :",res)
