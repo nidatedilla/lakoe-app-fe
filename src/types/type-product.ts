@@ -20,4 +20,9 @@ export type Item = {
   value: number;
   weight: number;
   quantity: number;
+  variant?: {
+    id: string;
+    combination: Record<string, string>;
+    stock: number;
+  };
 };

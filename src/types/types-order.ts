@@ -100,7 +100,7 @@ export type orderTypes = {
   }[];
   courier: {
     id: string;
-    courier_company: string;
+    courier_name: string;
     price: number;
   };
   created_at: string;

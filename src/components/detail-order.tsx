@@ -1,6 +1,5 @@
 import {
   Box,
-  Collapsible,
   Flex,
   Grid,
   HStack,
@@ -19,22 +18,18 @@ import {
   BreadcrumbLink,
   BreadcrumbRoot,
 } from './ui/breadcrumb';
-import HistoryOrder from './history-order';
 import { FaWhatsappSquare } from 'react-icons/fa';
-import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { LuCalendarRange, LuCopy, LuWallet } from 'react-icons/lu';
-import DialogTrackDelivery from './dialog-track-delivery';
-import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { useOrder } from '../hooks/use-order';
 import Cookies from 'js-cookie';
 import Lottie from 'lottie-react';
 import animationData from '../assets/lotties/loading-order.json';
+import { Button } from './ui/button';
 
 export default function DetailOrder() {
   const token = Cookies.get('token');
   const { orderId } = useParams<{ orderId: string }>();
-  const [isExpanded, setIsExpanded] = useState(false);
   const {
     data: order,
     isLoading,
@@ -146,7 +141,7 @@ export default function DetailOrder() {
               </Text>
             </Box>
             <Text fontSize={'14px'}>{statusInfo.message}</Text>
-            <Collapsible.Root
+            {/* <Collapsible.Root
               onOpenChange={(details) => setIsExpanded(details.open)}
             >
               <Collapsible.Trigger fontSize={'14px'} color={'blue.500'} pb={2}>
@@ -163,7 +158,7 @@ export default function DetailOrder() {
               <Collapsible.Content>
                 <HistoryOrder />
               </Collapsible.Content>
-            </Collapsible.Root>
+            </Collapsible.Root> */}
           </VStack>
         </HStack>
       </Box>
@@ -207,7 +202,9 @@ export default function DetailOrder() {
             <HStack>
               <LuCopy
                 cursor="pointer"
-                onClick={() => navigator.clipboard.writeText(order.code)}
+                onClick={() =>
+                  navigator.clipboard.writeText(order.invoices?.invoice_number)
+                }
               />
               <Text>{order.invoices?.invoice_number || ''}</Text>
             </HStack>
@@ -221,7 +218,10 @@ export default function DetailOrder() {
               </Box>
               <Text fontWeight="medium">Pembeli:</Text>
             </HStack>
-            <Link to={''}>
+            <Link
+              to={`https://wa.me/${order.destination_contact_phone}`}
+              target="_blank"
+            >
               <HStack>
                 <Icon color={'green.500'} size={'lg'}>
                   <FaWhatsappSquare />
@@ -309,7 +309,16 @@ export default function DetailOrder() {
               <HStack>
                 <Text fontWeight="medium">Detail Pengiriman:</Text>
               </HStack>
-              <DialogTrackDelivery />
+              <Link to={order.courier_link} target="_blank">
+                <Button
+                  height={'auto'}
+                  bg={'transparent'}
+                  color={'blue.500'}
+                  fontWeight={'medium'}
+                >
+                  Lacak Pengiriman
+                </Button>
+              </Link>
             </HStack>
 
             <Grid templateColumns="1fr 2fr" w="full" gap={2}>
@@ -319,7 +328,16 @@ export default function DetailOrder() {
               </Text>
 
               <Text fontWeight="medium">No. Resi:</Text>
-              <Text>{order.tracking_number || '-'}</Text>
+
+              <HStack>
+                <Text>{order.courier_waybill_id || ''}</Text>
+                <LuCopy
+                  cursor="pointer"
+                  onClick={() =>
+                    navigator.clipboard.writeText(order.courier_waybill_id)
+                  }
+                />
+              </HStack>
 
               <Text fontWeight="medium">Alamat:</Text>
               <Text>{order.destination_address}</Text>
