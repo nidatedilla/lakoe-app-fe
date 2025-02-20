@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Grid,
@@ -8,6 +8,8 @@ import {
   HStack,
   Table,
   Badge,
+  Input,
+  Button,
 } from '@chakra-ui/react';
 import {
   Chart as ChartJS,
@@ -24,10 +26,14 @@ import {
 import { Line, Pie } from 'react-chartjs-2';
 import { GiMoneyStack } from 'react-icons/gi';
 import { TbChecklist } from 'react-icons/tb';
+import { FaArrowDown } from 'react-icons/fa';
 import { AiOutlineProduct } from 'react-icons/ai';
 import type { LucideProps } from 'lucide-react';
 import { useTotalOrdersToday, useTotalRevenue } from '../hooks/use-order';
 import { useGetMe } from '../hooks/use-find-me';
+import { useCreateWithdrawal } from '../hooks/use-withdrawalts';
+import { WithdrawalSeller } from '../types/type-withdrawal';
+import Swal from 'sweetalert2';
 
 ChartJS.register(
   CategoryScale,
@@ -137,9 +143,48 @@ function StatWidget({ icon: Icon, title, value }: StatWidgetProps) {
 }
 
 export default function Dashboard() {
-  const { data: totalRevenue } = useTotalRevenue();
+ 
   const { data: totalOrders } = useTotalOrdersToday();
   const { User } = useGetMe();
+  const [num, setNum] = useState<number>(0);
+  const [formattedNum, setFormattedNum] = useState<string>('');
+  const { mutateAsync: CreateWithdrawal } = useCreateWithdrawal(() => {
+    setFormattedNum("")
+    setNum(0)
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\./g, '');
+    const numberValue = Number(value);
+
+    if (isNaN(numberValue)) return;
+
+    setNum(numberValue);
+    setFormattedNum(numberValue.toLocaleString('id-ID'));
+  };
+
+  const handleSubmit = async () => {
+    const payload: WithdrawalSeller = {
+      amount: num || 0,
+      sellerId: User?.id || '',
+      storeId: User?.stores?.id || '',
+    };
+    Swal.fire({
+      title: 'Konfirmasi Withdrawal',
+      text: 'Apakah Anda yakin ingin withdrawal?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya',
+      cancelButtonText: 'Batal',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const res = CreateWithdrawal(payload);
+        console.log('Withdrawal created:', res);
+      }
+    });
+  };
 
   const currentDate = new Date().toLocaleDateString('id-ID', {
     year: 'numeric',
@@ -167,7 +212,7 @@ export default function Dashboard() {
 
       <VStack mt={5} w={'full'}>
         <Grid
-          templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
+          templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }}
           gap={4}
           mb={6}
           w={'100%'}
@@ -175,8 +220,41 @@ export default function Dashboard() {
           <StatWidget
             icon={GiMoneyStack}
             title="Jumlah Pendapatan"
-            value={`Rp.${totalRevenue?.toLocaleString('id-ID')}`}
+            value={`Rp ${User?.balance.toLocaleString('id-ID')}`}
           />
+
+          <StatWidget icon={TbChecklist} title="Transaksi Hari Ini" value="9" />
+          <Box
+            display={'flex'}
+            justifyContent={'center'}
+            alignItems={'center'}
+            gap={'20px'}
+          >
+            <Input
+              borderRadius={'3xl'}
+              placeholder={User?.balance.toLocaleString('id-ID')}
+              type="text"
+              onChange={handleInputChange}
+              borderColor={'black'}
+              value={formattedNum}
+              width={'50%'}
+            />
+            <Button
+              colorScheme="blue"
+              alignSelf={'center'}
+              fontSize={'small'}
+              variant="solid"
+              borderRadius={'3xl'}
+              width={'35%'}
+              _hover={{ bg: 'blue.600' }}
+              onClick={handleSubmit}
+              _active={{ bg: 'blue.700' }}
+              disabled={num <= 0 || User?.balance == 0}
+            >
+              Tarik Saldo <FaArrowDown />
+            </Button>
+          </Box>
+
           <StatWidget
             icon={AiOutlineProduct}
             title="Jumlah Produk"

@@ -6,6 +6,7 @@ export interface User {
   role: string;
   name: string;
   phone: string;
+  balance: number;
   profile?: {
     id: String;
     image: String;
@@ -22,8 +23,18 @@ export interface stores {
   logo?: string;
   slogan?: string;
   products?: product[];
-  locations?: Location[]
+  locations?: Location[];
   _count: {
     products: number;
   };
+  bank_accounts?: Bank;
+}
+
+export interface Bank {
+  acc_name: string
+  acc_num : string
+  bank: string
+  id?: string
+  userId : string
+  storeId:string
 }
