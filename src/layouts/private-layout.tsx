@@ -1,10 +1,16 @@
 import { Box, Image } from '@chakra-ui/react';
 import Navbar from '../components/navbar';
-import { Outlet } from 'react-router';
+import { Navigate, Outlet } from 'react-router';
 import { Avatar } from '../components/ui/avatar';
 import { AiPage } from '../pages/ai';
+import { useGetMe } from '../hooks/use-find-me';
 
 const PrivateLayout = () => {
+  const { User } = useGetMe();
+  if (!User) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <Box
       display="flex"
@@ -31,7 +37,7 @@ const PrivateLayout = () => {
       </Box>
 
       <Box display="flex" flex="1" overflow="hidden">
-        <Box width="20%" height="100vh" overflow="hidden">
+        <Box width="20%" minHeight="100vh" overflow="hidden">
           <Navbar />
         </Box>
 
@@ -45,14 +51,15 @@ const PrivateLayout = () => {
             <Outlet />
           </Box>
         </Box>
-
-        <Box
-          width="30%"
-          height="100vh"
-          boxShadow="0 -1px 2px rgba(0, 0, 0, 0.1)"
-        >
-          <AiPage />
-        </Box>
+        {User.role == 'Seller' ? (
+          <Box
+            width="30%"
+            height="100vh"
+            boxShadow="0 -1px 2px rgba(0, 0, 0, 0.1)"
+          >
+            <AiPage />
+          </Box>
+        ) : null}
       </Box>
     </Box>
   );
