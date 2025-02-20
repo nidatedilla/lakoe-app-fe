@@ -7,6 +7,7 @@ import {
   SelectRoot,
   SelectTrigger,
   SelectValueText,
+  DialogCloseTrigger,
   Text,
   VStack,
 } from '@chakra-ui/react';
@@ -128,7 +129,7 @@ export default function DialogAddLocation() {
     listVillage.items.find((item) => item.value === selectedVillage)
       ?.postal_code || '';
 
-  console.log(
+  console.log( 
     `provinsi : ${selectedProvinceName} kabupaten/kota: ${selectedRegencyName} kecamatan:  ${selectedDistrictName} desa: ${selectedVillageName} kode pos: ${selectPostalCode}`
   );
 
@@ -154,7 +155,6 @@ export default function DialogAddLocation() {
       contact_phone: User?.phone || '',
       type,
       storeId: User?.stores?.id || '',
-      is_main_location: User?.stores?.locations ? false : true,
     };
 
     try {
@@ -361,6 +361,7 @@ export default function DialogAddLocation() {
             Simpan
           </Button>
         </DialogFooter>
+        <DialogCloseTrigger onClick={() => closeDialog()} />
       </DialogContent>
     </DialogRoot>
   );
