@@ -7,18 +7,27 @@ export function useGetPendingReqPayment() {
     queryKey: ['withdrawalspending'],
     queryFn: async () => {
       const res = await Api.get('/withdrawal/pending');
-      console.log('data pending servise: ', res.data);
       return res.data;
     },
   });
 }
+
+export const useGetUserWithdrawals = (userId?: string) => {
+  return useQuery<Withdrawal[]>({
+    queryKey: ['userWithdrawals', userId],
+    queryFn: async () => {
+      const res = await Api.get(`/withdrawal/user/${userId}`);
+      return res.data;
+    },
+    enabled: !!userId
+  });
+};
 
 export function useGetProcessingReqPayment() {
   return useQuery<Withdrawal[]>({
     queryKey: ['withdrawalsprocessing'],
     queryFn: async () => {
       const res = await Api.get('/withdrawal/processing');
-      console.log('data processing servise: ', res.data);
       return res.data;
     },
   });
@@ -29,7 +38,6 @@ export function useGetSuccessReqPayment() {
     queryKey: ['withdrawalsuccess'],
     queryFn: async () => {
       const res = await Api.get('/withdrawal/success');
-      console.log('data success servise: ', res.data);
       return res.data;
     },
   });
@@ -40,7 +48,6 @@ export function useGetRejectedReqPayment() {
     queryKey: ['withdrawalsrejected'],
     queryFn: async () => {
       const res = await Api.get('/withdrawal/rejected');
-      console.log('data rejected servise: ', res.data);
       return res.data;
     },
   });

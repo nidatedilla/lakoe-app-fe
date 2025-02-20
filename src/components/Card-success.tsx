@@ -1,6 +1,5 @@
 import { Box, Card, HStack, Stack, Strong, Text,Input } from '@chakra-ui/react';
 import { Avatar } from '../components/ui/avatar';
-import withdrawals from '../datas/saller.json';
 import { useDialogAdmin } from '../store/dialog-store';
 import { useGetSearchsuccessSeller, useGetSuccessReqPayment } from '../services/withdrawal';
 import { useForm } from 'react-hook-form';
