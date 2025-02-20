@@ -4,6 +4,8 @@ import {
   fetchOrdersByStore,
   getOrderById,
   getOrderByOrderId,
+  getTotalOrdersTodayByStore,
+  getTotalRevenue,
 } from '../services/order-services';
 
 export const useCreateOrder = () => {
@@ -39,5 +41,19 @@ export const useOrderById = (orderId: string) => {
     queryKey: ['orderById', orderId],
     queryFn: () => getOrderByOrderId(orderId),
     enabled: !!orderId,
+  });
+};
+
+export const useTotalRevenue = () => {
+  return useQuery({
+    queryKey: ['totalRevenue'],
+    queryFn: getTotalRevenue,
+  });
+};
+
+export const useTotalOrdersToday = () => {
+  return useQuery({
+    queryKey: ['totalOrdersToday'],
+    queryFn: getTotalOrdersTodayByStore,
   });
 };

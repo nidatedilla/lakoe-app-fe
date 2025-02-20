@@ -1,13 +1,13 @@
 export type courierType = {
-  courier_id: string;
+  id: string;
   available_collection_method: string[];
   available_for_cash_on_delivery: boolean;
   available_for_proof_of_delivery: boolean;
   available_for_instant_waybill_id: boolean;
   courier_name: string;
   courier_code: string;
-  service_name: string;
-  service_code: string;
+  courier_service_name: string;
+  courier_service_code: string;
   tier: string;
   description: string;
   shipping: [
@@ -41,4 +41,14 @@ export type GroupedCourier = {
     shipping_type: string;
     is_selected: boolean;
   }[];
+};
+
+export type courier = {
+  courier_id: string;
+  courier_name: string;
+  courier_code: string;
+  service_name: string;
+  shipment_duration_range: string;
+  shipment_duration_unit: string;
+  price: number;
 };

@@ -8,7 +8,6 @@ import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
 import Dashboard from './pages/dashboard';
 import SettingStore from './pages/setting-store';
-import LandingPage from './pages/landing-page';
 import { Toaster } from 'react-hot-toast';
 import SettingShipping from './pages/setting-shipping';
 import ProfilePage from './pages/profile';
@@ -19,13 +18,14 @@ import PrivateRoute from './routes/private-route';
 import CartPage from './pages/buyer-page/cart-page';
 import CheckoutPage from './pages/buyer-page/checkout-page';
 import StatusPaymentPage from './pages/buyer-page/status-payment-page';
+import NewLandingPage from './pages/new-landing-page';
 import './index.css';
 
 function App() {
   const router = createBrowserRouter([
     {
       path: '/landing-page',
-      Component: LandingPage,
+      Component: NewLandingPage,
       HydrateFallback: Fallback,
     },
     {

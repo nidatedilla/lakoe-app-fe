@@ -26,6 +26,8 @@ import { GiMoneyStack } from 'react-icons/gi';
 import { TbChecklist } from 'react-icons/tb';
 import { AiOutlineProduct } from 'react-icons/ai';
 import type { LucideProps } from 'lucide-react';
+import { useTotalOrdersToday, useTotalRevenue } from '../hooks/use-order';
+import { useGetMe } from '../hooks/use-find-me';
 
 ChartJS.register(
   CategoryScale,
@@ -135,6 +137,10 @@ function StatWidget({ icon: Icon, title, value }: StatWidgetProps) {
 }
 
 export default function Dashboard() {
+  const { data: totalRevenue } = useTotalRevenue();
+  const { data: totalOrders } = useTotalOrdersToday();
+  const { User } = useGetMe();
+
   const currentDate = new Date().toLocaleDateString('id-ID', {
     year: 'numeric',
     month: 'long',
@@ -169,14 +175,18 @@ export default function Dashboard() {
           <StatWidget
             icon={GiMoneyStack}
             title="Jumlah Pendapatan"
-            value="Rp.15.570.000"
+            value={`Rp.${totalRevenue?.toLocaleString('id-ID')}`}
           />
           <StatWidget
             icon={AiOutlineProduct}
             title="Jumlah Produk"
-            value="15"
+            value={User?.stores?.products?.length.toLocaleString() || '0'}
           />
-          <StatWidget icon={TbChecklist} title="Transaksi Hari Ini" value="9" />
+          <StatWidget
+            icon={TbChecklist}
+            title="Transaksi Hari Ini"
+            value={totalOrders?.toLocaleString() || ''}
+          />
         </Grid>
 
         <Box bg={'white'} borderRadius="lg" boxShadow="md" mb={6} w={'100%'}>

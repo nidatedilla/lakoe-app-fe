@@ -192,7 +192,7 @@ export default function CartPage() {
             <VStack gap={0} align="stretch" divideX={'1px'}>
               {cartItems.map((item) => (
                 <Box
-                  key={item.id}
+                  key={`${item.id}-${item?.variant?.id || 'default'}`}
                   p={6}
                   _hover={{ bg: secondaryBg }}
                   transition="background 0.2s"
@@ -214,6 +214,13 @@ export default function CartPage() {
                     <Box flex="1">
                       <Flex justify="space-between" align="start">
                         <VStack align="start" gap={2}>
+                          {item.variant && item.variant.combination && (
+                            <Badge colorPalette="blue" fontSize="xs">
+                              {Object.entries(item.variant.combination)
+                                .map(([key, value]) => `${key}: ${value}`)
+                                .join(', ')}
+                            </Badge>
+                          )}
                           <Text
                             fontSize="lg"
                             fontWeight="semibold"

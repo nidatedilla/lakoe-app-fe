@@ -73,7 +73,7 @@ export default function TabsOrder() {
     ? orders.data.filter(
         (order: orderTypes) =>
           (selectedCouriers.length > 0
-            ? selectedCouriers.includes(order.courier?.courier_company)
+            ? selectedCouriers.includes(order.courier?.courier_name)
             : true) &&
           (searchQuery
             ? order.order_items?.[0]?.product?.name
@@ -336,6 +336,9 @@ const courier = createListCollection({
   items: [
     { label: 'JNE', value: 'jne' },
     { label: 'J&T', value: 'jnt' },
+    { label: 'Grab', value: 'grab' },
+    { label: 'Gojek', value: 'gojek' },
+    { label: 'SiCepat', value: 'sicepat' },
   ],
 });
 
@@ -343,7 +346,5 @@ const sort = createListCollection({
   items: [
     { label: 'Paling Lama', value: 'paling lama' },
     { label: 'Paling Baru', value: 'paling baru' },
-    { label: 'Respons Tercepat', value: 'respons tercepat' },
-    { label: 'Respons Terlama', value: 'respons terlama' },
   ],
 });

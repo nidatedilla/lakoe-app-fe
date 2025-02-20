@@ -7,6 +7,7 @@ import {
   Stat,
   HStack,
   VStack,
+  Alert,
 } from '@chakra-ui/react';
 import { Avatar } from '../components/ui/avatar';
 import { useGetMe } from '../hooks/use-find-me';
@@ -54,6 +55,8 @@ function InfoRow({
 
 export default function ProfilePage() {
   const { User } = useGetMe();
+  console.log('Data user:', User);
+
   const navigate = useNavigate();
   const bgColor = useColorModeValue('gray.50', 'gray.900');
 
@@ -64,6 +67,8 @@ export default function ProfilePage() {
       </Box>
     );
   }
+
+  const isLocationEmpty = !User.stores?.locations?.length;
 
   return (
     <Box minH="100vh" bg={bgColor}>
@@ -100,35 +105,55 @@ export default function ProfilePage() {
                 </Text>
               </VStack>
 
-              <HStack mt={6} gap={3}>
-                <Button
-                  bg="blue.500"
-                  size="lg"
-                  borderRadius={'lg'}
-                  onClick={() => navigate('/setting-store')}
-                >
-                  <Icon as={PenSquare} /> Ubah Profil
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  borderRadius={'lg'}
-                  onClick={() => navigate('/product')}
-                >
-                  <Icon as={Package2} /> Kelola Produk
-                </Button>
-              </HStack>
+              <Button
+                mt={3}
+                bg="blue.500"
+                size="lg"
+                borderRadius={'lg'}
+                onClick={() => navigate('/setting-store')}
+              >
+                <Icon as={PenSquare} /> Ubah Profil
+              </Button>
             </Flex>
 
-            <Flex gap={4} mt={8}>
-              <StatCard label="Produk" value={'12'} />
-              <StatCard label="Bergabung Sejak" value={''} />
+            {isLocationEmpty && (
+              <Alert.Root status={'warning'} mt={6} borderRadius="md">
+                <Alert.Indicator />
+                <Alert.Content>
+                  <Alert.Title>Lengkapi Profil Toko Anda!</Alert.Title>
+                  <Alert.Description>
+                    Anda belum menambahkan lokasi toko. Silakan tambahkan lokasi
+                    toko terlebih dahulu.
+                  </Alert.Description>
+                </Alert.Content>
+              </Alert.Root>
+            )}
+
+            <Flex gap={4} mt={8} alignItems={'center'}>
+              <StatCard
+                label="Produk"
+                value={User.stores?.products?.length || 0}
+              />
+              <Button
+                width={'250px'}
+                variant="ghost"
+                size="lg"
+                borderRadius={'lg'}
+                onClick={() => navigate('/product')}
+              >
+                <Icon as={Package2} /> Kelola Produk
+              </Button>
             </Flex>
 
             <VStack mt={8} gap={3} maxW="lg" mx="auto" align="stretch">
               <InfoRow icon={UserIcon} text={User.name} />
               <InfoRow icon={Mail} text={User.email} />
-              <InfoRow icon={MapPin} text={'Jakarta'} />
+              <InfoRow
+                icon={MapPin}
+                text={
+                  User.stores?.locations?.[0]?.regencies ?? 'Tidak ada lokasi'
+                }
+              />
             </VStack>
           </Box>
         </Box>

@@ -31,6 +31,16 @@ type Product = {
   price: number;
   quantity: number;
   attachments: string;
+  variant: {
+    id: string;
+    productId: string;
+    combination: Record<string, string>;
+    photo: string;
+    price: number;
+    sku: string;
+    stock: number;
+    weight: number;
+  };
 };
 
 declare global {
@@ -116,7 +126,7 @@ export default function CheckoutPage() {
     };
   }, []);
 
-  if (!productList.length) return <Text>Produk tidak ditemukan</Text>;
+  if (!productList.length) return <Text></Text>;
 
   interface Shipping {
     id: string;
@@ -319,7 +329,19 @@ export default function CheckoutPage() {
 
             {productList.map((item: Product) => (
               <Box mb={6} key={item.id}>
-                <HStack gap={4} pb={4} borderBottomWidth="1px">
+                {item.variant && item.variant.combination && (
+                  <Badge colorPalette="blue" fontSize="xs">
+                    {Object.entries(item.variant.combination)
+                      .map(([key, value]) => `${key}: ${value}`)
+                      .join(', ')}
+                  </Badge>
+                )}
+                <HStack
+                  gap={4}
+                  pb={4}
+                  borderBottomWidth="1px"
+                  position="relative"
+                >
                   <Image
                     src={item.attachments}
                     boxSize="80px"

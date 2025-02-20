@@ -5,29 +5,17 @@ import {
   SimpleGrid,
   Heading,
   VStack,
-  HStack,
   Badge,
-  Icon,
-  Flex,
-  Button,
 } from '@chakra-ui/react';
 import { Link, useParams } from 'react-router';
-import { FiShoppingCart, FiStar } from 'react-icons/fi';
 import { useColorModeValue } from '../../components/ui/color-mode';
 import { useStoreData } from '../../hooks/use-store';
 import { product } from '../../types/type-product';
-import toast from 'react-hot-toast';
-import { useAddToCart } from '../../hooks/use-cart';
 
 export default function ShopPage() {
   const { domain } = useParams<{ domain: string }>();
   const { data: store, isLoading, error } = useStoreData(domain || '');
-  const addToCartMutation = useAddToCart();
-
-  const addToCart = (product: product) => {
-    addToCartMutation.mutate({ ...product, quantity: 1 });
-    toast.success(`${product.name} ditambahkan ke keranjang!`);
-  };
+  console.log('Data Store:', store);
 
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -118,29 +106,9 @@ export default function ShopPage() {
                       {product.name}
                     </Heading>
 
-                    <HStack gap={2}>
-                      <Icon as={FiStar} color="yellow.400" />
-                      <Text color="gray.500" fontSize="sm">
-                        4.5 (128 ulasan)
-                      </Text>
-                    </HStack>
-
-                    <Flex justify="space-between" align="center">
-                      <Text fontSize="xl" fontWeight="bold" color={accentColor}>
-                        Rp{product.price.toLocaleString()}
-                      </Text>
-                      <Button
-                        size="sm"
-                        colorScheme="blue"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          addToCart(product);
-                        }}
-                      >
-                        <Icon as={FiShoppingCart} />
-                      </Button>
-                    </Flex>
+                    <Text fontSize="xl" fontWeight="bold" color={accentColor}>
+                      Rp{product.price.toLocaleString()}
+                    </Text>
                   </VStack>
                 </Box>
               </Link>

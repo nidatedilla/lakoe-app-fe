@@ -11,7 +11,7 @@ import {
 import { Radio, RadioGroup } from '../../../components/ui/radio';
 import { useState } from 'react';
 import { useCourierRates } from '../../../hooks/use-courier';
-import { courierType } from '../../../types/type-courier';
+import { courier } from '../../../types/type-courier';
 import { FiTruck, FiClock } from 'react-icons/fi';
 import { useColorModeValue } from '../../../components/ui/color-mode';
 
@@ -69,7 +69,7 @@ export default function DialogChangeShippingMethod({
   if (isLoading) return <Text>Loading...</Text>;
 
   const selectedShippingOptions: ShippingOption[] = courierRates
-    ? courierRates.map((courier: courierType) => ({
+    ? courierRates.map((courier: courier) => ({
         id: courier.courier_id,
         courierName: courier.courier_name,
         courierCode: courier.courier_code,
