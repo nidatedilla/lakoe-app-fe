@@ -20,6 +20,8 @@ import CheckoutPage from './pages/buyer-page/checkout-page';
 import StatusPaymentPage from './pages/buyer-page/status-payment-page';
 import NewLandingPage from './pages/new-landing-page';
 import './index.css';
+import { DashboardAdminPage } from './pages/dasboard-admin';
+import { useGetMe } from './hooks/use-find-me';
 
 function App() {
   const router = createBrowserRouter([
@@ -45,11 +47,23 @@ function App() {
       children: [
         {
           path: '/',
-          Component: () => <Navigate to="/dashboard" />,
+          Component: () => {
+            const { User } = useGetMe();
+            if (User?.role === 'admin') {
+              return <Navigate to="/dashboard-admin" replace />;
+            }
+            if (User?.role === 'Seller')
+              return <Navigate to="/dashboard" replace />;
+          },
         },
         {
           path: '/dashboard',
           Component: Dashboard,
+          HydrateFallback: Fallback,
+        },
+        {
+          path: '/dashboard-admin',
+          Component: DashboardAdminPage,
           HydrateFallback: Fallback,
         },
         {

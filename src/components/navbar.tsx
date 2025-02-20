@@ -62,164 +62,233 @@ const Navbar = () => {
         px={10}
         py={5}
       >
-        <Box display={'flex'} flexDirection={'row'} gap={2}>
-          <Icon
-            fontSize={'2xl'}
-            color={activeTab === 'dashboard' ? 'blue.500' : 'black'}
-          >
-            {activeTab === 'dashboard' ? <HiHome /> : <HiOutlineHome />}
-          </Icon>
-          <Text
-            fontWeight={activeTab === 'dashboard' ? 'bold' : 'normal'}
-            color={activeTab === 'dashboard' ? 'blue.500' : 'black'}
-          >
-            <Link
-              onClick={() => handleSetActiveTab('dashboard')}
-              to="/dashboard"
-            >
-              Dashboard
-            </Link>
-          </Text>
-        </Box>
-
-        <Box display={'flex'} flexDirection={'row'} gap={2}>
-          <Icon
-            fontSize={'2xl'}
-            color={activeTab === 'product' ? 'blue.500' : 'black'}
-          >
-            {activeTab === 'product' ? <HiInbox /> : <HiOutlineInbox />}
-          </Icon>
-          <Text
-            fontWeight={activeTab === 'product' ? 'bold' : 'normal'}
-            color={activeTab === 'product' ? 'blue.500' : 'black'}
-          >
-            <Link onClick={() => handleSetActiveTab('product')} to={'/product'}>
-              Produk
-            </Link>
-          </Text>
-        </Box>
-
-        <Box display={'flex'} flexDirection={'row'} gap={2}>
-          <Icon
-            fontSize={'2xl'}
-            color={activeTab === 'order' ? 'blue.500' : 'black'}
-          >
-            {activeTab === 'order' ? (
-              <HiShoppingCart />
-            ) : (
-              <HiOutlineShoppingCart />
-            )}
-          </Icon>
-          <Text
-            fontWeight={activeTab === 'order' ? 'bold' : 'normal'}
-            color={activeTab === 'order' ? 'blue.500' : 'black'}
-          >
-            <Link onClick={() => handleSetActiveTab('order')} to={'/order'}>
-              Pesanan
-            </Link>
-          </Text>
-        </Box>
-
-        <Box w={'full'}>
-          <HStack onClick={toggleSetting} cursor="pointer" gap={2}>
+        {User?.role == 'Seller' ? (
+          <Box display={'flex'} flexDirection={'row'} gap={2}>
             <Icon
               fontSize={'2xl'}
-              color={
-                activeTab === 'setting' || isSettingOpen ? 'blue.500' : 'black'
-              }
+              color={activeTab === 'dashboard' ? 'blue.500' : 'black'}
             >
-              <LuSettings />
+              {activeTab === 'dashboard' ? <HiHome /> : <HiOutlineHome />}
             </Icon>
-            <HStack w={'full'} justifyContent={'space-between'}>
-              <Text
-                fontWeight={
-                  activeTab === 'setting' || isSettingOpen ? 'bold' : 'normal'
-                }
+            <Text
+              fontWeight={activeTab === 'dashboard' ? 'bold' : 'normal'}
+              color={activeTab === 'dashboard' ? 'blue.500' : 'black'}
+            >
+              <Link
+                onClick={() => handleSetActiveTab('dashboard')}
+                to="/dashboard"
+              >
+                Dashboard
+              </Link>
+            </Text>
+          </Box>
+        ) : (
+          <Box display={'flex'} flexDirection={'row'} gap={2}>
+            <Icon
+              fontSize={'2xl'}
+              color={activeTab === 'dashboard' ? 'blue.500' : 'black'}
+            >
+              {activeTab === 'dashboard' ? <HiHome /> : <HiOutlineHome />}
+            </Icon>
+            <Text
+              fontWeight={activeTab === 'dashboard' ? 'bold' : 'normal'}
+              color={activeTab === 'dashboard' ? 'blue.500' : 'black'}
+            >
+              <Link
+                onClick={() => handleSetActiveTab('dashboard')}
+                to="/dashboard-admin"
+              >
+                Dashboard
+              </Link>
+            </Text>
+          </Box>
+        )}
+
+        {/* product */}
+
+        {User?.role == 'Seller' ? (
+          <Box display={'flex'} flexDirection={'row'} gap={2}>
+            <Icon
+              fontSize={'2xl'}
+              color={activeTab === 'product' ? 'blue.500' : 'black'}
+            >
+              {activeTab === 'product' ? <HiInbox /> : <HiOutlineInbox />}
+            </Icon>
+            <Text
+              fontWeight={activeTab === 'product' ? 'bold' : 'normal'}
+              color={activeTab === 'product' ? 'blue.500' : 'black'}
+            >
+              <Link
+                onClick={() => handleSetActiveTab('product')}
+                to={'/product'}
+              >
+                Produk
+              </Link>
+            </Text>
+          </Box>
+        ) : null}
+
+        {/* order */}
+
+        {User?.role == 'Seller' ? (
+          <Box display={'flex'} flexDirection={'row'} gap={2}>
+            <Icon
+              fontSize={'2xl'}
+              color={activeTab === 'order' ? 'blue.500' : 'black'}
+            >
+              {activeTab === 'order' ? (
+                <HiShoppingCart />
+              ) : (
+                <HiOutlineShoppingCart />
+              )}
+            </Icon>
+            <Text
+              fontWeight={activeTab === 'order' ? 'bold' : 'normal'}
+              color={activeTab === 'order' ? 'blue.500' : 'black'}
+            >
+              <Link onClick={() => handleSetActiveTab('order')} to={'/order'}>
+                Pesanan
+              </Link>
+            </Text>
+          </Box>
+        ) : null}
+
+        {/* settings */}
+
+        {User?.role == 'Seller' ? (
+          <Box w={'full'}>
+            <HStack onClick={toggleSetting} cursor="pointer" gap={2}>
+              <Icon
+                fontSize={'2xl'}
                 color={
                   activeTab === 'setting' || isSettingOpen
                     ? 'blue.500'
                     : 'black'
                 }
               >
-                Pengaturan
-              </Text>
-              <Icon
-                fontSize={'2xl'}
-                color={isSettingOpen ? 'gray.500' : 'gray.500'}
-              >
-                {isSettingOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                <LuSettings />
               </Icon>
-            </HStack>
-          </HStack>
-          {isSettingOpen && (
-            <VStack align="start" pt={5} gap={5}>
-              <HStack>
-                {activeTab === 'setting-store' && (
-                  <Box px={1}>
-                    <Icon color={'blue.500'}>
-                      <GoDotFill />
-                    </Icon>
-                  </Box>
-                )}
+              <HStack w={'full'} justifyContent={'space-between'}>
                 <Text
-                  pl={activeTab === 'setting-store' ? '0' : '8'}
-                  color={activeTab === 'setting-store' ? 'blue.500' : 'black'}
-                >
-                  <Link
-                    onClick={() => handleSetActiveTab('setting-store')}
-                    to={'/setting-store'}
-                  >
-                    Atur Toko
-                  </Link>
-                </Text>
-              </HStack>
-
-              <HStack>
-                {activeTab === 'setting-shipping' && (
-                  <Box px={1}>
-                    <Icon color={'blue.500'}>
-                      <GoDotFill />
-                    </Icon>
-                  </Box>
-                )}
-                <Text
-                  pl={activeTab === 'setting-shipping' ? '0' : '8'}
+                  fontWeight={
+                    activeTab === 'setting' || isSettingOpen ? 'bold' : 'normal'
+                  }
                   color={
-                    activeTab === 'setting-shipping' ? 'blue.500' : 'black'
+                    activeTab === 'setting' || isSettingOpen
+                      ? 'blue.500'
+                      : 'black'
                   }
                 >
-                  <Link
-                    onClick={() => handleSetActiveTab('setting-shipping')}
-                    to={'/setting-shipping'}
-                  >
-                    Pengiriman
-                  </Link>
+                  Pengaturan
                 </Text>
+                <Icon
+                  fontSize={'2xl'}
+                  color={isSettingOpen ? 'gray.500' : 'gray.500'}
+                >
+                  {isSettingOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                </Icon>
               </HStack>
-            </VStack>
-          )}
-        </Box>
+            </HStack>
+            {isSettingOpen && (
+              <VStack align="start" pt={5} gap={5}>
+                <HStack>
+                  {activeTab === 'setting-store' && (
+                    <Box px={1}>
+                      <Icon color={'blue.500'}>
+                        <GoDotFill />
+                      </Icon>
+                    </Box>
+                  )}
+                  <Text
+                    pl={activeTab === 'setting-store' ? '0' : '8'}
+                    color={activeTab === 'setting-store' ? 'blue.500' : 'black'}
+                  >
+                    <Link
+                      onClick={() => handleSetActiveTab('setting-store')}
+                      to={'/setting-store'}
+                    >
+                      Atur Toko
+                    </Link>
+                  </Text>
+                </HStack>
 
-        <Box display={'flex'} flexDirection={'row'} gap={2}>
-          <Icon
-            fontSize={'2xl'}
-            color={activeTab === 'profile' ? 'blue.500' : 'black'}
-          >
-            {activeTab === 'profile' ? (
-              <HiOutlineUserCircle />
-            ) : (
-              <HiOutlineUserCircle />
+                <HStack>
+                  {activeTab === 'setting-shipping' && (
+                    <Box px={1}>
+                      <Icon color={'blue.500'}>
+                        <GoDotFill />
+                      </Icon>
+                    </Box>
+                  )}
+                  <Text
+                    pl={activeTab === 'setting-shipping' ? '0' : '8'}
+                    color={
+                      activeTab === 'setting-shipping' ? 'blue.500' : 'black'
+                    }
+                  >
+                    <Link
+                      onClick={() => handleSetActiveTab('setting-shipping')}
+                      to={'/setting-shipping'}
+                    >
+                      Pengiriman
+                    </Link>
+                  </Text>
+                </HStack>
+
+                <HStack>
+                  {activeTab === 'payment-method' && (
+                    <Box px={1}>
+                      <Icon color={'blue.500'}>
+                        <GoDotFill />
+                      </Icon>
+                    </Box>
+                  )}
+                  <Text
+                    pl={activeTab === 'payment-method' ? '0' : '8'}
+                    color={
+                      activeTab === 'payment-method' ? 'blue.500' : 'black'
+                    }
+                  >
+                    <Link
+                      onClick={() => handleSetActiveTab('payment-method')}
+                      to={'/payment-method'}
+                    >
+                      Metode Pembayaran
+                    </Link>
+                  </Text>
+                </HStack>
+              </VStack>
             )}
-          </Icon>
-          <Text
-            fontWeight={activeTab === 'profile' ? 'bold' : 'normal'}
-            color={activeTab === 'profile' ? 'blue.500' : 'black'}
-          >
-            <Link onClick={() => handleSetActiveTab('profile')} to={'/profile'}>
-              Profile
-            </Link>
-          </Text>
-        </Box>
+          </Box>
+        ) : null}
+
+        {/* Profile */}
+
+        {User?.role == 'Seller' ? (
+          <Box display={'flex'} flexDirection={'row'} gap={2}>
+            <Icon
+              fontSize={'2xl'}
+              color={activeTab === 'profile' ? 'blue.500' : 'black'}
+            >
+              {activeTab === 'profile' ? (
+                <HiOutlineUserCircle />
+              ) : (
+                <HiOutlineUserCircle />
+              )}
+            </Icon>
+            <Text
+              fontWeight={activeTab === 'profile' ? 'bold' : 'normal'}
+              color={activeTab === 'profile' ? 'blue.500' : 'black'}
+            >
+              <Link
+                onClick={() => handleSetActiveTab('profile')}
+                to={'/profile'}
+              >
+                Profile
+              </Link>
+            </Text>
+          </Box>
+        ) : null}
       </Box>
 
       {User ? (
