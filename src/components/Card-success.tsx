@@ -30,7 +30,7 @@ export const CardSuccess = () => {
       <Card.Body>
         <HStack mb="6" gap="3">
           <Avatar
-            src={withdrawal.seller.stores?.logo}
+            src={withdrawal.store.logo}
           />
           <Stack gap="0">
             <Text fontWeight="semibold" textStyle="sm">
