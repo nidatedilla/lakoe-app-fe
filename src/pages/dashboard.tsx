@@ -143,14 +143,13 @@ function StatWidget({ icon: Icon, title, value }: StatWidgetProps) {
 }
 
 export default function Dashboard() {
- 
   const { data: totalOrders } = useTotalOrdersToday();
   const { User } = useGetMe();
   const [num, setNum] = useState<number>(0);
   const [formattedNum, setFormattedNum] = useState<string>('');
   const { mutateAsync: CreateWithdrawal } = useCreateWithdrawal(() => {
-    setFormattedNum("")
-    setNum(0)
+    setFormattedNum('');
+    setNum(0);
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,7 +180,6 @@ export default function Dashboard() {
     }).then((result) => {
       if (result.isConfirmed) {
         const res = CreateWithdrawal(payload);
-        console.log('Withdrawal created:', res);
       }
     });
   };
@@ -222,8 +220,11 @@ export default function Dashboard() {
             title="Jumlah Pendapatan"
             value={`Rp ${User?.balance.toLocaleString('id-ID')}`}
           />
-
-          <StatWidget icon={TbChecklist} title="Transaksi Hari Ini" value="9" />
+          <StatWidget
+            icon={TbChecklist}
+            title="Transaksi Hari Ini"
+            value={totalOrders?.toLocaleString() || ''}
+          />
           <Box
             display={'flex'}
             justifyContent={'center'}
@@ -259,11 +260,6 @@ export default function Dashboard() {
             icon={AiOutlineProduct}
             title="Jumlah Produk"
             value={User?.stores?.products?.length.toLocaleString() || '0'}
-          />
-          <StatWidget
-            icon={TbChecklist}
-            title="Transaksi Hari Ini"
-            value={totalOrders?.toLocaleString() || ''}
           />
         </Grid>
 
