@@ -35,7 +35,7 @@ interface EditProductDialogProps {
   open: boolean;
   onClose: () => void;
   productData: product;
-  onProductUpdated: (newProduct: product) => void;
+  onProductUpdated: (updatedProduct: product) => void;
 }
 
 const EditProductDialog: React.FC<EditProductDialogProps> = ({
@@ -91,18 +91,7 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
       setLength(String(productData.length || ''));
       setWidth(String(productData.width || ''));
       setHeight(String(productData.height || ''));
-      setVariants(
-        productData.variant
-          ? productData.variant.map((v) => ({
-              combination: v.combination,
-              price: v.price.toString(),
-              sku: v.sku || '', // jika undefined, gunakan string kosong
-              stock: v.stock.toString(),
-              weight: v.weight.toString(),
-              photo: v.photo || '', // jika undefined, gunakan string kosong
-            }))
-          : []
-      );
+      setVariants(productData.variant || []);
       setCategoryId(productData.categoryId || null);
       const previews = Array(5).fill(null);
       if (productData.attachments) {
@@ -191,57 +180,55 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
       formData.append('width', width);
       formData.append('height', height);
 
-      // Mengirim request POST ke endpoint untuk membuat produk baru
-      const response = await fetch(`http://localhost:7000/api/product`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Mengirim request PUT ke endpoint update produk
+      const response = await fetch(
+        `http://localhost:7000/api/product/${productData.id}`,
+        {
+          method: 'POST',
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Error:', errorData.message);
         toast.error(`Error: ${errorData.message}`);
       } else {
-        const newProduct = await response.json();
-        console.log('Product created:', newProduct);
-        toast.success('Produk berhasil dibuat!');
+        const updatedProduct = await response.json();
+        console.log('Product updated:', updatedProduct);
+        toast.success('Produk berhasil diupdate!');
 
-        // Update state lokal dengan data produk yang baru dibuat
-        setProductName(newProduct.name || '');
-        setProductSlug(newProduct.slug || '');
-        setDescription(newProduct.description || '');
-        setPrice(String(newProduct.price || ''));
-        setMinimumOrder(String(newProduct.minimum_order || '1'));
-        setStock(String(newProduct.stock || ''));
-        setSku(newProduct.sku || '');
-        setWeight(String(newProduct.weight || ''));
-        setLength(String(newProduct.length || ''));
-        setWidth(String(newProduct.width || ''));
-        setHeight(String(newProduct.height || ''));
-        setVariants(newProduct.variant || []);
-        setCategoryId(newProduct.categoryId || null);
+        // Update state lokal dengan data produk yang telah di-update
+        setProductName(updatedProduct.name || '');
+        setProductSlug(updatedProduct.slug || '');
+        setDescription(updatedProduct.description || '');
+        setPrice(String(updatedProduct.price || ''));
+        setMinimumOrder(String(updatedProduct.minimum_order || '1'));
+        setStock(String(updatedProduct.stock || ''));
+        setSku(updatedProduct.sku || '');
+        setWeight(String(updatedProduct.weight || ''));
+        setLength(String(updatedProduct.length || ''));
+        setWidth(String(updatedProduct.width || ''));
+        setHeight(String(updatedProduct.height || ''));
+        setVariants(updatedProduct.variant || []);
+        setCategoryId(updatedProduct.categoryId || null);
         const previews = Array(5).fill(null);
-        if (newProduct.attachments) {
-          previews[0] = newProduct.attachments;
+        if (updatedProduct.attachments) {
+          previews[0] = updatedProduct.attachments;
         }
         setImagePreviews(previews);
         setImageFiles(Array(5).fill(null));
 
         // Memberitahukan parent component dan menutup dialog
-        onProductUpdated(newProduct);
+        onProductUpdated(updatedProduct);
         onClose();
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Error:', error.message);
-        toast.error(`Error: ${error.message}`);
-      } else {
-        console.error('Unexpected error:', error);
-        toast.error('Terjadi kesalahan yang tidak diketahui.');
-      }
+      console.error('Error:', error.message);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -249,7 +236,7 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Tambah Produk Baru</DialogTitle>
+      <DialogTitle>Edit Produk</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent dividers>
           <Container maxWidth="md" sx={{ mt: 2, mb: 2 }}>
@@ -456,6 +443,7 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
                     onVariantChange={(variantsData: VariantInput[]) =>
                       setVariants(variantsData)
                     }
+                    initialVariants={variants}
                   />
                 </Box>
 
