@@ -1,6 +1,5 @@
 import { Box, Card, HStack, Stack, Strong, Text,Input } from '@chakra-ui/react';
 import { Avatar } from '../components/ui/avatar';
-import withdrawals from '../datas/saller.json';
 import { useDialogAdmin } from '../store/dialog-store';
 import { useGetSearchsuccessSeller, useGetSuccessReqPayment } from '../services/withdrawal';
 import { useForm } from 'react-hook-form';
@@ -31,7 +30,7 @@ export const CardSuccess = () => {
       <Card.Body>
         <HStack mb="6" gap="3">
           <Avatar
-            src={withdrawal.seller.stores?.logo}
+            src={withdrawal.store.logo}
           />
           <Stack gap="0">
             <Text fontWeight="semibold" textStyle="sm">

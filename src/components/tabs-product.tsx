@@ -56,7 +56,7 @@ const CombinedProductPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [sortOption, setSortOption] = useState('');
-  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   // const navigate = useNavigate();
 
   // Fungsi untuk update produk, memanggil service updateProduct
@@ -133,8 +133,7 @@ const CombinedProductPage = () => {
     });
     if (result.isConfirmed) {
       try {
-        await Promise.all(selectedIds.map((id) => deleteProduct(Number(id))));
-
+        await Promise.all(selectedIds.map((id) => deleteProduct(id)));
         toast.success('Semua produk berhasil dihapus', { autoClose: 1000 });
         setSelectedIds([]);
         queryClient.invalidateQueries({ queryKey: ['product'] });
@@ -157,9 +156,7 @@ const CombinedProductPage = () => {
     if (result.isConfirmed) {
       try {
         await Promise.all(
-          selectedIds.map((id) =>
-            handleUpdateProduct(Number(id), { is_active: false })
-          )
+          selectedIds.map((id) => handleUpdateProduct(id, { is_active: false }))
         );
         toast.success(
           'Semua produk berhasil diubah statusnya menjadi tidak aktif',
@@ -175,8 +172,8 @@ const CombinedProductPage = () => {
     }
   };
 
-  const handleTabChange = (newValue: unknown) => {
-    setSelectedTab(newValue as string);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+    setSelectedTab(newValue);
   };
 
   const getEmptyMessage = () => {
@@ -435,11 +432,9 @@ const CombinedProductPage = () => {
             key={prod.id}
             product={prod}
             isSelected={selectedIds.includes(prod.id)}
-            onSelectChange={(checked) =>
-              handleSelectProduct(Number(prod.id), checked)
-            }
+            onSelectChange={(checked) => handleSelectProduct(prod.id, checked)}
             onUpdate={(updatedData) =>
-              handleUpdateProduct(Number(prod.id), updatedData)
+              handleUpdateProduct(prod.id, updatedData)
             }
             onDelete={() => {
               Swal.fire({
@@ -451,7 +446,7 @@ const CombinedProductPage = () => {
                 cancelButtonText: 'Batal',
               }).then((result) => {
                 if (result.isConfirmed) {
-                  deleteProduct(Number(prod.id));
+                  deleteProduct(prod.id);
                 }
               });
             }}
@@ -531,7 +526,7 @@ function ProductCard({
     if (variantData) {
       const initialData: Record<number, { price: number; stock: number }> = {};
       variantData.forEach((v) => {
-        initialData[Number(v.id)] = { price: v.price, stock: v.stock };
+        initialData[v.id] = { price: v.price, stock: v.stock };
       });
       setEditedVariants(initialData);
     }
@@ -573,7 +568,8 @@ function ProductCard({
     setActive(newStatus);
     try {
       await onUpdate({ is_active: newStatus });
-    } catch {
+    } catch (_error) {
+      void _error; // menandakan bahwa parameter sengaja diabaikan
       setActive(!newStatus);
     }
   };
@@ -587,7 +583,7 @@ function ProductCard({
       if (variantData) {
         await Promise.all(
           variantData.map((v) => {
-            const updatedData = editedVariants[Number(v.id)];
+            const updatedData = editedVariants[v.id];
             return axios.put(
               `${apiURL}/product/${product.id}/variants/${v.id}`,
               updatedData,
@@ -734,7 +730,7 @@ function ProductCard({
                 <MenuItemMUI
                   onClick={() => {
                     handleMenuClose();
-                    navigate(`/product/${product.id}`);
+                    navigate(`/lakoe-app/product-detail/${product.id}`);
                   }}
                 >
                   <RiLinksFill />
@@ -875,12 +871,12 @@ function ProductCard({
                         label="Price"
                         type="number"
                         size="small"
-                        value={editedVariants[Number(v.id)]?.price ?? v.price}
+                        value={editedVariants[v.id]?.price ?? v.price}
                         onChange={(e) => {
                           const value = Number(e.target.value);
                           setEditedVariants((prev) => ({
                             ...prev,
-                            [v.id]: { ...prev[Number(v.id)], price: value },
+                            [v.id]: { ...prev[v.id], price: value },
                           }));
                         }}
                       />
@@ -888,12 +884,12 @@ function ProductCard({
                         label="Stock"
                         type="number"
                         size="small"
-                        value={editedVariants[Number(v.id)]?.stock ?? v.stock}
+                        value={editedVariants[v.id]?.stock ?? v.stock}
                         onChange={(e) => {
                           const value = Number(e.target.value);
                           setEditedVariants((prev) => ({
                             ...prev,
-                            [v.id]: { ...prev[Number(v.id)], stock: value },
+                            [v.id]: { ...prev[v.id], stock: value },
                           }));
                         }}
                       />

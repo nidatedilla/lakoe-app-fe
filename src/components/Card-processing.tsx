@@ -9,7 +9,6 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { Avatar } from '../components/ui/avatar';
-import withdrawals from '../datas/saller.json';
 import { useDialogAdmin } from '../store/dialog-store';
 import {
   useGetProcessingReqPayment,
@@ -72,7 +71,7 @@ export const CardProcessing = () => {
       >
         <Card.Body>
           <HStack mb="6" gap="3">
-            <Avatar src={Withdrawal.seller.stores?.logo} />
+            <Avatar src={Withdrawal.store.logo} />
 
             <Stack gap="0">
               <Text fontWeight="semibold" textStyle="sm">

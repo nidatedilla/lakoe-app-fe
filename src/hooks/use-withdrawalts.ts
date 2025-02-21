@@ -12,7 +12,7 @@ export const useCreateWithdrawal = (resetForm: () => void) => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success(' withdrawal creat successfully');
+      toast.success('Berhasil melakaukan Withdrawal');
       resetForm()
       queryClient.invalidateQueries({ queryKey: ['withdrawalspending'] });
       queryClient.invalidateQueries({ queryKey: ['withdrawalsprocessing'] });

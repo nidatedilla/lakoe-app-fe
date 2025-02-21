@@ -92,7 +92,7 @@ export const CardPending = () => {
       >
         <Card.Body>
           <HStack mb="6" gap="3">
-            <Avatar src={withdrawal.seller.stores?.logo} />
+            <Avatar src={withdrawal.store.logo} />
             <Stack gap="0">
               <Text fontWeight="semibold" textStyle="sm">
                 {withdrawal.seller.name}

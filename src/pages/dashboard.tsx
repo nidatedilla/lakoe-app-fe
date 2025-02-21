@@ -152,7 +152,6 @@ export default function Dashboard() {
     }).then((result) => {
       if (result.isConfirmed) {
         const res = CreateWithdrawal(payload);
-        console.log('Withdrawal created:', res);
       }
     });
   };
@@ -193,7 +192,11 @@ export default function Dashboard() {
             title="Jumlah Pendapatan"
             value={`Rp ${User?.balance.toLocaleString('id-ID')}`}
           />
-
+          <StatWidget
+            icon={TbChecklist}
+            title="Transaksi Hari Ini"
+            value={totalOrders?.toLocaleString() || ''}
+          />
           <Box
             display={'flex'}
             justifyContent={'center'}
@@ -229,11 +232,6 @@ export default function Dashboard() {
             icon={AiOutlineProduct}
             title="Jumlah Produk"
             value={User?.stores?.products?.length.toLocaleString() || '0'}
-          />
-          <StatWidget
-            icon={TbChecklist}
-            title="Transaksi Hari Ini"
-            value={totalOrders?.toLocaleString() || ''}
           />
         </Grid>
 

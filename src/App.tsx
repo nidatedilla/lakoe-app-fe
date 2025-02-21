@@ -49,7 +49,7 @@ function App() {
           path: '/',
           Component: () => {
             const { User } = useGetMe();
-            if (User?.role === 'admin') {
+            if (User?.role === 'ADMIN') {
               return <Navigate to="/dashboard-admin" replace />;
             }
             if (User?.role === 'Seller')

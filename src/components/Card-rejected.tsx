@@ -1,6 +1,5 @@
 import { Box, Card, HStack, Stack, Strong, Text,Input } from '@chakra-ui/react';
 import { Avatar } from '../components/ui/avatar';
-import withdrawals from '../datas/saller.json';
 import { useDialogAdmin } from '../store/dialog-store';
 import { useGetRejectedReqPayment, useGetSearchrejectedSeller } from '../services/withdrawal';
 import { InputGroup } from '../components/ui/input-group';
@@ -18,7 +17,7 @@ export const CardRejected = () => {
   const {data} = useGetRejectedReqPayment()
 
   const rejectedSeller  = data?.slice(0, 3)
-  console.log("rejectedSeller: " , rejectedSeller,)
+
 
   const renderWithdrawalCard = (withdrawal: Withdrawal) => (
     <Box cursor={"pointer"} key={withdrawal.id} display={'flex'}>
@@ -26,7 +25,7 @@ export const CardRejected = () => {
       <Card.Body>
         <HStack mb="6" gap="3">
           <Avatar
-            src={withdrawal.seller.stores?.logo}
+            src={withdrawal.store.logo}
           />
           <Stack gap="0">
             <Text fontWeight="semibold" textStyle="sm">

@@ -8,6 +8,7 @@ export interface Withdrawal {
   amount: number;
   createdAt: Date;
   updatedAt: Date;
+  message: string
   seller: User;
   store: stores;
 }
