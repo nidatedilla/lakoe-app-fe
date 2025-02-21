@@ -63,7 +63,7 @@ export default function DialogChangeShippingMethod({
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
-  const bgHover = useColorModeValue('blue.50', 'blue.900');
+  const bgHover = useColorModeValue('#EFEBE9', '#3E2723');
   const textColor = useColorModeValue('gray.600', 'gray.300');
 
   if (isLoading) return <Text>Loading...</Text>;
@@ -100,8 +100,8 @@ export default function DialogChangeShippingMethod({
         <Button
           size="sm"
           variant="outline"
-          colorPalette="blue"
-          _hover={{ bg: 'blue.50' }}
+          colorPalette="gray"
+          _hover={{ bg: '#EFEBE9' }}
           disabled={!isRecipientInfoAvailable}
         >
           <HStack gap={2}>
@@ -115,7 +115,7 @@ export default function DialogChangeShippingMethod({
           <DialogCloseTrigger className="hidden" />
           <Flex justify="space-between" align="center" mb={6}>
             <HStack gap={3}>
-              <Icon as={FiTruck} boxSize={5} color="blue.500" />
+              <Icon as={FiTruck} boxSize={5} color="#795548" />
               <Text fontSize="lg" fontWeight="medium">
                 Pilih Opsi Pengiriman
               </Text>
@@ -146,7 +146,7 @@ export default function DialogChangeShippingMethod({
                     transition="all 0.2s"
                     _hover={{
                       bg: bgHover,
-                      borderColor: 'blue.500',
+                      borderColor: '#795548',
                       transform: 'translateY(-2px)',
                       shadow: 'md',
                     }}
@@ -166,17 +166,17 @@ export default function DialogChangeShippingMethod({
                             {option.courierName} - {option.serviceName}
                           </Text>
                           <HStack gap={2}>
-                            <Icon as={FiClock} color="blue.500" />
+                            <Icon as={FiClock} color="#795548" />
                             <Text fontSize="sm" color={textColor}>
                               Estimasi: {option.duration}
                             </Text>
                           </HStack>
                         </VStack>
                       </HStack>
-                      <Radio value={option.id} colorPalette="blue" />
+                      <Radio value={option.id} colorPalette="gray" />
                     </HStack>
                     <Text
-                      color="blue.500"
+                      color="#795548"
                       fontWeight="medium"
                       fontSize="md"
                       textAlign="right"
@@ -198,7 +198,7 @@ export default function DialogChangeShippingMethod({
               </DialogActionTrigger>
               <DialogActionTrigger asChild>
                 <Button
-                  colorPalette="blue"
+                  colorPalette="gray"
                   onClick={handleConfirm}
                   disabled={!selectedService}
                 >

@@ -75,7 +75,7 @@ export default function CheckoutPage() {
   const bgColor = useColorModeValue('white', 'gray.800');
   const bgPage = useColorModeValue('gray.50', 'gray.900');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
-  const headerBg = useColorModeValue('blue.50', 'blue.900');
+  const headerBg = useColorModeValue('#EFEBE9', '#3E2723');
   const textColor = useColorModeValue('gray.600', 'gray.300');
 
   const storedData = localStorage.getItem('checkout');
@@ -227,13 +227,9 @@ export default function CheckoutPage() {
         borderColor={borderColor}
       >
         <Container maxW="7xl">
-          <HStack gap={6}>
-            <Image src="../src/assets/lakoe-logo.png" h="55px" />
-            <Box borderRightWidth={'1px'} borderColor={'blue.400'} h={'35px'} />
-            <Heading size="2xl" color="blue.700">
-              Checkout
-            </Heading>
-          </HStack>
+          <Heading size="2xl" color="#5D4037">
+            Checkout
+          </Heading>
         </Container>
       </Box>
 
@@ -246,7 +242,7 @@ export default function CheckoutPage() {
           <VStack flex="1" gap={4} align="stretch" w="full">
             <Box bg={bgColor} p={6} borderRadius="xl" borderWidth="1px">
               <HStack mb={4}>
-                <Icon as={FiUser} color="blue.500" boxSize={5} />
+                <Icon as={FiUser} color="#795548" boxSize={5} />
                 <Heading size="md">Informasi Penerima</Heading>
               </HStack>
               <Flex justify="space-between" alignItems="center">
@@ -273,7 +269,7 @@ export default function CheckoutPage() {
 
             <Box bg={bgColor} p={6} borderRadius="xl" borderWidth="1px">
               <HStack mb={4}>
-                <Icon as={FiTruck} color="blue.500" boxSize={5} />
+                <Icon as={FiTruck} color="#795548" boxSize={5} />
                 <Heading size="md">Opsi Pengiriman</Heading>
               </HStack>
               <Flex justify="space-between" align="center">
@@ -284,10 +280,10 @@ export default function CheckoutPage() {
                       {selectedShipping.serviceName}
                     </Text>
                     <HStack>
-                      <Badge colorPalette="blue">
+                      <Badge colorPalette="gray">
                         {selectedShipping.duration}
                       </Badge>
-                      <Text color="blue.500" fontWeight="semibold">
+                      <Text color="#795548" fontWeight="semibold">
                         Rp {selectedShipping.price.toLocaleString()}
                       </Text>
                     </HStack>
@@ -330,7 +326,7 @@ export default function CheckoutPage() {
             {productList.map((item: Product) => (
               <Box mb={6} key={item.id}>
                 {item.variant && item.variant.combination && (
-                  <Badge colorPalette="blue" fontSize="xs">
+                  <Badge colorPalette="gray" fontSize="xs">
                     {Object.entries(item.variant.combination)
                       .map(([key, value]) => `${key}: ${value}`)
                       .join(', ')}
@@ -376,7 +372,7 @@ export default function CheckoutPage() {
               <Box borderBottomWidth={'1px'} />
               <Flex justify="space-between" fontWeight="bold">
                 <Text>Total</Text>
-                <Text color="blue.500" fontSize="lg">
+                <Text color="#795548" fontSize="lg">
                   Rp{' '}
                   {(
                     productList.reduce(
@@ -390,7 +386,7 @@ export default function CheckoutPage() {
 
             <Button
               borderRadius="full"
-              colorPalette="blue"
+              colorPalette="gray"
               size="lg"
               w="full"
               mt={6}

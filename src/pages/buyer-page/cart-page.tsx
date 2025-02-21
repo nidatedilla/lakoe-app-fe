@@ -40,7 +40,7 @@ export default function CartPage() {
   const secondaryBg = useColorModeValue('gray.50', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const secondaryText = useColorModeValue('gray.600', 'gray.400');
-  const highlightColor = useColorModeValue('blue.500', 'blue.300');
+  const highlightColor = useColorModeValue('#795548', '#A1887F');
 
   const allSelected =
     cartItems &&
@@ -150,7 +150,7 @@ export default function CartPage() {
             Tambahkan beberapa barang ke keranjang untuk memulai.
           </Text>
           <Link to={'/lakoe-app/shop-page'}>
-            <Button colorScheme="blue" size="lg">
+            <Button colorPalette="gray" size="lg">
               <Icon as={BsCartX} /> Continue Shopping
             </Button>
           </Link>
@@ -173,7 +173,7 @@ export default function CartPage() {
             >
               <Heading size="lg" color={textColor}>
                 Keranjang Belanja
-                <Badge ml={2} colorScheme="blue" fontSize="md">
+                <Badge ml={2} colorPalette="gray" fontSize="md">
                   {cartItems.reduce((total, item) => total + item.quantity, 0)}{' '}
                   item
                 </Badge>
@@ -181,7 +181,7 @@ export default function CartPage() {
               <Checkbox
                 checked={someSelected ? 'indeterminate' : allSelected}
                 inputProps={{ onChange: handleSelectAll }}
-                colorPalette="blue"
+                colorPalette="gray"
               >
                 <Text fontSize="sm" color={secondaryText}>
                   Pilih Semua
@@ -201,7 +201,7 @@ export default function CartPage() {
                     <Checkbox
                       checked={selectedItems.includes(item.id)}
                       onChange={() => handleSelectItem(item.id)}
-                      colorScheme="blue"
+                      colorScheme="gray"
                       size="lg"
                     />
                     <Image
@@ -215,7 +215,7 @@ export default function CartPage() {
                       <Flex justify="space-between" align="start">
                         <VStack align="start" gap={2}>
                           {item.variant && item.variant.combination && (
-                            <Badge colorPalette="blue" fontSize="xs">
+                            <Badge colorPalette="gray" fontSize="xs">
                               {Object.entries(item.variant.combination)
                                 .map(([key, value]) => `${key}: ${value}`)
                                 .join(', ')}
@@ -316,7 +316,7 @@ export default function CartPage() {
               )}
 
               <Button
-                colorScheme="blue"
+                colorPalette="gray"
                 size="lg"
                 disabled={selectedItems.length === 0}
                 onClick={handleCheckout}
