@@ -179,8 +179,8 @@ export default function DialogChangeLocation() {
         <Button
           size="sm"
           variant="outline"
-          colorPalette="blue"
-          _hover={{ bg: 'blue.50' }}
+          colorPalette="gray"
+          _hover={{ bg: '#EFEBE9' }}
           onClick={() => openDialog()}
         >
           <HStack gap={2}>
@@ -366,7 +366,7 @@ export default function DialogChangeLocation() {
           </DialogActionTrigger>
           <Button
             loading={isLoading}
-            bg="blue.500"
+            bg="#795548"
             borderRadius="full"
             onClick={handleSubmit}
           >

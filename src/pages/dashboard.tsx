@@ -23,7 +23,7 @@ import {
   Tooltip as ChartTooltip,
   Legend as ChartLegend,
 } from 'chart.js';
-import { Line, Pie } from 'react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
 import { GiMoneyStack } from 'react-icons/gi';
 import { TbChecklist } from 'react-icons/tb';
 import { FaArrowDown } from 'react-icons/fa';
@@ -91,37 +91,6 @@ const pieChartOptions = {
   },
 };
 
-const generateSalesData = () => {
-  return Array.from({ length: 30 }, (_, i) => ({
-    day: i + 1,
-    sales: Math.floor(Math.random() * 1000) + 500,
-  }));
-};
-
-const salesData = generateSalesData();
-
-const lineChartData = {
-  labels: salesData.map((data) => `Hari ${data.day}`),
-  datasets: [
-    {
-      label: 'Penjualan',
-      data: salesData.map((data) => data.sales),
-      borderColor: '#6dc5ff',
-      backgroundColor: 'rgb(0, 100, 167)',
-      fill: true,
-    },
-  ],
-};
-
-const lineChartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: 'top' as const,
-    },
-  },
-};
-
 function StatWidget({ icon: Icon, title, value }: StatWidgetProps) {
   return (
     <Box bg={'white'} p={3} borderRadius="lg" boxShadow="md">
@@ -143,14 +112,16 @@ function StatWidget({ icon: Icon, title, value }: StatWidgetProps) {
 }
 
 export default function Dashboard() {
- 
   const { data: totalOrders } = useTotalOrdersToday();
+  const { data: totalRevenue } = useTotalRevenue();
+  console.log('Total Revenue:', totalRevenue);
+
   const { User } = useGetMe();
   const [num, setNum] = useState<number>(0);
   const [formattedNum, setFormattedNum] = useState<string>('');
   const { mutateAsync: CreateWithdrawal } = useCreateWithdrawal(() => {
-    setFormattedNum("")
-    setNum(0)
+    setFormattedNum('');
+    setNum(0);
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,7 +194,6 @@ export default function Dashboard() {
             value={`Rp ${User?.balance.toLocaleString('id-ID')}`}
           />
 
-          <StatWidget icon={TbChecklist} title="Transaksi Hari Ini" value="9" />
           <Box
             display={'flex'}
             justifyContent={'center'}
@@ -266,15 +236,6 @@ export default function Dashboard() {
             value={totalOrders?.toLocaleString() || ''}
           />
         </Grid>
-
-        <Box bg={'white'} borderRadius="lg" boxShadow="md" mb={6} w={'100%'}>
-          <Text pt={4} pl={6} fontWeight={'medium'}>
-            Tren Penjualan 30 Hari
-          </Text>
-          <Box p={6}>
-            <Line data={lineChartData} options={lineChartOptions} />
-          </Box>
-        </Box>
 
         <HStack gap={4} alignItems="flex-start" w="full">
           <Box flex={1} bg={'white'} borderRadius="lg" boxShadow="md" p={6}>

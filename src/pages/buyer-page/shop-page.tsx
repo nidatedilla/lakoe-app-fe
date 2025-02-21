@@ -20,7 +20,7 @@ export default function ShopPage() {
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.700', 'white');
-  const accentColor = useColorModeValue('blue.500', 'blue.300');
+  const accentColor = useColorModeValue('#795548', '#A1887F');
 
   if (isLoading) return <Text>Loading products...</Text>;
   if (error)

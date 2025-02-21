@@ -38,9 +38,11 @@ export type Item = {
   name: string;
   description: string;
   value: number;
-  length: number;
-  width: number;
-  height: number;
   weight: number;
   quantity: number;
+  variant?: {
+    id: string;
+    combination: Record<string, string>;
+    stock: number;
+  };
 };

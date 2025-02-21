@@ -9,17 +9,16 @@ import {
   VStack,
   Heading,
   SimpleGrid,
-  IconButton,
   Button,
-  Spinner,
 } from '@chakra-ui/react';
-import { BsCartPlus, BsHeart, BsShare } from 'react-icons/bs';
-import { useState, useEffect, useMemo } from 'react';
+import { BsCartPlus } from 'react-icons/bs';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useColorModeValue } from '../../components/ui/color-mode';
 import toast from 'react-hot-toast';
 import { StepperInput } from '../../components/ui/stepper-input';
 import { useProduct } from '../../hooks/use-get-product';
+import { useAddToCart, useCart } from '../../hooks/use-cart';
 
 interface Variant {
   combination: { [key: string]: string }; // contoh: { Warna: "Merah", Ukuran: "S" }
@@ -30,18 +29,16 @@ interface Variant {
   photo: string;
 }
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  attachments: string;
-  variant: Variant;
-  quantity: number;
-}
-
 export default function ProductDetail() {
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const textColor = useColorModeValue('gray.800', 'white');
+  const accentColor = useColorModeValue('#795548', '#A1887F');
+  const buttonHoverBg = useColorModeValue('#EFEBE9', '#5D4037');
+
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading, isError, error } = useProduct(id || '');
+  console.log('Data produk:', product);
+
   const [quantity, setQuantity] = useState<number>(1);
   const navigate = useNavigate();
 
@@ -50,20 +47,17 @@ export default function ProductDetail() {
   // State untuk atribut pilihan (misal: warna dan ukuran)
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<string>('');
-
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const textColor = useColorModeValue('gray.800', 'white');
-  const accentColor = useColorModeValue('blue.500', 'blue.300');
-  const buttonHoverBg = useColorModeValue('blue.50', 'blue.700');
+  const { data: cartItems } = useCart();
+  const addToCartMutation = useAddToCart();
 
   // Mengambil daftar warna dan ukuran secara unik dari data varian
-  const availableColors: string[] = useMemo(() => {
+  const availableColors = useMemo<string[]>(() => {
     if (!product || !product.variant) return [];
     const colors = product.variant.map((v: Variant) => v.combination.Warna);
     return Array.from(new Set(colors));
   }, [product]);
 
-  const availableSizes: string[] = useMemo(() => {
+  const availableSizes = useMemo<string[]>(() => {
     if (!product || !product.variant) return [];
     const sizes = product.variant.map((v: Variant) => v.combination.Ukuran);
     return Array.from(new Set(sizes));
@@ -72,13 +66,13 @@ export default function ProductDetail() {
   // Set default pilihan warna dan ukuran apabila tersedia
   useEffect(() => {
     if (availableColors.length > 0 && !selectedColor) {
-      setSelectedColor(availableColors[0] as string);
+      setSelectedColor(availableColors[0]);
     }
   }, [availableColors, selectedColor]);
 
   useEffect(() => {
     if (availableSizes.length > 0 && !selectedSize) {
-      setSelectedColor(availableColors[0] as string);
+      setSelectedSize(availableSizes[0]);
     }
   }, [availableSizes, selectedSize]);
 
@@ -95,40 +89,36 @@ export default function ProductDetail() {
   }, [product, selectedColor, selectedSize]);
 
   const handleAddToCart = () => {
-    if (!selectedVariant) {
-      toast.error('Varian tidak tersedia');
+    const existingItem = cartItems?.find((item) => item.id === product.id);
+    const totalQuantity = (existingItem?.quantity || 0) + quantity;
+
+    if (totalQuantity > (product?.stock || 0)) {
+      toast.error(
+        `Stok produk hanya tersisa ${product?.stock} item, termasuk yang sudah ada di keranjang belanja anda`,
+        { duration: 2000 }
+      );
       return;
     }
-    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem: CartItem | undefined = cartItems.find(
-      (item: CartItem) =>
-        item.id === product.id && item.variant.sku === selectedVariant.sku
-    );
 
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      cartItems.push({
+    addToCartMutation.mutate(
+      {
         ...product,
+        quantity,
         variant: selectedVariant,
-        quantity: quantity,
-      });
-    }
-
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-    toast.success('Produk telah ditambahkan ke keranjang', { duration: 3000 });
+      },
+      {
+        onSuccess: () => {
+          toast.success('Produk telah ditambahkan ke keranjang', {
+            duration: 3000,
+          });
+        },
+      }
+    );
   };
 
   const handleBuyNow = () => {
-    if (!selectedVariant) {
-      toast.error('Varian tidak tersedia');
-      return;
-    }
     const checkoutItem = {
-      id: product.id,
-      name: product.name,
-      price: selectedVariant.price, // gunakan harga varian
-      attachments: product.attachments,
+      ...product,
       variant: selectedVariant,
       quantity: quantity,
     };
@@ -144,10 +134,19 @@ export default function ProductDetail() {
     }, 1000);
   };
 
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity > (product?.stock || 0)) {
+      toast.error(`Stok produk hanya tersisa ${product?.stock} item`, {
+        duration: 2000,
+      });
+      return;
+    }
+    setQuantity(newQuantity);
+  };
+
   if (isLoading) {
     return (
       <Container maxW="container.xl" h="100vh" centerContent>
-        <Spinner size="xl" />
         <Text mt={4} fontSize="xl" color={textColor}>
           Loading product details...
         </Text>
@@ -176,8 +175,8 @@ export default function ProductDetail() {
   }
 
   return (
-    <Box py={10} px={20} bg={'gray.50'}>
-      <SimpleGrid bg={'white'} columns={{ base: 1, lg: 2 }} p={5} gap={10}>
+    <Box py={10} px={20} bg="gray.50">
+      <SimpleGrid bg="white" columns={{ base: 1, lg: 2 }} p={5} gap={10}>
         {/* Tampilan Gambar */}
         <Box>
           <Box
@@ -193,24 +192,6 @@ export default function ProductDetail() {
               src={selectedVariant?.photo || product.attachments}
               alt={product.name}
             />
-            <HStack position="absolute" top={4} right={4} gap={2}>
-              <IconButton
-                as={BsHeart}
-                aria-label="Add to wishlist"
-                bg={'transparent'}
-                color={textColor}
-                size="xs"
-                _hover={{ transform: 'scale(1.1)' }}
-              />
-              <IconButton
-                aria-label="Share product"
-                as={BsShare}
-                bg={'transparent'}
-                color={textColor}
-                size="xs"
-                _hover={{ transform: 'scale(1.1)' }}
-              />
-            </HStack>
           </Box>
         </Box>
 
@@ -221,7 +202,7 @@ export default function ProductDetail() {
               {product.name}
             </Heading>
             <Badge
-              colorScheme="blue"
+              colorPalette="gray"
               fontSize="2xl"
               p={2}
               borderRadius="lg"
@@ -245,7 +226,7 @@ export default function ProductDetail() {
                 <Button
                   key={color}
                   variant={selectedColor === color ? 'solid' : 'outline'}
-                  colorScheme="blue"
+                  colorPalette="gray"
                   onClick={() => setSelectedColor(color)}
                 >
                   {color}
@@ -264,7 +245,7 @@ export default function ProductDetail() {
                 <Button
                   key={size}
                   variant={selectedSize === size ? 'solid' : 'outline'}
-                  colorScheme="blue"
+                  colorPalette="gray"
                   onClick={() => setSelectedSize(size)}
                 >
                   {size}
@@ -285,7 +266,9 @@ export default function ProductDetail() {
               max={99}
               step={1}
               value={String(quantity)}
-              onValueChange={(details) => setQuantity(Number(details.value))}
+              onValueChange={(details) =>
+                handleQuantityChange(Number(details.value))
+              }
               allowOverflow={false}
               spinOnPress={true}
               focusInputOnChange={false}
@@ -324,7 +307,7 @@ export default function ProductDetail() {
               borderRadius="lg"
               fontWeight="medium"
               transition="all 0.2s"
-              _hover={{ bg: 'blue.600' }}
+              _hover={{ bg: '#6D4C41' }}
               onClick={handleBuyNow}
             >
               Beli
