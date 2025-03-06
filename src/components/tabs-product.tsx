@@ -40,29 +40,22 @@ import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 import EditProductDialog from '../components/EditProductDialog';
 
-// function TabPanel(props: { children?: React.ReactNode; value: string; index: string }) {
-//   const { children, value, index, ...other } = props;
-//   return (
-//     <div role="tabpanel" hidden={value !== index} id={`tabpanel-${index}`} aria-labelledby={`tab-${index}`} {...other}>
-//       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-//     </div>
-//   );
-// }
-
 const CombinedProductPage = () => {
   const queryClient = useQueryClient();
   const { data: products } = useFindProducts();
+  console.log('Data produk:', products);
+
   const [selectedTab, setSelectedTab] = useState('semua');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [sortOption, setSortOption] = useState('');
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   // const navigate = useNavigate();
 
   // Fungsi untuk update produk, memanggil service updateProduct
   // dan meng-invalidate query sehingga data baru di-fetch secara otomatis
   const handleUpdateProduct = async (
-    id: number,
+    id: string,
     updatedData: Partial<product>
   ) => {
     try {
@@ -114,7 +107,7 @@ const CombinedProductPage = () => {
     }
   };
 
-  const handleSelectProduct = (id: number, checked: boolean) => {
+  const handleSelectProduct = (id: string, checked: boolean) => {
     if (checked) {
       setSelectedIds((prev) => [...prev, id]);
     } else {
@@ -172,7 +165,7 @@ const CombinedProductPage = () => {
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
     setSelectedTab(newValue);
   };
 
@@ -446,7 +439,16 @@ const CombinedProductPage = () => {
                 cancelButtonText: 'Batal',
               }).then((result) => {
                 if (result.isConfirmed) {
-                  deleteProduct(prod.id);
+                  try {
+                    deleteProduct(prod.id);
+                    toast.success('Produk berhasil dihapus', {
+                      autoClose: 1000,
+                    });
+                    queryClient.invalidateQueries({ queryKey: ['product'] });
+                  } catch (error) {
+                    console.error(error);
+                    toast.error('Gagal menghapus produk', { autoClose: 1000 });
+                  }
                 }
               });
             }}
@@ -519,12 +521,12 @@ function ProductCard({
       : 0;
 
   const [editedVariants, setEditedVariants] = useState<
-    Record<number, { price: number; stock: number }>
+    Record<string, { price: number; stock: number }>
   >({});
 
   useEffect(() => {
     if (variantData) {
-      const initialData: Record<number, { price: number; stock: number }> = {};
+      const initialData: Record<string, { price: number; stock: number }> = {};
       variantData.forEach((v) => {
         initialData[v.id] = { price: v.price, stock: v.stock };
       });

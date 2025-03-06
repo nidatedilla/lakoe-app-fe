@@ -1,12 +1,18 @@
 import PrivateLayout from '../layouts/private-layout';
-import { Navigate } from 'react-router-dom'; 
 import { useGetMe } from '../hooks/use-find-me';
 import Lottie from 'lottie-react';
 import animationData from '../assets/lotties/loading-among.json';
 import { Box, Flex } from '@chakra-ui/react';
+import { useEffect } from 'react';
 
 const PrivateRoute: React.FC = () => {
   const { User, isLoading } = useGetMe();
+
+  useEffect(() => {
+    if (!isLoading && !User) {
+      window.location.href = '/landing-page';
+    }
+  }, [isLoading, User]);
 
   if (isLoading) {
     return (
@@ -27,7 +33,7 @@ const PrivateRoute: React.FC = () => {
   }
 
   if (!User) {
-    return <Navigate to="/login" replace />;
+    return null;
   }
 
   return <PrivateLayout />;

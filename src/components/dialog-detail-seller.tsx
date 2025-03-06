@@ -8,17 +8,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  Text
+  Text,
 } from '@chakra-ui/react';
 import { useDialogAdmin } from '../store/dialog-store';
-import { green, red } from '@mui/material/colors';
-import { GiConsoleController } from 'react-icons/gi';
 
 export const DialogDetailSeller = () => {
-  const { isOpen, openDialog, selectedWithdrawal, closeDialog } = useDialogAdmin();
+  const { selectedWithdrawal, closeDialog } = useDialogAdmin();
 
- 
-  
   return (
     <Box
       position="fixed"
@@ -28,7 +24,7 @@ export const DialogDetailSeller = () => {
       width="50%"
       maxWidth="500px"
     >
-      <DialogBackdrop 
+      <DialogBackdrop
         onClick={closeDialog}
         position="fixed"
         top={0}
@@ -52,37 +48,51 @@ export const DialogDetailSeller = () => {
         <DialogBody>
           {selectedWithdrawal ? (
             <>
+              <Text>
+                <strong>Name:</strong>{' '}
+                {selectedWithdrawal.seller.name || 'No name'}
+              </Text>
+              <Text>
+                <strong>Nama Toko:</strong>{' '}
+                {selectedWithdrawal.store.name || 'No name'}
+              </Text>
 
               <Text>
-                <strong>Name:</strong> {selectedWithdrawal.seller.name || "No name"}
+                <strong>Nama Bank:</strong>{' '}
+                {selectedWithdrawal.store.bank_accounts?.bank || 'No name'}
               </Text>
               <Text>
-                <strong>Store Name:</strong> {selectedWithdrawal.store.name || "No name" }
-              </Text>
-             
-              <Text>
-                <strong>Bank Name:</strong> {selectedWithdrawal.store.bank_accounts?.bank || "No name"}
+                <strong>No Rekening:</strong>{' '}
+                {selectedWithdrawal.store.bank_accounts?.acc_num || 'No name'}
               </Text>
               <Text>
-                <strong>No Rekening:</strong> {selectedWithdrawal.store.bank_accounts?.acc_num || "No name"}
-              </Text>
-              <Text>
-                <strong>Nama Akun Bank:</strong> {selectedWithdrawal.store.bank_accounts?.acc_name || "No name"}
+                <strong>Nama Pemilik Rekening:</strong>{' '}
+                {selectedWithdrawal.store.bank_accounts?.acc_name || 'No name'}
               </Text>
               <Text>
                 <strong>Amount:</strong> Rp{' '}
                 {selectedWithdrawal.amount.toLocaleString('id-ID')}
-             
               </Text>
               <Text>
                 <strong>Balace Seller:</strong> Rp{' '}
                 {selectedWithdrawal.seller.balance.toLocaleString('id-ID')}
               </Text>
               <Text>
-                <strong>Status:</strong> <Text as={"span"} color={selectedWithdrawal.status === "Success"? "green.400": 
-                  selectedWithdrawal.status === "Rejected"? "red.400" :
-                  selectedWithdrawal.status === "Processing" ? "black": "black" 
-                }>{selectedWithdrawal.status}</Text>
+                <strong>Status:</strong>{' '}
+                <Text
+                  as={'span'}
+                  color={
+                    selectedWithdrawal.status === 'Success'
+                      ? 'green.400'
+                      : selectedWithdrawal.status === 'Rejected'
+                        ? 'red.400'
+                        : selectedWithdrawal.status === 'Processing'
+                          ? 'black'
+                          : 'black'
+                  }
+                >
+                  {selectedWithdrawal.status}
+                </Text>
               </Text>
             </>
           ) : (
@@ -90,7 +100,9 @@ export const DialogDetailSeller = () => {
           )}
         </DialogBody>
         <DialogFooter>
-          <Button cursor={"pointer"} onClick={closeDialog}>Close</Button>
+          <Button cursor={'pointer'} onClick={closeDialog}>
+            Close
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Box>

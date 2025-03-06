@@ -5,13 +5,19 @@ import { product } from '../types/type-product';
 import { useQuery } from '@tanstack/react-query';
 import { apiURL } from '../utils/constants';
 import { variant } from '../types/type-product';
+import Cookies from 'js-cookie';
 
 // Hook untuk mengambil seluruh produk
 export function useFindProducts() {
   return useQuery<product[]>({
     queryKey: ['product'],
     queryFn: async () => {
-      const res = await Api.get('/product');
+      const token = Cookies.get('token');
+      const res = await Api.get('/product', {
+        headers: {
+          Authorization: `Bearer ${token} `,
+        },
+      });
       return res.data;
     },
   });
@@ -30,7 +36,7 @@ export function useFindActiveProducts(isActive: boolean) {
 
 // Fungsi untuk update produk
 export async function updateProduct(
-  id: number,
+  id: string,
   updatedData: Partial<product>
 ): Promise<product> {
   const res = await Api.put(`/product/${id}`, updatedData);
@@ -44,7 +50,7 @@ export interface DeleteProductResponse {
 
 // Fungsi untuk delete produk
 export async function deleteProduct(
-  id: number
+  id: string
 ): Promise<DeleteProductResponse> {
   const res = await Api.delete(`/product/${id}`);
   return res.data;

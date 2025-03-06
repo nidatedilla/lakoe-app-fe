@@ -1,4 +1,4 @@
-import { Box, Flex, Image, Input, Text } from '@chakra-ui/react';
+import { Box, Image, Input, Text } from '@chakra-ui/react';
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
@@ -21,10 +21,6 @@ export const AiPage = () => {
     if (event.key === 'Enter') {
       handleSendMessage();
     }
-  };
-
-  const handleButtonClick = (message: string) => {
-    sendMessage(message);
   };
 
   return (
@@ -72,46 +68,6 @@ export const AiPage = () => {
             <Text fontSize="md" color="gray.600" marginBottom={4}>
               Silakan ajukan pertanyaan.
             </Text>
-
-            <Flex gap={2} justifyContent="center" flexWrap="wrap">
-              <Button
-                variant="outline"
-                colorScheme="blue"
-                borderRadius="full"
-                onClick={() =>{
-                  console.log('Coba tanyakan: Apa produk terlaris hari ini?')
-                handleButtonClick('Apa produk terlaris hari ini?')
-                }
-                }
-              >
-                Apa produk terlaris hari ini?
-              </Button>
-              <Button
-                variant="outline"
-                colorScheme="blue"
-                borderRadius="full"
-                onClick={() =>{
-                  console.log(
-                    'Coba tanyakan: Berapa banyak produk yang telah terjual?'
-                  )
-                  handleButtonClick("Berapa banyak produk yang telah terjual?")}
-                }
-              >
-                Berapa banyak produk yang telah terjual?
-              </Button>
-              <Button
-                variant="outline"
-                colorScheme="blue"
-                borderRadius="full"
-                onClick={() =>{
-                  console.log('Coba tanyakan: Apakah ada promo hari ini?')
-                  handleButtonClick(" Apakah ada promo hari ini?")
-                }
-                }
-              >
-                Apakah ada promo hari ini?
-              </Button>
-            </Flex>
           </Box>
         )}
         {currentMessage && (
@@ -155,7 +111,6 @@ export const AiPage = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-
         />
         <Box
           paddingRight={'7px'}

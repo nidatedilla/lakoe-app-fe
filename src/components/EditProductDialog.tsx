@@ -24,10 +24,10 @@ import { product } from '../types/type-product';
 
 interface VariantInput {
   combination: { [key: string]: string };
-  price: string;
+  price: number | null;
   sku: string;
-  stock: string;
-  weight: string;
+  stock: number | null;
+  weight: number | null;
   photo: string;
 }
 
@@ -91,7 +91,13 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
       setLength(String(productData.length || ''));
       setWidth(String(productData.width || ''));
       setHeight(String(productData.height || ''));
-      setVariants(productData.variant || []);
+      setVariants(
+        (productData.variant || []).map((v) => ({
+          ...v,
+          sku: v.sku ?? '',
+          photo: v.photo ?? '',
+        }))
+      );
       setCategoryId(productData.categoryId || null);
       const previews = Array(5).fill(null);
       if (productData.attachments) {
@@ -227,8 +233,13 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
         onClose();
       }
     } catch (error: unknown) {
-      console.error('Error:', error.message);
-      toast.error(`Error: ${error.message}`);
+      if (error instanceof Error) {
+        console.error('Error:', error.message);
+        toast.error(`Error: ${error.message}`);
+      } else {
+        console.error('Error:', error);
+        toast.error('An unknown error occurred.');
+      }
     } finally {
       setLoading(false);
     }
@@ -443,7 +454,7 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
                     onVariantChange={(variantsData: VariantInput[]) =>
                       setVariants(variantsData)
                     }
-                    initialVariants={variants}
+                    // initialVariants={variants}
                   />
                 </Box>
 

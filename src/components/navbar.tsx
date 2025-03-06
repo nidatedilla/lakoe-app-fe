@@ -1,13 +1,4 @@
-import {
-  Box,
-  Flex,
-  Icon,
-  Text,
-  Button,
-  HStack,
-  VStack,
-} from '@chakra-ui/react';
-import { useLogout } from '../hooks/use-logout';
+import { Box, Flex, Icon, Text, HStack, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import {
   HiHome,
@@ -18,7 +9,6 @@ import {
   HiShoppingCart,
   HiOutlineUserCircle,
 } from 'react-icons/hi2';
-import { RiLogoutCircleRLine } from 'react-icons/ri';
 import { GoDotFill } from 'react-icons/go';
 import { LuSettings } from 'react-icons/lu';
 import { Link } from 'react-router';
@@ -49,7 +39,6 @@ const Navbar = () => {
   };
 
   const { User } = useGetMe();
-  const logout = useLogout();
 
   return (
     <Flex flexDirection={'column'} minH="100vh" maxH="100vh" py={2}>
@@ -104,9 +93,7 @@ const Navbar = () => {
           </Box>
         )}
 
-        {/* product */}
-
-        {User?.role == 'Seller' ? (
+        {User?.role == 'Seller' && User.stores ? (
           <Box display={'flex'} flexDirection={'row'} gap={2}>
             <Icon
               fontSize={'2xl'}
@@ -128,9 +115,7 @@ const Navbar = () => {
           </Box>
         ) : null}
 
-        {/* order */}
-
-        {User?.role == 'Seller' ? (
+        {User?.role == 'Seller' && User.stores ? (
           <Box display={'flex'} flexDirection={'row'} gap={2}>
             <Icon
               fontSize={'2xl'}
@@ -152,8 +137,6 @@ const Navbar = () => {
             </Text>
           </Box>
         ) : null}
-
-        {/* settings */}
 
         {User?.role == 'Seller' ? (
           <Box w={'full'}>
@@ -239,9 +222,7 @@ const Navbar = () => {
           </Box>
         ) : null}
 
-        {/* Profile */}
-
-        {User?.role == 'Seller' ? (
+        {User?.role == 'Seller' && User.stores ? (
           <Box display={'flex'} flexDirection={'row'} gap={2}>
             <Icon
               fontSize={'2xl'}
@@ -267,23 +248,6 @@ const Navbar = () => {
           </Box>
         ) : null}
       </Box>
-
-      {User ? (
-        <Box display={'flex'} justifyContent={'center'} mt={'auto'} mb={20}>
-          <Button
-            onClick={logout}
-            width={'90px'}
-            bg={'transparent'}
-            color={'black'}
-            fontSize={'16px'}
-          >
-            Logout
-            <Icon fontSize={'2xl'} color={'black'}>
-              <RiLogoutCircleRLine />
-            </Icon>
-          </Button>
-        </Box>
-      ) : null}
     </Flex>
   );
 };

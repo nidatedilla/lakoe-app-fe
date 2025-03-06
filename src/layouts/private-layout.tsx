@@ -1,14 +1,20 @@
-import { Box, Image } from '@chakra-ui/react';
-import Navbar from '../components/navbar';
+import { Box, Button, Icon, Image } from '@chakra-ui/react';
+import { useState } from 'react';
+import { RiArrowDropDownLine, RiLogoutCircleRLine } from 'react-icons/ri';
 import { Navigate, Outlet } from 'react-router';
+import Navbar from '../components/navbar';
 import { Avatar } from '../components/ui/avatar';
-import { AiPage } from '../pages/ai';
 import { useGetMe } from '../hooks/use-find-me';
+import { useLogout } from '../hooks/use-logout';
+import { AiPage } from '../pages/ai';
 
 const PrivateLayout = () => {
   const { User } = useGetMe();
+  const logout = useLogout();
+  const [showLogout, setShowLogout] = useState(false);
+
   if (!User) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/landing-page" replace />;
   }
 
   return (
@@ -31,9 +37,48 @@ const PrivateLayout = () => {
         bgGradient="to-r"
         gradientFrom="whiteAlpha.200"
         gradientTo="blue.100"
+        position="relative"
       >
         <Image src="src/assets/lakoe-logo.png" width="100px" />
-        <Avatar name="User" cursor="pointer" bg="gray.300" />
+        <Box
+          position="relative"
+          display="flex"
+          alignItems="center"
+          cursor="pointer"
+          onClick={() => setShowLogout(!showLogout)}
+        >
+          <Avatar name={User?.name} bg="gray.300" />
+          <Icon as={RiArrowDropDownLine} fontSize="2xl" color="black" />
+        </Box>
+        {showLogout && (
+          <Box
+            position="absolute"
+            top="90%"
+            right={6}
+            mt={2}
+            bg="white"
+            boxShadow="md"
+            borderRadius="md"
+            px={2}
+          >
+            <Button
+              zIndex={999}
+              onClick={logout}
+              width={'90px'}
+              bg={'transparent'}
+              color={'black'}
+              fontSize={'14px'}
+              display="flex"
+              alignItems="center"
+              gap={2}
+            >
+              Logout
+              <Icon fontSize={'md'} color={'black'}>
+                <RiLogoutCircleRLine />
+              </Icon>
+            </Button>
+          </Box>
+        )}
       </Box>
 
       <Box display="flex" flex="1" overflow="hidden">
@@ -51,7 +96,7 @@ const PrivateLayout = () => {
             <Outlet />
           </Box>
         </Box>
-        {User.role == 'Seller' ? (
+        {User?.role === 'Seller' ? (
           <Box
             width="30%"
             height="100vh"

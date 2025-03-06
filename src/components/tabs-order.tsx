@@ -33,14 +33,6 @@ export default function TabsOrder() {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   console.log('Orders:', orders);
-  console.log('Type of orders:', typeof orders);
-  console.log('Is Array:', Array.isArray(orders));
-
-  // useEffect(() => {
-  //   if (orders && orders.length > 0) {
-  //     setActiveTab("all");
-  //   }
-  // }, [orders]);
 
   if (isLoading)
     return (
@@ -53,7 +45,10 @@ export default function TabsOrder() {
         </Box>
       </Flex>
     );
-  if (error) return <Text>Error loading orders.</Text>;
+  if (error || !orders || !orders.data)
+    return (
+      <Text>Silahkan buat Toko terlebih dahulu di halaman pengaturan.</Text>
+    );
 
   const getOrderCountByStatus = (status: string) => {
     if (!Array.isArray(orders?.data)) return 0;

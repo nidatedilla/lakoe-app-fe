@@ -1,4 +1,4 @@
-import { Text, Icon, VStack, Box, HStack } from '@chakra-ui/react';
+import { Text, Icon, VStack, Box, HStack, Alert } from '@chakra-ui/react';
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import { useState } from 'react';
 import { MessageTemplate } from 'types/type-message';
 import { Button } from './ui/button';
+import { TbMessageOff } from 'react-icons/tb';
 
 interface DialogSendTemplateMessageProps {
   buyerName: string;
@@ -133,9 +134,19 @@ export default function DialogSendTemplateMessage({
                     </Box>
                   ))
                 ) : (
-                  <Text fontSize="md" color="gray.500">
-                    Tidak ada template tersedia.
-                  </Text>
+                  <VStack mb={3}>
+                    <TbMessageOff size={'70px'} color="gray" />
+                    <Text fontSize="md" color="gray.500" pb={3}>
+                      Belum ada template pesan yang tersedia.
+                    </Text>
+                    <Alert.Root status="warning" title="Warning">
+                      <Alert.Indicator />
+                      <Alert.Title>
+                        Silahkan buat template pesan terlebih dahulu di halaman
+                        pengaturan
+                      </Alert.Title>
+                    </Alert.Root>
+                  </VStack>
                 )}
 
                 <HStack gap={4} width="full">

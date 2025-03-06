@@ -1,18 +1,29 @@
 import {
   Box,
   createListCollection,
+  DialogCloseTrigger,
   Input,
   SelectContent,
   SelectItem,
   SelectRoot,
   SelectTrigger,
   SelectValueText,
-  DialogCloseTrigger,
   Text,
   VStack,
 } from '@chakra-ui/react';
 import { useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { IoIosArrowDown } from 'react-icons/io';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import { useCreateLocation } from '../hooks/use-create-locations';
+import { useGetMe } from '../hooks/use-find-me';
+import {
+  useFindDistricts,
+  useFindProvince,
+  useFindRegencies,
+  useFindVillages,
+} from '../services/get-region';
+import { useDialogStore } from '../store/dialog-store';
+import { Location } from '../types/type-location';
 import { Button } from './ui/button';
 import {
   DialogActionTrigger,
@@ -22,20 +33,8 @@ import {
   DialogHeader,
   DialogRoot,
   DialogTitle,
-  DialogTrigger,
 } from './ui/dialog';
 import { Field } from './ui/field';
-import { IoIosArrowDown } from 'react-icons/io';
-import {
-  useFindProvince,
-  useFindRegencies,
-  useFindDistricts,
-  useFindVillages,
-} from '../services/get-region';
-import { useCreateLocation } from '../hooks/use-create-locations';
-import { Location } from '../types/type-location';
-import { useGetMe } from '../hooks/use-find-me';
-import { useDialogStore } from '../store/dialog-store';
 
 const defaultPosition: [number, number] = [-6.2088, 106.8456];
 
@@ -57,7 +56,7 @@ export default function DialogAddLocation() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [type] = useState('origin');
-  const { isOpen, closeDialog, openDialog } = useDialogStore();
+  const { isOpen, closeDialog } = useDialogStore();
 
   const [position, setPosition] = useState<[number, number]>(defaultPosition);
 
@@ -161,11 +160,8 @@ export default function DialogAddLocation() {
     }
   };
 
-
   return (
     <DialogRoot open={isOpen}>
-      {' '}
-     
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Tambah Lokasi Baru</DialogTitle>

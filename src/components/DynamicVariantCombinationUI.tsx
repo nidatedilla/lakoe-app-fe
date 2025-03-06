@@ -18,10 +18,10 @@ import { Add, Delete } from '@mui/icons-material';
 
 interface Variant {
   combination: { [key: string]: string }; // Contoh: { Warna: "Merah", Ukuran: "L" }
-  price: string;
+  price: number | null;
   sku: string;
-  stock: string;
-  weight: string;
+  stock: number | null;
+  weight: number | null;
   photo: string; // Satu preview foto per varian
 }
 
@@ -49,10 +49,10 @@ const DynamicVariantCombinationUI: React.FC<
   const [openGlobalDialog, setOpenGlobalDialog] = useState(false);
   // Global setting untuk harga, SKU, stok, dan berat
   const [globalSettings, setGlobalSettings] = useState({
-    price: '',
+    price: null,
     sku: '',
-    stock: '',
-    weight: '',
+    stock: null,
+    weight: null,
   });
 
   // Panggil callback ketika varian berubah
@@ -156,10 +156,10 @@ const DynamicVariantCombinationUI: React.FC<
       });
       return {
         combination: combinationObj,
-        price: '',
+        price: null,
         sku: '',
-        stock: '',
-        weight: '',
+        stock: null,
+        weight: null,
         photo: '',
       };
     });
@@ -427,7 +427,7 @@ const DynamicVariantCombinationUI: React.FC<
                   value={variant.price}
                   onChange={(e) => {
                     const updated = [...variants];
-                    updated[index].price = e.target.value;
+                    updated[index].price = Number(e.target.value);
                     setVariants(updated);
                   }}
                   fullWidth
@@ -453,7 +453,7 @@ const DynamicVariantCombinationUI: React.FC<
                   value={variant.stock}
                   onChange={(e) => {
                     const updated = [...variants];
-                    updated[index].stock = e.target.value;
+                    updated[index].stock = Number(e.target.value);
                     setVariants(updated);
                   }}
                   fullWidth
@@ -466,7 +466,7 @@ const DynamicVariantCombinationUI: React.FC<
                   value={variant.weight}
                   onChange={(e) => {
                     const updated = [...variants];
-                    updated[index].weight = e.target.value;
+                    updated[index].weight = Number(e.target.value);
                     setVariants(updated);
                   }}
                   fullWidth
