@@ -1,29 +1,28 @@
 import {
   Box,
+  Button,
   Card,
   HStack,
+  Input,
   Stack,
   Strong,
   Text,
-  Button,
-  Input,
 } from '@chakra-ui/react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { LuCheck, LuSearch } from 'react-icons/lu';
+import Swal from 'sweetalert2';
 import { Avatar } from '../components/ui/avatar';
-import { useDialogAdmin } from '../store/dialog-store';
+import { InputGroup } from '../components/ui/input-group';
+import { useSuccessWithdrawal } from '../hooks/use-withdrawalts';
 import {
   useGetProcessingReqPayment,
   useGetSearchProcessingSeller,
 } from '../services/withdrawal';
-import { useSuccessWithdrawal } from '../hooks/use-withdrawalts';
-import toast from 'react-hot-toast';
-import Swal from 'sweetalert2';
-import { InputGroup } from '../components/ui/input-group';
-import { LuCheck, LuSearch, LuX } from 'react-icons/lu';
+import { useDialogAdmin } from '../store/dialog-store';
 import { Withdrawal } from '../types/type-withdrawal';
-import { useForm } from 'react-hook-form';
 
 export const CardProcessing = () => {
-  // const procesingSaller = withdrawals.filter((w) => w.status === 'Processing');
   const { openDialog } = useDialogAdmin();
   const { register, watch } = useForm({ defaultValues: { search: '' } });
   const searchValue = watch('search');
@@ -159,7 +158,7 @@ export const CardProcessing = () => {
               <Input {...register('search')} placeholder="Search Seller" />
             </InputGroup>
           </Box>
-          <Box  display={'flex'}>
+          <Box display={'flex'}>
             {withdrawalsToDisplay && withdrawalsToDisplay.length > 0
               ? withdrawalsToDisplay.map(renderWithdrawalCard)
               : renderEmptyState()}

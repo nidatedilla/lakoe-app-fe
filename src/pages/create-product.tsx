@@ -27,10 +27,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 interface Variant {
   combination: { [key: string]: string };
-  price: string;
+  price: number | null;
   sku: string;
-  stock: string;
-  weight: string;
+  stock: number | null;
+  weight: number | null;
   photo: string;
 }
 

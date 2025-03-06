@@ -6,10 +6,10 @@ import {
   Text,
   VStack,
   HStack,
-  Table,
   Badge,
   Input,
   Button,
+  Alert,
 } from '@chakra-ui/react';
 import {
   Chart as ChartJS,
@@ -23,7 +23,6 @@ import {
   Tooltip as ChartTooltip,
   Legend as ChartLegend,
 } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
 import { GiMoneyStack } from 'react-icons/gi';
 import { TbChecklist } from 'react-icons/tb';
 import { FaArrowDown } from 'react-icons/fa';
@@ -52,44 +51,6 @@ interface StatWidgetProps {
   title: string;
   value: string;
 }
-
-const products = [
-  { id: 1, product_name: 'Tas Wanita Elegan', sold_quantity: 120 },
-  { id: 2, product_name: 'Tas Ransel Pria', sold_quantity: 90 },
-  { id: 3, product_name: 'Tas Sekolah Anak', sold_quantity: 70 },
-  { id: 4, product_name: 'Tas Laptop', sold_quantity: 50 },
-  { id: 5, product_name: 'Tas Selempang Kecil', sold_quantity: 30 },
-  { id: 6, product_name: 'Tas Travel Besar', sold_quantity: 200 },
-  { id: 7, product_name: 'Tas Pinggang', sold_quantity: 150 },
-  { id: 8, product_name: 'Tas Tote Bag', sold_quantity: 80 },
-  { id: 9, product_name: 'Tas Kulit Premium', sold_quantity: 110 },
-  { id: 10, product_name: 'Tas Anyaman', sold_quantity: 60 },
-  { id: 11, product_name: 'Tas Pesta', sold_quantity: 40 },
-  { id: 12, product_name: 'Tas Olahraga', sold_quantity: 180 },
-];
-
-const top3Products = [...products]
-  .sort((a, b) => b.sold_quantity - a.sold_quantity)
-  .slice(0, 3);
-
-const pieChartData = {
-  labels: top3Products.map((product) => product.product_name),
-  datasets: [
-    {
-      data: top3Products.map((product) => product.sold_quantity),
-      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-    },
-  ],
-};
-
-const pieChartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: 'top' as const,
-    },
-  },
-};
 
 function StatWidget({ icon: Icon, title, value }: StatWidgetProps) {
   return (
@@ -141,8 +102,8 @@ export default function Dashboard() {
       storeId: User?.stores?.id || '',
     };
     Swal.fire({
-      title: 'Konfirmasi Withdrawal',
-      text: 'Apakah Anda yakin ingin withdrawal?',
+      title: 'Konfirmasi Pencairan Dana',
+      text: 'Apakah Anda yakin ingin melakukan pencairan dana?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -151,7 +112,7 @@ export default function Dashboard() {
       cancelButtonText: 'Batal',
     }).then((result) => {
       if (result.isConfirmed) {
-        const res = CreateWithdrawal(payload);
+        CreateWithdrawal(payload);
       }
     });
   };
@@ -161,6 +122,8 @@ export default function Dashboard() {
     month: 'long',
     day: 'numeric',
   });
+
+  const isStoreEmpty = !User?.stores;
 
   return (
     <Box bg={'white'} borderRadius="lg" p={6} m={4}>
@@ -179,6 +142,19 @@ export default function Dashboard() {
           {currentDate}
         </Badge>
       </VStack>
+
+      {isStoreEmpty && (
+        <Alert.Root status={'warning'} mt={6} borderRadius="md">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Profil Toko Belum Lengkap</Alert.Title>
+            <Alert.Description>
+              Mohon lengkapi informasi toko Anda di halaman pengaturan untuk
+              dapat mengelola produk, pesanan, dan fitur lainnya secara optimal.
+            </Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
+      )}
 
       <VStack mt={5} w={'full'}>
         <Grid
@@ -201,7 +177,7 @@ export default function Dashboard() {
             display={'flex'}
             justifyContent={'center'}
             alignItems={'center'}
-            gap={'20px'}
+            gap={'2'}
           >
             <Input
               borderRadius={'3xl'}
@@ -210,16 +186,15 @@ export default function Dashboard() {
               onChange={handleInputChange}
               borderColor={'black'}
               value={formattedNum}
-              width={'50%'}
+              width={'55%'}
             />
             <Button
-              colorScheme="blue"
+              colorPalette="blue"
               alignSelf={'center'}
               fontSize={'small'}
-              variant="solid"
-              borderRadius={'3xl'}
-              width={'35%'}
-              _hover={{ bg: 'blue.600' }}
+              borderRadius={'full'}
+              width={'40%'}
+              _hover={{ bg: 'blue.500' }}
               onClick={handleSubmit}
               _active={{ bg: 'blue.700' }}
               disabled={num <= 0 || User?.balance == 0}
@@ -234,46 +209,6 @@ export default function Dashboard() {
             value={User?.stores?.products?.length.toLocaleString() || '0'}
           />
         </Grid>
-
-        <HStack gap={4} alignItems="flex-start" w="full">
-          <Box flex={1} bg={'white'} borderRadius="lg" boxShadow="md" p={6}>
-            <Text mb={3} fontWeight={'medium'}>
-              Data Penjualan Bulanan
-            </Text>
-            <Box overflowX="auto" maxH="250px">
-              <Table.Root size="sm" striped>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.ColumnHeader>Nama Produk</Table.ColumnHeader>
-                    <Table.ColumnHeader>Terjual</Table.ColumnHeader>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {products.map((product) => (
-                    <Table.Row key={product.id}>
-                      <Table.Cell>{product.product_name}</Table.Cell>
-                      <Table.Cell>{product.sold_quantity}</Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Root>
-            </Box>
-          </Box>
-
-          <Box
-            width={'50%'}
-            h={'334px'}
-            bg={'white'}
-            borderRadius="lg"
-            boxShadow="md"
-            p={6}
-          >
-            <Text textAlign="center" mb={3} fontWeight="medium">
-              3 Produk Terlaris
-            </Text>
-            <Pie data={pieChartData} options={pieChartOptions} />
-          </Box>
-        </HStack>
       </VStack>
     </Box>
   );

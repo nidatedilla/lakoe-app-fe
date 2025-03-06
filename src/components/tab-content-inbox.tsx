@@ -8,16 +8,17 @@ export default function TabInbox() {
   const { User } = useGetMe();
   const { data: withdrawals, isLoading } = useGetUserWithdrawals(User?.id);
 
-
   return (
     <Box bg={'white'} borderRadius={'lg'} p={4}>
-      <Text fontSize="lg" fontWeight="bold" mb={4}>
-        Riwayat Withdrawal
+      <Text fontWeight={'medium'} fontSize={'16px'} mb={4}>
+        Riwayat Pencairan Dana
       </Text>
       {isLoading ? (
         <SkeletonText noOfLines={3} gap="4" />
       ) : !withdrawals?.length ? (
-        <Text>Belum ada riwayat withdrawal</Text>
+        <Text fontSize="small" color="gray.400">
+          Belum ada riwayat pencairan dana
+        </Text>
       ) : (
         <VStack gap={4} align="stretch">
           {withdrawals.map((withdrawal) => (
@@ -28,23 +29,19 @@ export default function TabInbox() {
               borderRadius="md"
               position="relative"
             >
-              <Badge
-                position="absolute"
-                top={2}
-                right={2}
-              >
+              <Badge position="absolute" top={2} right={2}>
                 {withdrawal.status}
               </Badge>
-              
+
               <VStack align="start" gap={2}>
                 <Text fontSize="lg" fontWeight="semibold">
                   Rp {withdrawal.amount.toLocaleString('id-ID')}
                 </Text>
-                
+
                 <Text fontSize="sm" color="gray.600">
                   {format(new Date(withdrawal.createdAt), 'dd MMM yyyy HH:mm')}
                 </Text>
-                
+
                 <Text fontSize="sm">
                   {withdrawal.message || 'Tidak ada pesan'}
                 </Text>

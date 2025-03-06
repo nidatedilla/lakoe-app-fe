@@ -6,8 +6,7 @@ import { CardSuccess } from '../components/Card-success';
 import { DialogDetailSeller } from '../components/dialog-detail-seller';
 import { useDialogAdmin } from '../store/dialog-store';
 export const DashboardAdminPage = () => {
-  const { isOpen } =
-    useDialogAdmin()
+  const { isOpen } = useDialogAdmin();
   return (
     <Box position="relative" minHeight={'100vh'} display={'flex'}>
       <Box display={'flex'} gap={'20px'} margin={'10'} flexDirection={'column'}>
@@ -24,25 +23,17 @@ export const DashboardAdminPage = () => {
           gap={'40px'}
           flexDirection={'column'}
         >
-          {/* pending */}
-
           <Box display={'flex'}>
             <CardPending />
           </Box>
-
-          {/* success */}
 
           <Box display={'flex'}>
             <CardSuccess />
           </Box>
 
-          {/* rejected */}
-
           <Box gap={'25px'} display={'flex'}>
             <CardRejected />
           </Box>
-
-          {/* procesing */}
 
           <Box display={'flex'}>
             <CardProcessing />

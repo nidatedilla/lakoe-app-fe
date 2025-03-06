@@ -17,9 +17,11 @@ export default function TabLocation() {
   const { User } = useGetMe();
   const [locations, setLocations] = useState<Location[]>([]);
   const { mutate: deleteLocation } = useDeleteLocation();
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    null
+  );
   const { openDialog, isOpen, dialogType } = useDialogStore();
-  const {mutate} =useUpdateMainLocation()
+  const { mutate } = useUpdateMainLocation();
 
   const handleDelete = (id: string) => {
     Swal.fire({
@@ -69,7 +71,14 @@ export default function TabLocation() {
         <Text fontSize="small" color="gray.400">
           Alamat ini akan digunakan sebagai alamat pengirimanmu
         </Text>
-        <Button onClick={() => handleOpenDialog('create', null)}>
+        <Button
+          bg={'blue.500'}
+          size={'sm'}
+          borderRadius={'full'}
+          height={'30px'}
+          color={'white'}
+          onClick={() => handleOpenDialog('create', null)}
+        >
           Tambah Lokasi
         </Button>
       </HStack>

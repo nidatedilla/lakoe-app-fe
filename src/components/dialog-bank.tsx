@@ -1,4 +1,4 @@
-import { Input, VStack } from '@chakra-ui/react';
+import { Alert, Input, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import {
@@ -10,7 +10,6 @@ import {
   DialogHeader,
   DialogRoot,
   DialogTitle,
-  DialogTrigger,
 } from './ui/dialog';
 import { Field } from './ui/field';
 
@@ -46,8 +45,8 @@ export default function DialogCreateBank() {
       const res = await createBankAcc(payload);
       closeDialog();
       console.log('res', res);
-    } catch (err: any) {
-      console.error('Error creating location:', err);
+    } catch (error) {
+      console.error('Error creating location:', error);
     }
   };
 
@@ -73,12 +72,19 @@ export default function DialogCreateBank() {
             {' '}
             {User?.stores?.bank_accounts == null ||
             User.stores?.bank_accounts == undefined
-              ? ' Buat akun bank baru'
+              ? 'Tambahkan Akun Bank'
               : 'Edit Akun Bank'}
           </DialogTitle>
         </DialogHeader>
         <DialogBody>
           <VStack gap={4}>
+            <Alert.Root status="warning" title="Warning">
+              <Alert.Indicator />
+              <Alert.Title>
+                Mohon masukkan informasi rekening bank yang valid. Rekening ini
+                akan digunakan untuk proses pencairan dana hasil penjualan Anda.
+              </Alert.Title>
+            </Alert.Root>
             <Field label="Nama Bank" required>
               <Input
                 onChange={(e) => setBank(e.target.value)}

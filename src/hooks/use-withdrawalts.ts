@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WithdrawalSeller } from '../types/type-withdrawal';
 import { Api } from '../libs/api';
 import toast from 'react-hot-toast';
+import { AxiosError } from 'axios';
 
 export const useCreateWithdrawal = (resetForm: () => void) => {
   const queryClient = useQueryClient();
@@ -12,16 +13,21 @@ export const useCreateWithdrawal = (resetForm: () => void) => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success('Berhasil melakaukan Withdrawal');
-      resetForm()
+      toast.success('Berhasil request pencairan dana');
+      resetForm();
       queryClient.invalidateQueries({ queryKey: ['withdrawalspending'] });
       queryClient.invalidateQueries({ queryKey: ['withdrawalsprocessing'] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to  withdrawal');
-      console.log(error.response?.data?.message);
-    }
+    onError: (error: unknown) => {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || 'Failed to withdrawal');
+        console.log(error.response?.data?.message);
+      } else {
+        toast.error('Failed to withdrawal');
+        console.log(error);
+      }
+    },
   });
   return mutation;
 };

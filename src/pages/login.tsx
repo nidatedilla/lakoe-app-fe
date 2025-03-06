@@ -2,7 +2,6 @@ import { Input, Box, Flex, Text, VStack } from '@chakra-ui/react';
 import { useLoginForm } from '../hooks/use-login';
 import { Button } from '../components/ui/button';
 import { Link } from 'react-router';
-import { FcGoogle } from 'react-icons/fc';
 
 export function LoginPage() {
   const { onSubmit, register, handleSubmit, errors, isLoading } =
@@ -56,7 +55,6 @@ export function LoginPage() {
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <VStack gapY={6}>
-                {/* Email Input */}
                 <Box w="full" textAlign="left">
                   <Text mb={2} fontWeight="semibold">
                     Email
@@ -76,7 +74,6 @@ export function LoginPage() {
                   )}
                 </Box>
 
-                {/* Password Input */}
                 <Box w="full" textAlign="left">
                   <Flex justify="space-between" align="center" mb={2}>
                     <Text fontWeight="semibold">Password</Text>
@@ -112,12 +109,6 @@ export function LoginPage() {
                   w="full"
                 >
                   Login
-                </Button>
-
-                {/* Login with Google */}
-                <Button variant="outline" size="lg" w="full">
-                  <FcGoogle />
-                  Continue with Google
                 </Button>
               </VStack>
             </form>

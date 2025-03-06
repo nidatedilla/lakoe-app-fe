@@ -21,7 +21,9 @@ export default function TabTemplateMessage() {
       {isLoading ? (
         <SkeletonText noOfLines={3} gap="4" />
       ) : templates.length === 0 ? (
-        <Text>Tidak ada template pesan.</Text>
+        <Text fontSize="small" color="gray.400">
+          Belum ada template pesan yang tersedia.
+        </Text>
       ) : (
         templates.map((template: MessageTemplate) => (
           <Box
