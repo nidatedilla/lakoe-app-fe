@@ -155,7 +155,7 @@ export default function DialogChangeShippingMethod({
                     <HStack justify="space-between" mb={3}>
                       <HStack gap={4}>
                         <Image
-                          src={`../src/assets/logo-${option.courierCode}.png`}
+                          src={`/images/logo-${option.courierCode}.png`}
                           alt={option.courierName}
                           w="80px"
                           h="40px"

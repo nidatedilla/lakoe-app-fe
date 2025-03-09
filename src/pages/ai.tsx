@@ -3,7 +3,6 @@ import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import React, { useState } from 'react';
-import lakoe from '../assets/lakoe-logo.png';
 import { Button } from '../components/ui/button';
 import { useAiChat } from '../hooks/use-ai-chat';
 
@@ -56,7 +55,7 @@ export const AiPage = () => {
           <Box textAlign="center">
             <Image
               marginLeft={'100px'}
-              src={lakoe}
+              src="/images/lakoe-logo.png"
               alt="AI Assistant"
               maxWidth="150px"
               maxHeight="150px"

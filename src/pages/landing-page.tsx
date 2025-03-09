@@ -24,7 +24,7 @@ export default function LandingPage() {
             gradientFrom="blue.100"
             gradientTo="whiteAlpha.700"
           >
-            <Image src="src/assets/lakoe-logo.png" width={'150px'} />
+            <Image src="/images/lakoe-logo.png" width={'150px'} />
             <HStack gap={4}>
               <Button
                 bg={'transparent'}

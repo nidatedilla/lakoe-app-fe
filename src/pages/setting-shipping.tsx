@@ -172,7 +172,7 @@ export default function ShippingSettings() {
                 <HStack flex="1" justify="space-between">
                   <HStack gap={6}>
                     <Image
-                      src={`src/assets/logo-${courier.courier_code}.png`}
+                      src={`/images/logo-${courier.courier_code}.png`}
                       alt={courier.courier_name}
                       w="100px"
                       h="50px"

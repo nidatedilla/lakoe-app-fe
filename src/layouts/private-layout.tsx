@@ -39,7 +39,7 @@ const PrivateLayout = () => {
         gradientTo="blue.100"
         position="relative"
       >
-        <Image src="src/assets/lakoe-logo.png" width="100px" />
+        <Image src="/images/lakoe-logo.png" width="100px" />
         <Box
           position="relative"
           display="flex"
