@@ -12,6 +12,7 @@ import {
   Box,
   Button,
 } from '@mui/material';
+import { apiURL } from '../utils/constants';
 
 // Tipe untuk kategori
 export type CategoryItem = {
@@ -68,7 +69,7 @@ const MultiColumnCategory: React.FC<MultiColumnCategoryProps> = ({
     const fetchCategories = async () => {
       try {
         const token = Cookies.get('token');
-        const response = await fetch('http://localhost:7000/api/category', {
+        const response = await fetch(`${apiURL}/category`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

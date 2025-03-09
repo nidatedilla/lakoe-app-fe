@@ -21,6 +21,7 @@ import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { product } from '../types/type-product';
+import { apiURL } from '../utils/constants';
 
 interface VariantInput {
   combination: { [key: string]: string };
@@ -187,16 +188,13 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
       formData.append('height', height);
 
       // Mengirim request PUT ke endpoint update produk
-      const response = await fetch(
-        `http://localhost:7000/api/product/${productData.id}`,
-        {
-          method: 'POST',
-          body: formData,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${apiURL}/product/${productData.id}`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();

@@ -55,7 +55,7 @@ export default function NewLandingPage() {
       >
         <Container maxW="7xl" py={3}>
           <Flex justify="space-between" align="center">
-            <Image src="src/assets/lakoe-logo.png" width={'120px'} />
+            <Image src="/images/lakoe-logo.png" width={'120px'} />
             <HStack gap={8} display={{ base: 'none', md: 'flex' }}>
               <Link to={'/login'}>
                 <Button variant="ghost" colorPalette="blue">
@@ -184,7 +184,7 @@ export default function NewLandingPage() {
             gap={8}
           >
             <VStack align="start" gap={6}>
-              <Image src="src/assets/lakoe-logo.png" width={'120px'} />
+              <Image src="/images/lakoe-logo.png" width={'120px'} />
               <Text fontSize="sm" color="blue.950">
                 Platform terpercaya untuk membangun dan mengembangkan bisnis
                 online Anda.

@@ -20,10 +20,9 @@ import MultiColumnCategory from '../components/MultiColumnCategory';
 import DynamicVariantCombinationUI from '../components/DynamicVariantCombinationUI';
 import Cookies from 'js-cookie';
 import { useStoreDomain } from '../hooks/use-store';
-
-// Import react-toastify
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { apiURL } from '../utils/constants';
 
 interface Variant {
   combination: { [key: string]: string };
@@ -158,7 +157,7 @@ function App() {
       formData.append('width', width);
       formData.append('height', height);
 
-      const response = await fetch('http://localhost:7000/api/product', {
+      const response = await fetch(`${apiURL}/product`, {
         method: 'POST',
         body: formData,
         headers: {
